@@ -3,7 +3,7 @@
 A single HTML file that records a student's conversation with an AI, exactly as it
 happens, and hands back one JSON file per student ready for analysis.
 
-**[Try it →](https://ohiomathteacher.github.io/verbatim/)** — nothing is uploaded, nothing
+**[Try it →](https://ohiomathteacher.github.io/verbatim-app/)** — nothing is uploaded, nothing
 is stored anywhere but your own browser.
 
 ## What it is for
@@ -40,7 +40,7 @@ One JSON file per student, conforming to a written schema:
 
 ## Making your own activity — without installing anything
 
-**[Open the setup page →](https://ohiomathteacher.github.io/verbatim/setup.html)**
+**[Open the setup page →](https://ohiomathteacher.github.io/verbatim-app/setup.html)**
 
 Fill in the title, the prompt, the questions at the end, a thumbnail and a footer, then press
 **Download the activity**. You get a single HTML file with all of it baked in — that file is
