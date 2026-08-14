@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Set up an activity · verbatim</title>
+<style>
+:root{
+  --paper:#f6f2ea; --card:#fffdf8; --ink:#221f1a; --muted:#726a5f; --rule:#e4dccd;
+  --accent:#2f5d6b; --ok:#4a7a55; --warn:#a8622e;
+  --shadow:0 1px 2px rgba(60,45,25,.05), 0 6px 20px -8px rgba(60,45,25,.14);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#16150f; --card:#1e1c16; --ink:#ece6d9; --muted:#9d968a; --rule:#332f26;
+  --accent:#8fc0cd; --ok:#8ab894; --warn:#d99a63;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -10px rgba(0,0,0,.5);
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.6}
+.wrap{max-width:820px;margin:0 auto;padding:44px 22px 130px}
+h1{font-family:var(--serif);font-size:31px;font-weight:600;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:10px 0 0;max-width:62ch}
+.mark{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--rule);margin:32px 0 0;flex-wrap:wrap}
+.tabs button{background:transparent;border:0;color:var(--muted);cursor:pointer;font-family:inherit;
+  font-size:14px;font-weight:600;padding:11px 15px;border-bottom:2px solid transparent}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.panel{display:none;padding:26px 0 0}
+.panel.on{display:block}
+label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 7px}
+input,textarea,select{width:100%;padding:11px 13px;border:1px solid var(--rule);border-radius:9px;
+  background:var(--card);color:var(--ink);font:inherit}
+textarea{resize:vertical;font-family:var(--mono);font-size:13px;line-height:1.6}
+textarea.prose{font-family:var(--sans);font-size:15px}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--accent);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)}
+.field{margin:0 0 20px}
+.hint{font-size:13.5px;color:var(--muted);margin:7px 0 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.row{grid-template-columns:1fr}}
+button.go{background:var(--ink);color:var(--paper);border:1px solid var(--ink);border-radius:10px;
+  padding:12px 20px;font:inherit;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule);
+  border-radius:10px;padding:12px 18px;font:inherit;font-weight:600;cursor:pointer}
+button:hover{border-color:var(--accent)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 94%,transparent);
+  backdrop-filter:blur(10px);border-top:1px solid var(--rule);padding:14px 22px}
+.bar .in{max-width:820px;margin:0 auto;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+.bar .msg{font-size:14px;color:var(--muted);margin-left:auto;max-width:46ch;text-align:right}
+.bar .msg.ok{color:var(--ok)} .bar .msg.bad{color:var(--warn)}
+.thumb{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.thumb img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--rule)}
+.note{border-left:3px solid var(--accent);padding:13px 16px;margin:0 0 22px;
+  background:var(--card);border-radius:0 9px 9px 0;font-size:14.5px;color:var(--muted)}
+.note b{color:var(--ink)}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.88em}
+:where(a,button,input,textarea,select):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="mark">verbatim</div>
+  <h1>Set up an activity</h1>
+  <p class="sub">Fill this in, then download the activity. That one file is what you give
+    your students — it already contains everything below, so there is nothing for them to
+    set up and nothing for you to install.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" data-p="activity"  aria-selected="true">Activity</button>
+    <button role="tab" data-p="prompt"    aria-selected="false">What the AI is told</button>
+    <button role="tab" data-p="questions" aria-selected="false">Questions at the end</button>
+    <button role="tab" data-p="about"     aria-selected="false">About</button>
+  </div>
+
+  <section class="panel on" id="p-activity">
+    <div class="row">
+      <div class="field"><label for="title">Title</label>
+        <input id="title"><p class="hint">Shown at the top of the page.</p></div>
+      <div class="field"><label for="titlezh">Title in 中文</label>
+        <input id="titlezh"><p class="hint">Used when a student switches language.</p></div>
+    </div>
+    <div class="field"><label for="subtitle">Opening paragraph</label>
+      <textarea id="subtitle" rows="4" class="prose"></textarea>
+      <p class="hint">The first thing a student reads. Say what they are about to do and what
+        to hand in.</p></div>
+    <div class="field"><label for="subtitlezh">Opening paragraph in 中文</label>
+      <textarea id="subtitlezh" rows="4" class="prose"></textarea></div>
+    <div class="row">
+      <div class="field"><label for="section">Section code</label>
+        <input id="section" placeholder="S4">
+        <p class="hint">Recorded with every session. Leave it empty to ask each student.</p></div>
+      <div class="field"><label for="lang">Language it opens in</label>
+        <select id="lang"><option value="en">English</option><option value="zh">中文</option></select>
+        <p class="hint">Students can switch either way at any time.</p></div>
+    </div>
+    <div class="field"><label for="footer">Footer line</label>
+      <input id="footer" placeholder="Riverside College · Calculus II · Dr Ada Shah">
+      <p class="hint">Identifies the course, so a student can see the page is yours.</p></div>
+    <div class="field"><label for="thumb">Thumbnail</label>
+      <div class="thumb">
+        <img id="thumbimg" alt="" style="display:none">
+        <input type="file" id="thumb" accept="image/*" style="flex:1;min-width:200px">
+        <button type="button" class="ghost" id="thumbclear">Remove</button>
+      </div>
+      <p class="hint">Stored inside the activity file, so it still shows with no internet.
+        A small image keeps the file small.</p></div>
+  </section>
+
+  <section class="panel" id="p-prompt">
+    <div class="note"><b>This is the activity.</b> Every student's AI teacher is given exactly
+      this, and it is recorded with each session, so what was asked is never in doubt.</div>
+    <div class="field"><label for="prompt">The prompt</label>
+      <textarea id="prompt" rows="22"></textarea></div>
+  </section>
+
+  <section class="panel" id="p-questions">
+    <div class="note">A list of questions in JSON. Each needs <code>id</code>,
+      <code>type</code> (<code>single</code>, <code>multi</code> or <code>text</code>),
+      <code>en</code> and <code>zh</code>; the first two also need <code>options</code>.
+      Checked before anything downloads.</div>
+    <div class="field"><label for="survey">The questions</label>
+      <textarea id="survey" rows="22"></textarea></div>
+  </section>
+
+  <section class="panel" id="p-about">
+    <p><b>verbatim</b> records a student's conversation with an AI as it happens and returns
+      one JSON file per student, ready for analysis. Every turn is labelled where it is
+      known — as it is made — so who said what is never inferred from the text afterwards.</p>
+    <p class="hint" id="about-build"></p>
+    <p style="margin-top:20px"><a href="https://github.com/OhioMathTeacher/verbatim"
+      target="_blank" rel="noopener">github.com/OhioMathTeacher/verbatim</a></p>
+    <p class="hint">The activity you download is a single file. Hand it out, put it on your
+      LMS, or serve it from a web address — all three work, and nothing is ever uploaded.</p>
+  </section>
+</div>
+
+<div class="bar"><div class="in">
+  <button class="go" id="download">Download the activity</button>
+  <button class="ghost" id="preview">Open a preview</button>
+  <button class="ghost" id="revert">Start from the example</button>
+  <span class="msg" id="msg"></span>
+</div></div>
+
+<script>
+const TEMPLATE = __TEMPLATE_JSON__;
+const D        = __DEFAULTS_JSON__;
+const $ = s => document.querySelector(s);
+const say = (t, cls) => { const m = $("#msg"); m.textContent = t; m.className = "msg " + (cls || ""); };
+
+for(const t of document.querySelectorAll(".tabs button")){
+  t.onclick = () => {
+    for(const o of document.querySelectorAll(".tabs button"))
+      o.setAttribute("aria-selected", String(o === t));
+    for(const p of document.querySelectorAll(".panel"))
+      p.classList.toggle("on", p.id === "p-" + t.dataset.p);
+  };
+}
+
+let avatar = D.avatar;
+function showThumb(){
+  const img = $("#thumbimg");
+  img.style.display = avatar ? "" : "none";
+  if(avatar) img.src = avatar;
+}
+function fillForm(d){
+  $("#title").value = d.title;          $("#titlezh").value = d.title_zh;
+  $("#subtitle").value = d.subtitle;    $("#subtitlezh").value = d.subtitle_zh;
+  $("#section").value = d.section;      $("#footer").value = d.footer;
+  $("#lang").value = d.lang;
+  $("#prompt").value = d.prompt.text;
+  $("#survey").value = JSON.stringify(d.survey, null, 2);
+  avatar = d.avatar; showThumb();
+}
+$("#thumb").onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { avatar = r.result; showThumb(); say("Thumbnail loaded.", "ok"); };
+  r.readAsDataURL(f);
+};
+$("#thumbclear").onclick = () => { avatar = ""; $("#thumb").value = ""; showThumb(); };
+$("#revert").onclick = () => { fillForm(D); say("Back to the example activity.", "ok"); };
+
+function validateSurvey(v){
+  if(!Array.isArray(v) || !v.length) return "The questions should be a list, and not empty.";
+  for(const q of v){
+    if(!q || !q.id || !q.en || !q.zh || !q.type) return "Every question needs id, type, en and zh.";
+    if(["single","multi","text"].indexOf(q.type) < 0) return "Unknown question type: " + q.type;
+    if(q.type !== "text" && !(Array.isArray(q.options) && q.options.length))
+      return "This question needs options: " + q.id;
+  }
+  return "";
+}
+
+/* A digest of the prompt, so a session can show which activity produced it. It needs a
+   secure context; over plain http it is recorded as null rather than invented, and the
+   prompt text itself is stored verbatim either way. */
+async function sha256(t){
+  try{
+    const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t));
+    return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join("");
+  }catch(e){ return null; }
+}
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/* The same substitutions the command-line builder makes, against the same tokens, so the
+   two cannot produce different pages from the same answers. */
+async function compose(){
+  const text = $("#prompt").value.trim();
+  if(text.length < 200) throw new Error("That looks too short to be the activity prompt.");
+  let survey;
+  try{ survey = JSON.parse($("#survey").value); }
+  catch(e){ throw new Error("The questions are not valid JSON: " + e.message); }
+  if(survey && survey.questions) survey = survey.questions;
+  const bad = validateSurvey(survey);
+  if(bad) throw new Error(bad);
+
+  const title = $("#title").value.trim() || "AI activity";
+  const sub   = $("#subtitle").value.trim();
+  const prompt = { id: "setup", source: "instructor", sha256: await sha256(text), text: text };
+
+  return TEMPLATE
+    .split("__PROVIDERS_JSON__").join(JSON.stringify(D.providers))
+    .split("__PROMPT_JSON__").join(JSON.stringify(prompt))
+    .split("__SUBMIT_JSON__").join(JSON.stringify(D.submit))
+    .split("__CHAT_JSON__").join(JSON.stringify(D.chat_url))
+    .split("__AVATAR_JSON__").join(JSON.stringify(avatar || ""))
+    .split("__FOOTER_JSON__").join(JSON.stringify($("#footer").value.trim()))
+    .split("__TITLE_JSON__").join(JSON.stringify(title))
+    .split("__SUBTITLE_JSON__").join(JSON.stringify(sub))
+    .split("__LANG_JSON__").join(JSON.stringify($("#lang").value))
+    .split("__SECTION_JSON__").join(JSON.stringify($("#section").value.trim().toUpperCase()))
+    .split("__SURVEY_JSON__").join(JSON.stringify(survey))
+    .split("__TITLE_ZH_JSON__").join(JSON.stringify($("#titlezh").value.trim() || title))
+    .split("__SUBTITLE_ZH_JSON__").join(JSON.stringify($("#subtitlezh").value.trim() || sub))
+    .split("__DEMO_JSON__").join("false")
+    .split("__TITLE__").join(esc(title))
+    .split("__SUBTITLE__").join(esc(sub));
+}
+
+function slug(s){
+  const t = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return (t || "activity").slice(0, 48);
+}
+$("#download").onclick = async () => {
+  try{
+    const html = await compose();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+    a.download = slug($("#title").value) + ".html";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    say("Downloaded " + a.download + " — that is the file to give your students.", "ok");
+  }catch(e){ say(e.message, "bad"); }
+};
+$("#preview").onclick = async () => {
+  try{
+    const url = URL.createObjectURL(new Blob([await compose()], { type: "text/html;charset=utf-8" }));
+    window.open(url, "_blank", "noopener");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    say("Preview opened in a new tab.", "ok");
+  }catch(e){ say(e.message, "bad"); }
+};
+
+fillForm(D);
+$("#about-build").textContent = "Built from the activity template of " + D.built
+  + ". It fills in exactly the same fields the command-line builder does.";
+</script>

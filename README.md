@@ -38,7 +38,18 @@ One JSON file per student, conforming to a written schema:
   be matched up afterwards.
 - **Codes, never names.** The filename carries participant, group and section only.
 
-## Running it
+## Making your own activity — without installing anything
+
+**[Open the setup page →](https://ohiomathteacher.github.io/verbatim/setup.html)**
+
+Fill in the title, the prompt, the questions at the end, a thumbnail and a footer, then press
+**Download the activity**. You get a single HTML file with all of it baked in — that file is
+what you give your students. Nothing to install, no command line.
+
+It is the same generator as below, running in the browser: it fills in the same template
+through the same fields, so the two cannot produce different pages from the same answers.
+
+## Running it from the command line
 
 ```bash
 # build the page for a class
@@ -55,7 +66,9 @@ python3 make_session_capture.py --demo
 Hand out the resulting file, or serve it. Both work: a page opened directly from a file
 sends `Origin: null`, and every provider offered accepts that.
 
-`--help` lists the rest: branding, language, submission, provider selection.
+`--help` lists the rest: branding, language, submission, provider selection. Every build also
+writes `setup.html` beside the activity, so the browser builder always carries the template it
+was built from.
 
 ## Changing the activity without rebuilding
 

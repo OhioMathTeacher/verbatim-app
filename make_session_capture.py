@@ -1975,6 +1975,29 @@ applyLang();
 """
 
 
+SETUP_SRC = HERE / "setup.src.html"
+
+
+def build_setup(defaults: dict) -> str:
+    """The same generator, in the browser.
+
+    A teacher who wants a different prompt, different questions, their own title
+    and their own thumbnail should not need Python to get them. setup.html embeds
+    the student template with its tokens still in place and fills them in exactly
+    as build() does -- same template, same tokens, so the two cannot disagree.
+
+    It ships beside the activity rather than inside it, so the page students open
+    carries no teacher controls at all.
+    """
+    def js(obj):
+        # </script> inside a JS string literal would close the block it sits in
+        return json.dumps(obj, ensure_ascii=False).replace("</script", "<\\/script")
+
+    return (SETUP_SRC.read_text(encoding="utf-8")
+            .replace("__TEMPLATE_JSON__", js(TEMPLATE))
+            .replace("__DEFAULTS_JSON__", js(defaults)))
+
+
 def load_prompt(path: Path) -> dict:
     """Read the activity prompt, dropping the instructions addressed to students.
 
@@ -2024,18 +2047,23 @@ def check(provs: list[dict]) -> int:
     return 0 if ok else 1
 
 
-def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
-          avatar: str, footer: str, lang: str, section: str, title_zh: str,
-          subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str) -> str:
-    # Deliberately NOT published to the page: url and key. The page names a
-    # provider; serve_collect.py holds the credential and does the calling.
-    pub = [{"id": p["id"], "label": p["label"], "model": p["model"],
+def pub_providers(providers: list[dict]) -> list[dict]:
+    """What the page is allowed to know about a provider: never a key."""
+    return [{"id": p["id"], "label": p["label"], "model": p["model"],
             "blurb": p.get("blurb", ""), "blurb_zh": p.get("blurb_zh", ""),
             "recommended": bool(p.get("recommended")),
             "tier": p.get("tier", "paid"), "api": p.get("api", "openai"),
             "url": p["url"], "key_url": p.get("key_url", ""),
             "prefix": p.get("prefix", ""),
             "placeholder": p.get("placeholder", "")} for p in providers]
+
+
+def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
+          avatar: str, footer: str, lang: str, section: str, title_zh: str,
+          subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str) -> str:
+    # Deliberately NOT published to the page: url and key. The page names a
+    # provider; the student supplies the credential.
+    pub = pub_providers(providers)
     return (TEMPLATE
             .replace("__PROVIDERS_JSON__", json.dumps(pub, ensure_ascii=False))
             .replace("__PROMPT_JSON__", json.dumps(prompt, ensure_ascii=False))
@@ -2174,7 +2202,22 @@ def main() -> int:
     a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.lang, a.section.strip().upper(),
                            a.title_zh, a.subtitle_zh, survey, a.demo, a.title, subtitle), encoding="utf-8")
 
+    # The builder ships with the activity so a teacher can make their own without
+    # Python. It embeds this exact template, so the two stay in step by construction.
+    setup_out = a.out.parent / "setup.html"
+    if SETUP_SRC.exists() and not a.demo:
+        setup_out.write_text(build_setup({
+            "providers": pub_providers(provs), "submit": submit, "chat_url": a.chat_url,
+            "avatar": avatar, "footer": a.footer, "title": a.title, "title_zh": a.title_zh,
+            "subtitle": subtitle, "subtitle_zh": a.subtitle_zh, "lang": a.lang,
+            "section": a.section.strip().upper(), "prompt": prompt, "survey": survey,
+            "built": prompt["sha256"][:12],
+        }), encoding="utf-8")
+
     print(f"wrote {a.out}  ({a.out.stat().st_size/1024:.0f} KB)")
+    if SETUP_SRC.exists() and not a.demo:
+        print(f"wrote {setup_out}  ({setup_out.stat().st_size/1024:.0f} KB)  "
+              f"— the browser builder, for making an activity without Python")
     print(f"  prompt            : {prompt['id']}  sha256 {prompt['sha256'][:12]}…  "
           f"{len(prompt['text'])} chars")
     print(f"  survey            : {len(survey)} question(s)" if survey else "  survey            : (none)")
