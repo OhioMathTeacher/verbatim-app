@@ -697,9 +697,9 @@ if(FOOTER){ $("#foottext").textContent = FOOTER; $("#foot").classList.remove("hi
 
 
 /* ---------- language ----------
-   SCUPI teaches in English, but students write in both, so the whole interface
-   switches. The choice persists for the tab; it does not change what language the
-   AI teacher replies in -- that follows whatever the student writes. */
+   A course may be taught in one language while students write in another, so the
+   whole interface switches and the choice persists for the tab. It also sets the
+   language the AI teacher is asked to work in; see apiMessages(). */
 const I18N = {
   en: {
     title: __TITLE_JSON__, subtitle: __SUBTITLE_JSON__,
@@ -1424,7 +1424,7 @@ async function turnFromAI(){
    a provider id and nothing else. Same-origin, so CORS does not arise either. */
 /* The browser calls the provider directly, using the key the student entered.
    Nothing is baked into this file and nothing is proxied, so the page is a plain
-   static file that Zheng can hand out however suits him.
+   static file that can be handed out however suits the course.
 
    Two request shapes: OpenAI-compatible (everything here, plus any local server)
    and Gemini, which uses its own body and an x-goog-api-key header. Google also
