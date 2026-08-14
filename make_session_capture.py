@@ -771,7 +771,6 @@ const I18N = {
     toolerrfields: "Every question needs id, type, en and zh.",
     toolerrtype: "Unknown question type: ",
     toolerropts: "This question needs options: ",
-    testing: "Testing…", connected: "Connected. The AI replied: ", notconnected: "Could not connect: "
   },
   zh: {
     title: __TITLE_ZH_JSON__,
@@ -844,7 +843,6 @@ const I18N = {
     toolerrfields: "\u6bcf\u9053\u95ee\u9898\u90fd\u9700\u8981 id\u3001type\u3001en \u548c zh\u3002",
     toolerrtype: "\u672a\u77e5\u7684\u95ee\u9898\u7c7b\u578b\uff1a",
     toolerropts: "\u8be5\u95ee\u9898\u9700\u8981 options\uff1a",
-    testing: "正在测试……", connected: "连接成功。AI 回复：", notconnected: "无法连接："
   }
 };
 let lang = (() => { try{ return localStorage.getItem("tea.lang") || __LANG_JSON__; }catch(e){ return __LANG_JSON__; } })();
