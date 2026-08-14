@@ -1,0 +1,11 @@
+[
+  {
+    "id": "alkimi",
+    "label": "Alkimi",
+    "blurb": "Miami AI pilot · US-hosted, not reachable from mainland China",
+    "url": "https://REPLACE-WITH-ALKIMI-BASE/v1/chat/completions",
+    "model": "REPLACE-WITH-MODEL",
+    "env": "ALKIMI_API_KEY",
+    "test_only": true
+  }
+]
