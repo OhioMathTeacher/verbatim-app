@@ -104,6 +104,21 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .who{display:block;font-family:var(--sans);font-size:10.5px;font-weight:700;
   letter-spacing:.15em;text-transform:uppercase;margin:0 0 8px}
 .turn.ai .who{color:var(--ai)} .turn.student .who{color:var(--stu)}
+
+/* The report. What the student just handed in, rendered from the session already
+   in memory -- no file to reopen, no page to visit, so it works from a disk and
+   on a network that does not reach anything. Timings appear here and nowhere in
+   the activity itself: showing a clock during the work would make them hurry,
+   but afterwards it is simply what the record says about them. */
+#report{margin:26px 0 0;border-top:1px solid var(--rule);padding:22px 0 0}
+#report .turn{animation:none}
+#report .rmeta{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);
+  margin:9px 0 0;white-space:normal}
+#report h3{font-family:var(--serif);font-size:17px;font-weight:600;margin:26px 0 10px}
+#report .qa{margin:0 0 13px}
+#report .qa .q{display:block;font-size:14.5px;margin:0 0 3px}
+#report .qa .a{display:block;font-family:var(--mono);font-size:13px;color:var(--muted);
+  overflow-wrap:anywhere}
 .dots span{display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;
   background:var(--ai);opacity:.35;animation:blink 1.3s infinite}
 .dots span:nth-child(2){animation-delay:.18s} .dots span:nth-child(3){animation-delay:.36s}
@@ -339,9 +354,12 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
     <p class="err" id="done-note"></p>
     <p style="margin:26px 0 0">
       <button id="to-survey" class="hide" data-i18n="answerq">Answer the questions</button>
+      <button id="see-report" class="ghost" data-i18n="seereport">See what you handed in</button>
       <button id="redownload" class="ghost" data-i18n="dlcopy">Download the file again</button>
       <button id="resume" class="ghost" data-i18n="backconv">Back to the conversation</button>
     </p>
+
+    <div id="report" class="hide"></div>
   </div>
 </section>
 
@@ -528,6 +546,9 @@ const I18N = {
     recvmsg: "Your instructor has your session. There is nothing else to do.",
     savedmsg: "Your conversation has downloaded as a JSON file. Hand it in the way your instructor asked \u2014 by email, on the LMS, or however else they set up \u2014 for class credit.",
     turns: "turns", turn1: "turn", wordsfrom: "words from you", wordsai: "from the AI",
+    seereport: "See what you handed in", hidereport: "Hide what you handed in",
+    youranswers: "Your answers", noanswers: "You did not answer the questions.",
+    rreplied: "replied in", rtyped: "typed for", word1: "word", wordn: "words",
     cardlocaldesc: "Running on your own machine.",
     cardfound: "model(s) found. Click to use.",
     addserver: "Add a server", addserverdesc: "Type the address of an OpenAI-compatible model you are running.",
@@ -600,6 +621,9 @@ const I18N = {
     recvmsg: "老师已收到你的会话。无需其他操作。",
     savedmsg: "\u4f60\u7684\u5bf9\u8bdd\u5df2\u4e0b\u8f7d\u4e3a JSON \u6587\u4ef6\u3002\u8bf7\u6309\u8001\u5e08\u8981\u6c42\u7684\u65b9\u5f0f\u63d0\u4ea4 \u2014\u2014 \u90ae\u4ef6\u3001\u6559\u5b66\u5e73\u53f0\u6216\u5176\u4ed6\u65b9\u5f0f \u2014\u2014 \u4f5c\u4e3a\u672c\u6b21\u8bfe\u7684\u6210\u7ee9\u3002",
     turns: "轮对话", turn1: "轮对话", wordsfrom: "个词来自你", wordsai: "来自 AI",
+    seereport: "查看你提交的内容", hidereport: "收起提交的内容",
+    youranswers: "你的回答", noanswers: "你没有回答这些问题。",
+    rreplied: "回复用时", rtyped: "输入用时", word1: "个词", wordn: "个词",
     cardlocaldesc: "在你自己的电脑上运行。",
     cardfound: "个模型可用。点击使用。",
     addserver: "添加服务器", addserverdesc: "输入你正在运行的 OpenAI 兼容模型的地址。",
@@ -644,6 +668,10 @@ function applyLang(){
   // while standing on it would otherwise leave the last thing a student reads in
   // the language they just switched away from.
   if(S && !$("#s-done").classList.contains("hide")) fillDone();
+  // The report's button says what it will do next, so its label depends on state
+  // rather than on a single key -- the loop above cannot know which one is right.
+  if($("#report")) $("#see-report").textContent =
+    tr($("#report").classList.contains("hide") ? "seereport" : "hidereport");
   // Same for the survey, whose questions come from survey.json and so are built
   // rather than translated in place. Answers already given are carried across --
   // re-rendering must not cost a student what they have filled in.
@@ -1652,7 +1680,101 @@ function fillDone(){
   const aw = S.turns.filter(t => t.role === "ai").reduce((a, t) => a + t.word_count, 0);
   $("#done-stats").textContent = turnCount(S.turns.length) + " · "
                                + sw + " " + tr("wordsfrom") + " · " + aw + " " + tr("wordsai");
+  if(!$("#report").classList.contains("hide")) fillReport();
 }
+
+/* The report, drawn from S rather than from the file that was just written.
+
+   The file and this view are the same session by construction -- S is what was
+   serialised -- so there is nothing to load and nothing that can go stale, and
+   it works with no network at all. That matters more than it sounds: a student
+   handed a single HTML file on a disk has no other page to open, and the class
+   this was built for may not reach anything outside it.
+
+   The survey is shown as questions, not as ids. reader.html cannot do that,
+   because a session file records answers and not the wording; this page still
+   has SURVEY, so it can say what was asked. */
+const ms1 = n => n == null ? null : (n >= 10000 ? Math.round(n / 1000) + "s"
+                                                : (n / 1000).toFixed(1) + "s");
+function answerText(q, v){
+  if(v == null || v === "") return null;
+  if(typeof v === "string") return v;
+  const label = id => {
+    const o = (q.options || []).find(x => x.v === id);
+    return o ? ((lang === "zh" && o.zh) ? o.zh : o.en) : id;
+  };
+  const sel = Array.isArray(v.selected) ? v.selected
+            : (v.selected == null ? [] : [v.selected]);
+  let out = sel.map(label).join(lang === "zh" ? "、" : ", ");
+  if(v.specify && typeof v.specify === "object"){
+    const extra = Object.entries(v.specify).filter(([, t]) => t !== "" && t != null)
+                                           .map(([, t]) => t);
+    if(extra.length) out += (out ? " — " : "") + extra.join("; ");
+  }
+  return out || null;
+}
+function fillReport(){
+  const box = $("#report");
+  box.innerHTML = "";
+  const add = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(text != null) e.textContent = text;
+    box.appendChild(e); return e;
+  };
+
+  for(const t of S.turns){
+    const d = document.createElement("div");
+    d.className = "turn " + t.role;
+    const w = document.createElement("span");
+    w.className = "who";
+    w.textContent = t.role === "ai" ? tr("aiteacher") : tr("you");
+    d.appendChild(w);
+    d.appendChild(document.createTextNode(t.text));
+    const bits = [];
+    if(t.role === "ai" && t.latency_ms != null) bits.push(tr("rreplied") + " " + ms1(t.latency_ms));
+    if(t.role === "student" && t.compose_ms != null) bits.push(tr("rtyped") + " " + ms1(t.compose_ms));
+    if(t.word_count != null) bits.push(t.word_count + " " + tr(t.word_count === 1 ? "word1" : "wordn"));
+    if(bits.length){
+      const m = document.createElement("span");
+      m.className = "rmeta"; m.textContent = bits.join("  ·  ");
+      d.appendChild(m);
+    }
+    box.appendChild(d);
+  }
+
+  const answers = (S.survey && S.survey.answers) || null;
+  if(SURVEY.length){
+    add("h3", null, tr("youranswers"));
+    const asked = SURVEY.filter(q => answers && answerText(q, answers[q.id]) != null);
+    if(!asked.length){
+      add("p", "hint", tr("noanswers"));
+    } else {
+      for(const q of asked){
+        const wrap = document.createElement("div"); wrap.className = "qa";
+        const qq = document.createElement("span"); qq.className = "q";
+        qq.textContent = (lang === "zh" && q.zh) ? q.zh : q.en;
+        const aa = document.createElement("span"); aa.className = "a";
+        aa.textContent = answerText(q, answers[q.id]);
+        wrap.appendChild(qq); wrap.appendChild(aa); box.appendChild(wrap);
+      }
+    }
+  }
+
+  const det = document.createElement("details");
+  const sum = document.createElement("summary");
+  sum.textContent = tr("whatai");
+  const pre = document.createElement("pre");
+  pre.textContent = S.activity_prompt.text;
+  det.appendChild(sum); det.appendChild(pre); box.appendChild(det);
+}
+$("#see-report").onclick = () => {
+  const box = $("#report"), showing = box.classList.contains("hide");
+  if(showing) fillReport();
+  box.classList.toggle("hide", !showing);
+  $("#see-report").textContent = tr(showing ? "hidereport" : "seereport");
+  if(showing) box.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 
 /* Submission. The page is served from the instructor's machine on the classroom
    LAN, so it posts straight back there and the file never leaves the room. If
