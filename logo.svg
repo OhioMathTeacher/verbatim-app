@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="verbatim">
+  <title>verbatim</title>
+  <!-- Two speakers, both recorded, told apart. The colours are the ones the activity
+       already uses for turns: the AI teacher in teal, the student in terracotta, and
+       the larger bubble is the AI because that is what the data shows.
+
+       The separation is a cut rather than a stroke in the background colour, so the
+       mark holds on paper, on ink, and on anything between. -->
+  <mask id="vb-gap">
+    <rect width="64" height="64" fill="#fff"/>
+    <path d="M30 30 H53 a8 8 0 0 1 8 8 V46 a8 8 0 0 1 -8 8 H48 l1 7 -10 -7 H30 a8 8 0 0 1 -8 -8 V38 a8 8 0 0 1 8 -8 Z"
+          fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/>
+  </mask>
+  <path mask="url(#vb-gap)"
+        d="M11 5 H36 a8 8 0 0 1 8 8 V26 a8 8 0 0 1 -8 8 H11 a8 8 0 0 1 -8 -8 V13 a8 8 0 0 1 8 -8 Z"
+        fill="var(--vb-ai, #2f5d6b)"/>
+  <path d="M30 30 H53 a8 8 0 0 1 8 8 V46 a8 8 0 0 1 -8 8 H48 l1 7 -10 -7 H30 a8 8 0 0 1 -8 -8 V38 a8 8 0 0 1 8 -8 Z"
+        fill="var(--vb-stu, #9a5734)"/>
+</svg>
