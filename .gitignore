@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 providers.local.json
 session_capture.html
+verbatim-user-manual.docx
+verbatim-user-manual.pdf
+.~lock.*#
