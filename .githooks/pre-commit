@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Refuse to commit a manual that still carries what its crops were meant to remove.
+#
+# Cropping in Word and Google Docs hides pixels, it does not delete them, and a
+# fresh export brings the originals back every time. The document looks right on
+# every page while `pdfimages` pulls the name straight back out. Checking by eye
+# cannot catch that, so it is checked here instead.
+#
+# Install once:  git config core.hooksPath .githooks
+set -euo pipefail
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.pdf$' || true)
+[ -z "$staged" ] && exit 0
+
+for f in $staged; do
+  [ -f "$f" ] || continue
+  if ! python3 publish_manual.py --check-only "$f" >/tmp/manual-check.$$ 2>&1; then
+    echo
+    cat /tmp/manual-check.$$
+    echo
+    echo "refusing to commit $f"
+    echo "  Rebuild it:  python3 publish_manual.py"
+    echo "  Then:        git add $f && git commit"
+    rm -f /tmp/manual-check.$$
+    exit 1
+  fi
+  rm -f /tmp/manual-check.$$
+done
