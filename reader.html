@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Read a session · verbatim</title>
+<!--
+  Read a session file.
+
+  The activity hands a student a JSON file. That file is the research record, and
+  JSON is not a thing you can ask a colleague to read. This turns one into a
+  transcript: who said what, in order, with the AI and the student told apart the
+  same way the activity tells them apart.
+
+  Nothing is uploaded. The file is read in the browser with FileReader and never
+  leaves the machine -- which matters, because these files are research data and
+  the people reading them are not always the people who collected them. Open this
+  page from a URL or from a disk; both work, and neither sends anything.
+
+  It is deliberately not the activity: no keys, no providers, no network at all.
+-->
+<style>
+:root{
+  --paper:#f6f2ea; --card:#fffdf8; --ink:#221f1a; --muted:#726a5f; --rule:#e4dccd;
+  --ai:#2f5d6b; --ai-bg:#eef4f5; --ai-edge:#cfe0e3;
+  --stu:#9a5734; --stu-bg:#fbf0e7; --stu-edge:#eed7c3;
+  --accent:#9a5734; --ok:#4a7a55;
+  --shadow:0 1px 2px rgba(60,45,25,.05), 0 6px 20px -8px rgba(60,45,25,.14);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC","Noto Serif CJK SC","Noto Serif SC",serif;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%}
+.wrap{max-width:860px;margin:0 auto;padding:34px 20px 90px}
+header{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+h1{font-family:var(--serif);font-size:27px;font-weight:600;margin:0;line-height:1.25;flex:1 1 auto}
+h2{font-family:var(--serif);font-size:19px;font-weight:600;margin:34px 0 10px}
+.sub{color:var(--muted);font-size:14.5px;margin:8px 0 0}
+button{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--rule);
+  border-radius:9px;padding:8px 15px;cursor:pointer;box-shadow:var(--shadow)}
+button:hover{border-color:var(--accent);color:var(--accent)}
+hr{border:0;border-top:1px solid var(--rule);margin:20px 0 0}
+
+/* Drop target. A file picker as well, because dragging is not available to
+   everyone and a research tool should not require a mouse. */
+#drop{margin:26px 0 0;border:1.5px dashed var(--rule);border-radius:14px;background:var(--card);
+  padding:44px 24px;text-align:center;transition:border-color .15s,background .15s}
+#drop.over{border-color:var(--accent);background:#fbf5ec}
+#drop p{margin:0 0 14px;color:var(--muted)}
+#err{color:#9a3324;margin:16px 0 0;font-size:14.5px}
+
+/* Header facts. Everything a reader needs to know before the first turn. */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:18px 0 0}
+.fact{background:var(--card);border:1px solid var(--rule);border-radius:11px;padding:11px 13px}
+.fact .k{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fact .v{display:block;font-family:var(--mono);font-size:13.5px;margin:3px 0 0;word-break:break-word}
+
+/* Turns. The AI and the student are told apart by colour, by side, and by a
+   written label -- three ways, because colour alone fails for some readers and
+   in print. */
+.turn{margin:16px 0 0;display:flex}
+.turn.student{justify-content:flex-end}
+.bubble{max-width:86%;border-radius:14px;padding:13px 16px;border:1px solid;box-shadow:var(--shadow)}
+.ai     .bubble{background:var(--ai-bg);border-color:var(--ai-edge)}
+.student .bubble{background:var(--stu-bg);border-color:var(--stu-edge)}
+.who{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;margin:0 0 5px}
+.ai      .who{color:var(--ai)}
+.student .who{color:var(--stu)}
+.text{white-space:pre-wrap;overflow-wrap:anywhere}
+.meta{margin:7px 0 0;font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+table{border-collapse:collapse;width:100%;background:var(--card);border:1px solid var(--rule);
+  border-radius:11px;overflow:hidden;font-size:14.5px}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto}
+details{margin:12px 0 0}
+summary{cursor:pointer;color:var(--muted);font-size:13.5px;font-weight:600}
+pre{font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;background:var(--card);
+  border:1px solid var(--rule);border-radius:9px;padding:13px;max-height:320px;overflow:auto}
+.hide{display:none !important}
+@media (max-width:520px){ .bubble{max-width:100%} .wrap{padding:22px 14px 70px} }
+</style>
+
+<div class="wrap">
+<header>
+  <h1 data-i18n="title">Read a session</h1>
+  <button id="lang">中文</button>
+</header>
+<p class="sub" data-i18n="sub">Open a session file from the activity. It is read here, in this browser — nothing is uploaded.</p>
+
+<div id="drop">
+  <p data-i18n="droph">Drop a <code>session_….json</code> file here</p>
+  <button id="pick" data-i18n="pick">Choose a file</button>
+  <input id="file" type="file" accept="application/json,.json" hidden>
+</div>
+<p id="err"></p>
+
+<div id="out" class="hide"></div>
+</div>
+
+<script>
+/* Two dictionaries, the same shape, like the activity's. */
+const T = {
+  en: {
+    title:"Read a session", sub:"Open a session file from the activity. It is read here, in this browser — nothing is uploaded.",
+    droph:"Drop a session_….json file here", pick:"Choose a file", another:"Read another file",
+    student:"Student", ai:"AI", conversation:"The conversation", survey:"The questions at the end",
+    prompt:"What the AI was told", notasked:"Not answered.", nosurvey:"No questions were answered in this session.",
+    participant:"Participant", group:"Group", section:"Section", provider:"AI service", model:"Model",
+    started:"Started", exported:"Exported", turns:"Turns", words:"Words",
+    swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
+    reach:"Services that answered", noreach:"not recorded", schema:"Schema",
+    latency:"replied in", compose:"typed for", elapsed:"at", inserts:"maths palette used",
+    badfile:"That does not look like a session file from the activity.",
+    badjson:"That file is not readable JSON.", question:"Question", answer:"Answer",
+    answeredat:"Answered", idnote:"Questions and options appear as the ids the activity recorded — the session file stores the answers, not the wording.",
+  },
+  zh: {
+    title:"查看会话记录", sub:"打开活动生成的会话文件。文件只在本浏览器中读取，不会上传。",
+    droph:"把 session_….json 文件拖到这里", pick:"选择文件", another:"再看一个文件",
+    student:"学生", ai:"AI", conversation:"对话记录", survey:"结束时的问题",
+    prompt:"AI 收到的指令", notasked:"未作答。", nosurvey:"本次会话没有回答任何问题。",
+    participant:"参与者编号", group:"组别", section:"班级", provider:"AI 服务", model:"模型",
+    started:"开始时间", exported:"导出时间", turns:"轮次", words:"字数",
+    swords:"学生", awords:"AI", promptsha:"指令 SHA-256", psource:"指令来源",
+    reach:"有响应的服务", noreach:"未记录", schema:"数据格式",
+    latency:"回复用时", compose:"输入用时", elapsed:"发生于", inserts:"使用数学面板",
+    badfile:"这似乎不是活动生成的会话文件。",
+    badjson:"该文件不是可读的 JSON。", question:"问题", answer:"回答",
+    answeredat:"作答时间", idnote:"问题和选项以活动记录的编号显示——会话文件保存的是答案本身，而不是题目文字。",
+  }
+};
+let lang = "en", DATA = null;
+const tr = k => (T[lang][k] ?? T.en[k] ?? k);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(e => e.textContent = tr(e.dataset.i18n));
+  $("#lang").textContent = lang === "en" ? "中文" : "EN";
+  if (DATA) render(DATA);
+}
+$("#lang").onclick = () => { lang = lang === "en" ? "zh" : "en"; applyLang(); };
+
+/* Times are stored UTC. Shown in the reader's own zone, with the raw value kept
+   in the title attribute so nothing is lost to a timezone. */
+const when = s => { if(!s) return "—";
+  const d = new Date(s); return isNaN(d) ? s : d.toLocaleString(undefined, {dateStyle:"medium", timeStyle:"short"}); };
+const ms = n => n == null ? null : (n >= 10000 ? Math.round(n/1000) + "s" : (n/1000).toFixed(1) + "s");
+
+function fact(k, v, title){
+  return `<div class="fact"><span class="k">${esc(k)}</span><span class="v"${
+    title ? ` title="${esc(title)}"` : ""}>${esc(v ?? "—")}</span></div>`;
+}
+
+function render(d){
+  DATA = d;
+  const turns = Array.isArray(d.turns) ? d.turns : [];
+  const stu = turns.filter(t => t.role === "student");
+  const ai  = turns.filter(t => t.role === "ai");
+  const sum = a => a.reduce((n, t) => n + (t.word_count || 0), 0);
+  const ap  = d.activity_prompt || {};
+  const nc  = d.network_check;
+
+  let h = `<h2>${esc(tr("conversation"))}</h2><div class="facts">`;
+  h += fact(tr("participant"), d.participant) + fact(tr("group"), d.group) + fact(tr("section"), d.section);
+  h += fact(tr("provider"), d.provider) + fact(tr("model"), d.model);
+  h += fact(tr("turns"), turns.length);
+  h += fact(tr("words"), `${sum(stu)} ${tr("swords")} · ${sum(ai)} ${tr("awords")}`);
+  h += fact(tr("started"), when(d.started_utc), d.started_utc);
+  h += fact(tr("exported"), when(d.exported_utc), d.exported_utc);
+  h += fact(tr("psource"), ap.source || "—");
+  h += fact(tr("promptsha"), ap.sha256 ? ap.sha256.slice(0, 16) + "…" : "—", ap.sha256);
+  h += fact(tr("reach"), nc && nc.answered ? nc.answered.join(", ") : tr("noreach"),
+            nc && nc.checked_utc ? nc.checked_utc : "");
+  h += fact(tr("schema"), d.schema);
+  h += `</div>`;
+
+  for (const t of turns){
+    const role = t.role === "student" ? "student" : "ai";
+    const bits = [];
+    if (t.latency_ms != null && role === "ai")  bits.push(`${tr("latency")} ${ms(t.latency_ms)}`);
+    if (t.compose_ms != null && role === "student") bits.push(`${tr("compose")} ${ms(t.compose_ms)}`);
+    if (t.elapsed_ms != null) bits.push(`${tr("elapsed")} ${ms(t.elapsed_ms)}`);
+    if (t.word_count != null) bits.push(`${t.word_count} ${lang === "zh" ? "词" : "words"}`);
+    if (t.math_inserts) bits.push(`${tr("inserts")} ×${t.math_inserts}`);
+    if (t.reply_lang) bits.push(t.reply_lang);
+    h += `<div class="turn ${role}"><div class="bubble">
+        <p class="who">${esc(role === "student" ? tr("student") : tr("ai"))}</p>
+        <div class="text">${esc(t.text)}</div>
+        ${bits.length ? `<p class="meta">${esc(bits.join("  ·  "))}</p>` : ""}
+      </div></div>`;
+  }
+
+  h += `<h2>${esc(tr("survey"))}</h2>`;
+  /* survey.answers is keyed by the question id the build derived from the question
+     text, and each answer is either a plain string (free text) or {selected, specify}
+     where `selected` is one option id or several. The file carries the ids, not the
+     wording -- see the note under the table. */
+  const sv  = d.survey && typeof d.survey === "object" ? d.survey : null;
+  const ans = sv && sv.answers && typeof sv.answers === "object" ? sv.answers : null;
+  if (ans && Object.keys(ans).length){
+    if (sv.answered_utc){
+      h += `<p class="sub">${esc(tr("answeredat"))} <span title="${esc(sv.answered_utc)}">${
+        esc(when(sv.answered_utc))}</span></p>`;
+    }
+    h += `<div class="scroll"><table><tr><th>${esc(tr("question"))}</th><th>${esc(tr("answer"))}</th></tr>`;
+    for (const [k, v] of Object.entries(ans)){
+      let out;
+      if (v == null || v === ""){
+        out = tr("notasked");
+      } else if (typeof v === "string"){
+        out = v;
+      } else {
+        const sel = Array.isArray(v.selected) ? v.selected : (v.selected == null ? [] : [v.selected]);
+        out = sel.length ? sel.join(", ") : tr("notasked");
+        // "Other (please specify)" keeps its typed text beside the option it belongs to.
+        if (v.specify && typeof v.specify === "object"){
+          const extra = Object.entries(v.specify)
+            .filter(([, t]) => t !== "" && t != null)
+            .map(([opt, t]) => `${opt}: ${t}`);
+          if (extra.length) out += ` — ${extra.join("; ")}`;
+        }
+      }
+      h += `<tr><td><code>${esc(k)}</code></td><td>${esc(out)}</td></tr>`;
+    }
+    h += `</table></div><p class="sub" style="font-size:13px">${esc(tr("idnote"))}</p>`;
+  } else {
+    h += `<p class="sub">${esc(tr("nosurvey"))}</p>`;
+  }
+
+  if (ap.text){
+    h += `<details><summary>${esc(tr("prompt"))}</summary><pre>${esc(ap.text)}</pre></details>`;
+  }
+  h += `<hr><p style="margin:18px 0 0"><button id="again">${esc(tr("another"))}</button></p>`;
+
+  $("#out").innerHTML = h;
+  $("#out").classList.remove("hide");
+  $("#drop").classList.add("hide");
+  $("#again").onclick = () => {
+    DATA = null; $("#out").classList.add("hide"); $("#drop").classList.remove("hide");
+    $("#err").textContent = ""; $("#file").value = ""; window.scrollTo(0, 0);
+  };
+  window.scrollTo(0, 0);
+}
+
+function load(file){
+  $("#err").textContent = "";
+  const fr = new FileReader();
+  fr.onload = () => {
+    let d;
+    try { d = JSON.parse(fr.result); }
+    catch { $("#err").textContent = tr("badjson"); return; }
+    // A session file is recognised by carrying turns, not by its name.
+    if (!d || typeof d !== "object" || !Array.isArray(d.turns)){
+      $("#err").textContent = tr("badfile"); return;
+    }
+    render(d);
+  };
+  fr.readAsText(file);
+}
+
+$("#pick").onclick = () => $("#file").click();
+$("#file").onchange = e => { if (e.target.files[0]) load(e.target.files[0]); };
+const drop = $("#drop");
+["dragenter","dragover"].forEach(n => drop.addEventListener(n, e => {
+  e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(n => drop.addEventListener(n, e => {
+  e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if (f) load(f); });
+// Dropping anywhere else should not make the browser navigate away from the page.
+window.addEventListener("dragover", e => e.preventDefault());
+window.addEventListener("drop", e => e.preventDefault());
+
+applyLang();
+</script>
+</html>

@@ -1,0 +1,189 @@
+{
+  "schema": "tea-taylor-session/1",
+  "participant": "P01",
+  "group": "G1",
+  "section": "S4",
+  "network_check": null,
+  "session_id": "d855d1d82a0337d3",
+  "provider": "demo",
+  "model": "demo",
+  "started_utc": "2026-08-15T02:13:26Z",
+  "exported_utc": "2026-08-15T02:13:40Z",
+  "reply_directives": {
+    "en": "Reply in English throughout, whatever language the student writes in.",
+    "zh": "请全程使用简体中文回复，无论学生使用什么语言。"
+  },
+  "activity_prompt": {
+    "id": "taylor-series.txt",
+    "sha256": "e12e4834d2757c6ae13b5f86e5a7f6d8b6b0e34deade22ee308115d2b12a530e",
+    "source": "built-in",
+    "text": "You are a Personality-based AI Teacher Generator.\n\nYour goal is to identify what kind of AI teacher the user would learn best from—not based on what they *say* they want, but based on how they respond to different tones, emotional energies, and teaching styles.\n\nYour final purpose is to **become** this AI teacher and help the user work through a specific learning activity—a real academic task about Taylor Series (see below)\n\nTask: Approximating sin(x) Near Zero\nWithout using a calculator, estimate sin(0.2) using a 3rd-degree Taylor polynomial centered at x = 0.\nWrite the Taylor series for sin(x) centered at 0.\nUse the first four nonzero terms (up to the x3x^3x3 term).\nPlug in x=0.2x = 0.2x=0.2 and calculate the approximate value.\nCompare your result to the actual value of sin(0.2) (use a calculator for this part).\nReflect: How accurate is your estimate? Why do you think that is?\nThis includes guided help with calculus-based applications in physics and engineering.\n\nFollow these instructions exactly:\n\n---\n\n**STEP 1: RUN A PERSONALITY TEST (one question at a time)**\n\nStart by introducing yourself as a temporary AI profiler.\n\nExplain that you’ll ask a few short questions to get a sense of what kind of *teacher* they’d respond best to—even if they wouldn’t normally say it out loud.\n\nAsk **3 to 5** questions total, **one at a time**, waiting for a response before continuing. Ask questions that explore:\n- Communication style preferences  \n- Humor tolerance and tone comfort  \n- Learning frustrations  \n- Preferred ways of being challenged or supported  \n- Projection (fictional characters, ideal guides, etc.)  \n- Correction style and interactivity  \n\nDo not comment on, explain, or summarize the user’s responses.\n\n---\n\n**STEP 2: INTERNALLY CREATE AN AI TEACHER PROFILE (DO NOT SHOW IT)**\n\nQuietly analyze their responses and determine what personality and teaching style will help them learn best.\n\nCreate a mental model of the AI teacher based on:\n- Personality (tone, energy, humor level, warmth)\n- Teaching behavior (direct, Socratic, nurturing, blunt, creative, structured, chaotic)\n- Conversation dynamics (short responses? lots of questions? poetic explanations?)\n- Limits (avoids overtalking, excessive empathy, spoon-feeding)\n- Learning strengths (motivation, clarity, simplification, challenge, etc.)\n\nKeep this model **internal**. **Do not display** the teacher profile or explain the results to the user.\n\n---\n\n**STEP 3: TRANSFORM INTO THAT AI TEACHER + GUIDE THE ACTIVITY**\n\nNow begin helping the user through the assigned academic Task: Approximating sin(x) Near Zero mentioned above\n\n- Start with Part 1\n- Guide the user through creating definitions, solving custom examples, and writing procedures.\n- Encourage interactivity. Ask questions. Make the user participate.\n- Maintain the tone and teaching style that fits their profile throughout the session.\n\nMUST Be:\n- Interactive: Please keep your responses short. I am looking for back and forth conversation as engaging as possible. Let's get as much words and talking from the user as possible. \n- Focused: Ultimately, you need to be critical and keep the student focus on the topic. If the user is giving \"dumb\" answers, make sure to put guardrails and bring them back to the point. YOU are the TEACHER!\n- Personality-matching  \n- Clear, but never over-explaining  \n- Responsive to confusion or silence using your personality\n\nYou are now their custom AI teacher. Begin by introducing yourself as a profiler and asking the first test question.",
+    "word_count": 552,
+    "char_count": 3531
+  },
+  "turns": [
+    {
+      "i": 0,
+      "role": "ai",
+      "text": "Hi! I'm your temporary AI profiler. Before we start on Taylor series, I'd like to ask a few short questions to work out what kind of teacher you'd learn best from.\n\nFirst one: when something doesn't make sense, would you rather be given a hint, or be asked a question that helps you find it yourself?",
+      "ts": "2026-08-15T02:13:27Z",
+      "word_count": 56,
+      "char_count": 300,
+      "request_ts": "2026-08-15T02:13:26Z",
+      "elapsed_ms": 800,
+      "reply_lang": "en"
+    },
+    {
+      "i": 1,
+      "role": "student",
+      "text": "I need to approximate sin(x) near 0. Where do I even start?",
+      "ts": "2026-08-15T02:13:27Z",
+      "word_count": 12,
+      "char_count": 59,
+      "latency_ms": 403,
+      "compose_ms": 1,
+      "math_inserts": 0
+    },
+    {
+      "i": 2,
+      "role": "ai",
+      "text": "Good — that tells me something.\n\n我明白了。Next: when you get an answer wrong, do you want me to say so directly, or work around to it more gently?",
+      "ts": "2026-08-15T02:13:28Z",
+      "word_count": 32,
+      "char_count": 142,
+      "request_ts": "2026-08-15T02:13:27Z",
+      "elapsed_ms": 800,
+      "reply_lang": "en"
+    },
+    {
+      "i": 3,
+      "role": "student",
+      "text": "So the first term is x, because the derivative of sin at 0 is 1?",
+      "ts": "2026-08-15T02:13:30Z",
+      "word_count": 15,
+      "char_count": 64,
+      "latency_ms": 1404,
+      "compose_ms": 1,
+      "math_inserts": 0
+    },
+    {
+      "i": 4,
+      "role": "ai",
+      "text": "Right. Let's begin.\n\nWithout a calculator, estimate sin(0.2) using a 3rd-degree Taylor polynomial centred at x = 0.\n\nStart with the series for sin(x). What are its first few terms?\n\n(Demo reply 3 — no API was called.)",
+      "ts": "2026-08-15T02:13:30Z",
+      "word_count": 38,
+      "char_count": 217,
+      "request_ts": "2026-08-15T02:13:30Z",
+      "elapsed_ms": 800,
+      "reply_lang": "en"
+    },
+    {
+      "i": 5,
+      "role": "student",
+      "text": "Then the next non-zero term is -x³/3! — is that right?",
+      "ts": "2026-08-15T02:13:32Z",
+      "word_count": 11,
+      "char_count": 54,
+      "latency_ms": 1401,
+      "compose_ms": 0,
+      "math_inserts": 0
+    },
+    {
+      "i": 6,
+      "role": "ai",
+      "text": "Right. Let's begin.\n\nWithout a calculator, estimate sin(0.2) using a 3rd-degree Taylor polynomial centred at x = 0.\n\nStart with the series for sin(x). What are its first few terms?\n\n(Demo reply 4 — no API was called.)",
+      "ts": "2026-08-15T02:13:33Z",
+      "word_count": 38,
+      "char_count": 217,
+      "request_ts": "2026-08-15T02:13:32Z",
+      "elapsed_ms": 800,
+      "reply_lang": "en"
+    },
+    {
+      "i": 7,
+      "role": "student",
+      "text": "Why do the even-powered terms all vanish?",
+      "ts": "2026-08-15T02:13:34Z",
+      "word_count": 7,
+      "char_count": 41,
+      "latency_ms": 1403,
+      "compose_ms": 1,
+      "math_inserts": 0
+    },
+    {
+      "i": 8,
+      "role": "ai",
+      "text": "Right. Let's begin.\n\nWithout a calculator, estimate sin(0.2) using a 3rd-degree Taylor polynomial centred at x = 0.\n\nStart with the series for sin(x). What are its first few terms?\n\n(Demo reply 5 — no API was called.)",
+      "ts": "2026-08-15T02:13:35Z",
+      "word_count": 38,
+      "char_count": 217,
+      "request_ts": "2026-08-15T02:13:34Z",
+      "elapsed_ms": 800,
+      "reply_lang": "en"
+    },
+    {
+      "i": 9,
+      "role": "student",
+      "text": "So sin(x) ≈ x - x³/3! + x⁵/5! and it gets better the more terms I keep?",
+      "ts": "2026-08-15T02:13:36Z",
+      "word_count": 17,
+      "char_count": 71,
+      "latency_ms": 1403,
+      "compose_ms": 1,
+      "math_inserts": 0
+    },
+    {
+      "i": 10,
+      "role": "ai",
+      "text": "Right. Let's begin.\n\nWithout a calculator, estimate sin(0.2) using a 3rd-degree Taylor polynomial centred at x = 0.\n\nStart with the series for sin(x). What are its first few terms?\n\n(Demo reply 6 — no API was called.)",
+      "ts": "2026-08-15T02:13:37Z",
+      "word_count": 38,
+      "char_count": 217,
+      "request_ts": "2026-08-15T02:13:36Z",
+      "elapsed_ms": 800,
+      "reply_lang": "en"
+    }
+  ],
+  "survey": {
+    "answered_utc": "2026-08-15T02:13:40Z",
+    "answers": {
+      "llms_used": {
+        "selected": [
+          "chatgpt",
+          "other"
+        ],
+        "specify": {
+          "other": "Sample answer for the format example."
+        }
+      },
+      "how_long": {
+        "selected": "lt1m"
+      },
+      "how_often": {
+        "selected": "never"
+      },
+      "purposes": {
+        "selected": [
+          "check",
+          "fun"
+        ]
+      },
+      "other_courses": {
+        "selected": "yes_freq"
+      },
+      "professor_views": {
+        "selected": "encourage"
+      },
+      "alone_or_with": {
+        "selected": "alone"
+      },
+      "helped_learn": {
+        "selected": "1"
+      },
+      "attitude_after": {
+        "selected": "much_pos"
+      },
+      "comments": "Sample answer for the format example."
+    }
+  }
+}

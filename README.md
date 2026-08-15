@@ -6,6 +6,14 @@ happens, and hands back one JSON file per student ready for analysis.
 **[Try it →](https://ohiomathteacher.github.io/verbatim-app/)** — nothing is uploaded, nothing
 is stored anywhere but your own browser.
 
+Three pages, each a single self-contained file:
+
+| | |
+|---|---|
+| [the activity](https://ohiomathteacher.github.io/verbatim-app/) | what a student opens |
+| [setup](https://ohiomathteacher.github.io/verbatim-app/setup.html) | build your own activity, without installing anything |
+| [reader](https://ohiomathteacher.github.io/verbatim-app/reader.html) | drop a session file in and read it as a transcript |
+
 ## What it is for
 
 Research on how students talk with AI usually collects *what the student produced* — a
