@@ -3,5 +3,4 @@ __pycache__/
 providers.local.json
 session_capture.html
 verbatim-user-manual.docx
-verbatim-user-manual.pdf
 .~lock.*#
