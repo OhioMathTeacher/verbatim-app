@@ -674,7 +674,14 @@ let   SURVEY    = __SURVEY_JSON__;
 const FOOTER    = __FOOTER_JSON__;
 const DEMO      = __DEMO_JSON__;
 const SCHEMA    = "tea-taylor-session/1";
-const KEY       = "tea-taylor-session-v1";
+/* Saved work is keyed per activity, not per app.
+   localStorage is scoped to the origin and ignores the path, so two activities
+   served from one site -- which happens the moment you publish more than one --
+   shared a single slot under a fixed key. Opening the second showed the first
+   one's conversation, finished screen and all. Keying on the prompt's digest
+   gives each activity its own slot, and keeps that slot stable across rebuilds
+   of the same prompt so a student who reloads still has their work. */
+const KEY       = "tea-taylor-session-v1." + PROMPT.sha256.slice(0, 12);
 
 const $ = s => document.querySelector(s);
 let S = null;   // the session record — this IS the exported file
