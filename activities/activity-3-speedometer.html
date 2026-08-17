@@ -455,6 +455,11 @@ const SCHEMA    = "tea-taylor-session/1";
    gives each activity its own slot, and keeps that slot stable across rebuilds
    of the same prompt so a student who reloads still has their work. */
 const KEY       = "tea-taylor-session-v1." + PROMPT.sha256.slice(0, 12);
+/* Anyone who opened a page built before that change has one slot left under the
+   bare key, which nothing reads any more. Sweep it here rather than asking a reader
+   to clear site data: site data is the whole origin, so clearing it would take every
+   other page published on the same site with it, and most readers will never be asked. */
+try{ localStorage.removeItem("tea-taylor-session-v1"); }catch(e){}
 
 const $ = s => document.querySelector(s);
 let S = null;   // the session record — this IS the exported file
