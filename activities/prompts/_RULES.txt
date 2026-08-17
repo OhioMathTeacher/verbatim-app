@@ -1,0 +1,13 @@
+The reply rules shared by all three drafts, and why they are there.
+
+Measured in the May corpus once speakers could be told apart: students took 45%
+of the turns and wrote 7% of the words. The model produced 148 words for every
+14 of theirs. The old prompt asked once for short replies and was ignored.
+
+  - 60-word cap, stated as a rule and repeated at the end
+  - one question per reply, then stop
+  - never answer your own question
+  - never supply a value the student could produce
+  - no headings, bold or bullets, which inflate reading load
+  - two personality questions, not five: in the May transcripts that test
+    consumed roughly a third of a twenty-minute activity before any mathematics

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Verbatim — Draft Activities</title>
+<style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #fff;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 32px 32px 24px 32px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 0.2em;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+    h2 {
+      margin-top: 2em;
+      font-size: 1.3em;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.2em;
+    }
+    .applet-list {
+      margin: 2em 0 2em 0;
+      padding: 0;
+      list-style: none;
+    }
+    .applet-list li {
+      margin-bottom: 2em;
+    }
+    .applet-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+    .applet-title a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .applet-title a:hover {
+      text-decoration: underline;
+    }
+    .applet-desc {
+      margin: 0.3em 0 0 2em;
+      color: #444;
+    }
+    .applet-desc p {
+      margin: 0 0 0.7em 0;
+    }
+    .week {
+      color: #666;
+      font-style: italic;
+    }
+    hr {
+      border: none;
+      border-top: 2px solid #eee;
+      margin: 2em 0 1.5em 0;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 12px; }
+      .applet-desc { margin-left: 0; }
+    }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1><span role="img" aria-label="conversation">💬</span> Verbatim — Draft Activities</h1>
+    <p>Three short conversations between a student and a generative AI, drafted for
+    Mathematical Modeling 1.</p>
+    <p><strong>These are drafts to try, not a finished set.</strong> Open any of them,
+    press <strong>AI Setup</strong>, choose a provider and paste in your own key —
+    DeepSeek, or any of the eight offered — then talk to it. The key stays in your
+    browser: it is not stored in the page and goes nowhere but the provider you chose.
+    Each activity takes about twenty minutes, needs nothing installed, and saves the
+    conversation as you go.</p>
+    <p>🔑 <strong>Never set up a key before?</strong>
+    <a href="getting-a-key.html">Start here</a> — it takes about three minutes and
+    needs no programming.</p>
+    <hr>
+    <h2>Activities</h2>
+    <ul class="applet-list">
+
+      <li>
+        <span class="applet-title">🕰️ <a href="activity-1-pendulum.html">How small is small enough?</a></span>
+        <div class="applet-desc">
+          <p class="week">Week 2 · approximation for large and small values</p>
+          <p>A pendulum is a weight on a string, and how long it takes to swing depends —
+          surprisingly — hardly at all on how far you pull it aside. The exact relationship
+          involves the sine of the release angle, and for small angles the sine of an angle
+          is very nearly the angle itself. So how small does the angle have to be?</p>
+          <p>That question has no answer until you know what the pendulum is <em>for</em>.
+          Students are given three: a metronome for someone practising, a child's swing in a
+          playground, and a clock that must not lose a second a day. Those want accuracies
+          three orders of magnitude apart, and each gives a different bound on the angle.
+          Purpose fixes the tolerance; the tolerance fixes the angle.</p>
+          <p>It closes by asking whether there is <em>always</em> an angle small enough,
+          however strict the requirement becomes — the idea behind a limit, reached from
+          three concrete cases rather than from a definition.</p>
+        </div>
+      </li>
+
+      <li>
+        <span class="applet-title">🕷️ <a href="activity-2-scaling.html">Why can't a spider be the size of a horse?</a></span>
+        <div class="applet-desc">
+          <p class="week">Week 2 · dimensional analysis and proportionality</p>
+          <p>In films, giant spiders walk around like ordinary animals. Could a real one?
+          Double every length and the weight goes up eightfold, while the cross-section of
+          each leg goes up only fourfold — so every leg carries twice the load it did before.
+          Keep scaling and something has to give.</p>
+          <p>Students are told neither of those numbers. They work out what happens to weight
+          and to leg thickness themselves, put the two together, and then look for the same
+          argument elsewhere — anywhere a surface and a volume both matter.</p>
+          <p>This one uses almost no arithmetic and no calculus at all, which makes it the
+          most accessible of the three and a reasonable choice early in the term.</p>
+        </div>
+      </li>
+
+      <li>
+        <span class="applet-title">🚗 <a href="activity-3-speedometer.html">What does the speedometer mean?</a></span>
+        <div class="applet-desc">
+          <p class="week">Week 3 · limits, and what a derivative is before it is computed</p>
+          <p>A speedometer reads 60 km/h at one instant. How would you check that, given only
+          a stopwatch and distance markers? Whatever the student proposes, the next question
+          is how long an interval they would measure over — and then what happens as that
+          interval shrinks.</p>
+          <p>Eventually they reach an interval of exactly zero seconds and have to say what
+          their method gives there. Then a harder question: is the speed at an instant
+          something the car <em>has</em>, or something we <em>compute</em>?</p>
+          <p>It ends by asking whether any accuracy anyone demanded could be met by choosing
+          a short enough interval. Students describe a limit in their own words, without
+          having been given a definition.</p>
+        </div>
+      </li>
+
+    </ul>
+    <hr>
+    <h2>About these</h2>
+    <p>All three were built with <strong>Verbatim</strong>, which records a student's
+    conversation with a generative AI as it happens — each turn marked as the student's or
+    the AI's, saved on the student's own device, and handed in as a single file. Nothing is
+    posted to a website.</p>
+    <p>The three share the same rules for how the AI may reply: no more than sixty words at
+    a time, one question per turn, and never answering its own question. Those came out of
+    reading an earlier round of transcripts, where the AI was writing roughly eleven words
+    for every one the student wrote. Students were holding up their half of the conversation
+    and being buried in it.</p>
+    <p><em>Draft — for comment, not yet for classroom use.</em></p>
+  </div>
+</body>
+</html>

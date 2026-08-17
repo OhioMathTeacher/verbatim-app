@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Getting an AI key — Verbatim</title>
+<style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #fff;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 32px 32px 24px 32px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 0.2em;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+    h2 {
+      margin-top: 2em;
+      font-size: 1.3em;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.2em;
+    }
+    a { color: #2563eb; }
+    ol { padding-left: 1.4em; }
+    ol li { margin-bottom: 0.9em; }
+    .aside {
+      background: #f8f9fb;
+      border-left: 3px solid #2563eb;
+      padding: 0.9em 1.1em;
+      margin: 1.5em 0;
+      color: #444;
+    }
+    .aside p { margin: 0 0 0.6em; }
+    .aside p:last-child { margin-bottom: 0; }
+    .back { display: inline-block; margin-top: 2em; }
+    code {
+      background: #f4f4f2;
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    hr {
+      border: none;
+      border-top: 2px solid #eee;
+      margin: 2em 0 1.5em 0;
+    }
+    @media (max-width: 600px) { .container { padding: 12px; } }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1><span role="img" aria-label="key">🔑</span> Getting an AI key</h1>
+    <p>The activities don't come with an AI attached. You point one at an AI service
+    of your choosing, using a <strong>key</strong> — a long string of letters and
+    numbers that tells the service the requests are yours. Getting one takes about
+    three minutes and doesn't require knowing anything about programming.</p>
+    <hr>
+
+    <h2>Why a key, rather than just a login</h2>
+    <p>The chat website you may already use (chat.deepseek.com, ChatGPT and so on)
+    is a finished product. The activities here are a different page talking to the
+    same underlying model directly, and a key is how that page identifies itself.
+    It is the ordinary way this is done; it is not a developer-only thing.</p>
+    <p>Practically, it also means <strong>the conversation is yours</strong>. It
+    isn't routed through anyone else's server, and no account of ours is involved.</p>
+
+    <h2>DeepSeek, step by step</h2>
+    <ol>
+      <li>Go to <a href="https://platform.deepseek.com">platform.deepseek.com</a>
+      and sign up. This is the developer platform, which is a different place from
+      the chat website — the same account works for both.</li>
+      <li>Find <strong>API keys</strong> in the left-hand menu.</li>
+      <li>Press <strong>Create API Key</strong>. Give it a name you'll recognise
+      later, such as <code>verbatim</code>, and an expiry date if you'd like one.</li>
+      <li>Press <strong>Submit</strong>. The key appears once and only once — copy
+      it now. If you lose it, no harm done: delete it and make another.</li>
+      <li>Open any activity, press <strong>AI Setup</strong>, choose DeepSeek, and
+      paste the key in. It turns into dots once saved.</li>
+    </ol>
+
+    <div class="aside">
+      <p><strong>Your key stays in your browser.</strong> It is not written into the
+      activity page, not sent to us, and not stored anywhere but on your own device.
+      If you clear your browser data it will be gone and you'll simply paste it again.</p>
+    </div>
+
+    <h2>What it costs</h2>
+    <p>Very little. DeepSeek has no permanent free API tier, but new developer
+    accounts have generally started with a grant of a few million tokens — enough
+    to run these activities many times over. It isn't guaranteed, so check the
+    billing page when you sign up.</p>
+    <p>Beyond any grant, the rates are low enough that the arithmetic is almost
+    comic. A twenty-minute conversation of this kind runs to a few thousand tokens,
+    which is a fraction of a cent. <strong>A whole class of thirty would cost well
+    under a dollar.</strong></p>
+
+    <h2>If DeepSeek is awkward</h2>
+    <p>Seven other services are in the picker — OpenAI, Gemini, Qwen, Zhipu,
+    Moonshot, Groq and OpenRouter — and every one works the same way: sign up, make
+    a key, paste it in. The activity itself doesn't care which you choose, though
+    for a class it's simpler if everyone uses the same one.</p>
+
+    <hr>
+    <p class="back"><a href="index.html">← Back to the activities</a></p>
+  </div>
+</body>
+</html>
