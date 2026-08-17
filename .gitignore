@@ -4,3 +4,10 @@ providers.local.json
 session_capture.html
 verbatim-user-manual.docx
 .~lock.*#
+
+# Photo masters for the activity banners. Kept in the PRIVATE repo instead, at
+# Data/Activity Materials/verbatim-drafts/figure-sources/ -- this one is public
+# and publishes to Pages, and their licensing is not established. The small
+# derivatives the gallery serves live in activities/img/ and are committed.
+examples/*.png
+examples/*.jpg
