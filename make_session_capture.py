@@ -84,7 +84,8 @@ Deployment
 """
 from __future__ import annotations
 
-import argparse, hashlib, json, os, sys
+import argparse
+import colorsys, hashlib, json, os, sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -244,8 +245,8 @@ TEMPLATE = r"""<!doctype html>
 :root{
   --paper:#f6f2ea; --card:#fffdf8; --ink:#221f1a; --muted:#726a5f; --rule:#e4dccd;
   --ai:#2f5d6b; --ai-bg:#eef4f5; --ai-edge:#cfe0e3;
-  --stu:#9a5734; --stu-bg:#fbf0e7; --stu-edge:#eed7c3;
-  --accent:#9a5734; --ok:#4a7a55; --warn:#a8622e;
+  --stu:__ACCENT__; --stu-bg:__ACCENT_BG__; --stu-edge:__ACCENT_EDGE__;
+  --accent:__ACCENT__; --ok:#4a7a55; --warn:#a8622e;
   --shadow:0 1px 2px rgba(60,45,25,.05), 0 6px 20px -8px rgba(60,45,25,.14);
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC","Noto Serif CJK SC","Noto Serif SC",serif;
   --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;
@@ -2240,9 +2241,32 @@ def pub_providers(providers: list[dict]) -> list[dict]:
             "placeholder": p.get("placeholder", "")} for p in providers]
 
 
+def tint(hex_colour: str, s: float, l: float) -> str:
+    """Take the accent's HUE and restate it at a fixed lightness and saturation.
+
+    The student's turns are tinted with the accent, so an accent needs a very
+    pale background and a light edge to go with it. Deriving them means a new
+    activity colour is one flag, not three hand-picked hexes that may or may not
+    sit together.
+
+    Hue only, rather than mixing the accent towards white: a straight mix
+    desaturates, and the pair that was hand-picked for the original accent
+    (#fbf0e7 / #eed7c3) is *more* saturated in HSL terms than the accent itself,
+    because saturation inflates as lightness approaches 1. Fixing s and l and
+    carrying only the hue reproduces those two almost exactly for the default
+    accent, so existing pages keep the look they have.
+    """
+    c = hex_colour.lstrip("#")
+    r, g, b = (int(c[i:i+2], 16) / 255 for i in (0, 2, 4))
+    h, _, _ = colorsys.rgb_to_hls(r, g, b)
+    rr, gg, bb = colorsys.hls_to_rgb(h, l, s)
+    return "#%02x%02x%02x" % (round(rr * 255), round(gg * 255), round(bb * 255))
+
+
 def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
           avatar: str, footer: str, lang: str, section: str, title_zh: str,
-          subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str) -> str:
+          subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str,
+          accent: str) -> str:
     # Deliberately NOT published to the page: url and key. The page names a
     # provider; the student supplies the credential.
     pub = pub_providers(providers)
@@ -2261,6 +2285,9 @@ def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
             .replace("__TITLE_ZH_JSON__", json.dumps(title_zh, ensure_ascii=False))
             .replace("__SUBTITLE_ZH_JSON__", json.dumps(subtitle_zh, ensure_ascii=False))
             .replace("__DEMO_JSON__", "true" if demo else "false")
+            .replace("__ACCENT_BG__", tint(accent, 0.71, 0.945))
+            .replace("__ACCENT_EDGE__", tint(accent, 0.56, 0.849))
+            .replace("__ACCENT__", accent)
             .replace("__TITLE__", title)
             .replace("__SUBTITLE__", subtitle))
 
@@ -2313,6 +2340,11 @@ def main() -> int:
                     help="Chinese opening paragraph")
     ap.add_argument("--lang", choices=("en", "zh"), default="en",
                     help="language the page opens in; students can switch either way")
+    ap.add_argument("--accent", default="#9a5734", metavar="HEX",
+                    help="accent colour, e.g. --accent '#3f5f7a'. Tints the student's "
+                         "turns, the buttons and the links, so a set of activities can "
+                         "be told apart at a glance instead of looking identical. The "
+                         "pale background and edge tones are derived from it.")
     ap.add_argument("--title", default="AI activity")
     ap.add_argument("--minutes", type=int, default=0,
                     help="suggested duration shown to students; 0 says nothing. "
@@ -2382,7 +2414,8 @@ def main() -> int:
     submit = {"url": a.submit_url}
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.lang, a.section.strip().upper(),
-                           a.title_zh, a.subtitle_zh, survey, a.demo, a.title, subtitle), encoding="utf-8")
+                           a.title_zh, a.subtitle_zh, survey, a.demo, a.title, subtitle,
+                           a.accent), encoding="utf-8")
 
     # The builder ships with the activity so a teacher can make their own without
     # Python. It embeds this exact template, so the two stay in step by construction.
@@ -2393,6 +2426,7 @@ def main() -> int:
             "avatar": avatar, "footer": a.footer, "title": a.title, "title_zh": a.title_zh,
             "subtitle": subtitle, "subtitle_zh": a.subtitle_zh, "lang": a.lang,
             "section": a.section.strip().upper(), "prompt": prompt, "survey": survey,
+            "accent": a.accent,
             "built": prompt["sha256"][:12],
         }), encoding="utf-8")
 

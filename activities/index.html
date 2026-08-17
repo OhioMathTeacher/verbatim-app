@@ -57,9 +57,13 @@
       text-decoration: underline;
     }
     .applet-desc {
-      margin: 0.3em 0 0 2em;
+      margin: 0.3em 0 0 0;
       color: #444;
     }
+    /* The week line is the heading's subtitle, so it sits directly under the
+       title. It used to fall below the figure, which put the picture between
+       a heading and the line that qualifies it. */
+    .applet-desc .week { margin: 0.15em 0 0.9em 0; display: block; }
     .applet-desc p {
       margin: 0 0 0.7em 0;
     }
@@ -99,26 +103,59 @@
     }
     @media (max-width: 600px) { .sketch { margin-left: 0; } }
     /* Photographs, where a line drawing was doing the subject no favours. The
-       caption carries what the drawing's arrows and labels used to say. */
-    figure.fig { margin: 0 0 1em 0; }
+       caption carries what the drawing's arrows and labels used to say.
+       The figure spans the same column as the prose: capped at 420px and
+       indented, it left the right half of every entry empty. */
+    figure.fig { margin: 0 0 1.1em 0; }
     .photo {
       display: block;
-      margin: 0 0 0.45em 2em;
+      margin: 0 0 0.5em 0;
       width: 100%;
-      max-width: 420px;
       height: auto;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1px solid #e8e4dc;
     }
     figure.fig figcaption {
-      margin-left: 2em;
-      max-width: 420px;
       color: #666;
       font-size: 0.9em;
-      line-height: 1.45;
+      line-height: 1.5;
     }
-    @media (max-width: 600px) {
-      .photo, figure.fig figcaption { margin-left: 0; }
+    /* The pendulum stays a drawing — a photograph of one would show a weight on
+       a string and none of the point. It is drawn to the same 6.5:1 banner as
+       the two photographs so the three entries keep one rhythm, and the width
+       is spent on the three pendulums the activity actually turns on. */
+    .banner {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0 0 0.5em 0;
+      border: 1px solid #e8e4dc;
+      border-radius: 8px;
+      background: #faf8f4;
+    }
+    .banner .rod  { fill: none; stroke: #333; stroke-width: 2.2; stroke-linecap: round; }
+    .banner .bar  { fill: none; stroke: #333; stroke-width: 3;   stroke-linecap: round; }
+    .banner .bob  { fill: #333; }
+    .banner .ref  { fill: none; stroke: #b9b1a3; stroke-width: 1.2; stroke-dasharray: 3 3; }
+    .banner .arc  { fill: none; stroke: #2563eb; stroke-width: 2; stroke-linecap: round; }
+    .banner text  { font: 500 9px system-ui, sans-serif; fill: #6b6156; text-anchor: middle; }
+    .banner text.deg { fill: #2563eb; font-weight: 600; }
+    /* One period for all three, so the eye compares amplitude and not speed —
+       which is the comparison the activity is about. */
+    .p30, .p15, .p05 { animation: 3.6s ease-in-out infinite; }
+    .p30 { animation-name: sw30; } .p15 { animation-name: sw15; } .p05 { animation-name: sw05; }
+    @keyframes sw30 { 0%,100% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } }
+    @keyframes sw15 { 0%,100% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } }
+    @keyframes sw05 { 0%,100% { transform: rotate(-5deg);  } 50% { transform: rotate(5deg);  } }
+    /* With motion reduced the rods must still rest at the angle each arc marks,
+       or the picture shows three identical vertical pendulums with three
+       different arcs floating beside them. */
+    @media (prefers-reduced-motion: reduce) {
+      /* Negative, because y runs downwards here: a positive rotation would take
+         the bob left, away from the arc that measures it. */
+      .p30 { animation: none; transform: rotate(-30deg); }
+      .p15 { animation: none; transform: rotate(-15deg); }
+      .p05 { animation: none; transform: rotate(-5deg); }
     }
     hr {
       border: none;
@@ -152,19 +189,45 @@
       <li>
         <span class="applet-title">🕰️ <a href="activity-1-pendulum.html">How small is small enough?</a></span>
         <div class="applet-desc">
-          <svg class="sketch" viewBox="0 0 340 190" role="img"
-               aria-label="A pendulum swinging from a pivot, with the release angle marked">
-            <line class="stroke" x1="110" y1="24" x2="230" y2="24"/>
-            <path class="thin" d="M170 24 V 160"/>
-            <g class="swing">
-              <line class="stroke" x1="170" y1="24" x2="170" y2="146"/>
-              <circle class="solid" cx="170" cy="152" r="11"/>
-            </g>
-            <path class="key" d="M170 104 A 80 80 0 0 0 194 100"/>
-            <text class="k" x="200" y="104">angle</text>
-            <text x="236" y="30">pivot</text>
-          </svg>
           <p class="week">Week 2 · approximation for large and small values</p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="Three pendulums swinging through 30, 15 and 5 degrees — a
+                             playground swing, a metronome and a clock">
+              <g>
+                <path class="bar" d="M120 14 H200"/>
+                <path class="ref" d="M160 14 V 88"/>
+                <path class="arc" d="M160 62 A 48 48 0 0 0 184 55"/>
+                <g class="p30" style="transform-origin:160px 14px">
+                  <path class="rod" d="M160 14 V 76"/>
+                  <circle class="bob" cx="160" cy="82" r="7"/>
+                </g>
+                <text class="deg" x="160" y="98">30° · playground swing</text>
+              </g>
+              <g>
+                <path class="bar" d="M285 14 H365"/>
+                <path class="ref" d="M325 14 V 88"/>
+                <path class="arc" d="M325 62 A 48 48 0 0 0 338 60"/>
+                <g class="p15" style="transform-origin:325px 14px">
+                  <path class="rod" d="M325 14 V 76"/>
+                  <circle class="bob" cx="325" cy="82" r="7"/>
+                </g>
+                <text class="deg" x="325" y="98">15° · metronome</text>
+              </g>
+              <g>
+                <path class="bar" d="M450 14 H530"/>
+                <path class="ref" d="M490 14 V 88"/>
+                <path class="arc" d="M490 62 A 48 48 0 0 0 494 61.8"/>
+                <g class="p05" style="transform-origin:490px 14px">
+                  <path class="rod" d="M490 14 V 76"/>
+                  <circle class="bob" cx="490" cy="82" r="7"/>
+                </g>
+                <text class="deg" x="490" y="98">5° · clock</text>
+              </g>
+            </svg>
+            <figcaption>How far can you pull it aside before the usual formula stops
+              being good enough? It depends entirely on what the pendulum is for.</figcaption>
+          </figure>
           <p>A pendulum is a weight on a string, and how long it takes to swing depends —
           surprisingly — hardly at all on how far you pull it aside. The exact relationship
           involves the sine of the release angle, and for small angles the sine of an angle
@@ -183,15 +246,15 @@
       <li>
         <span class="applet-title">🕷️ <a href="activity-2-scaling.html">Why can't a spider be the size of a horse?</a></span>
         <div class="applet-desc">
+          <p class="week">Week 2 · dimensional analysis and proportionality</p>
           <figure class="fig">
-            <img class="photo" src="img/spiders.jpg" width="920" height="494" loading="lazy"
+            <img class="photo" src="img/spiders.jpg" width="1950" height="300" loading="lazy"
                  alt="Two garden spiders of the same species photographed side by side, the
                       right-hand one markedly larger, both with the same body plan and eight legs">
             <figcaption>Two garden spiders of the same species. Double every length and
               the weight goes up eightfold, while each leg's cross-section goes up only
               fourfold.</figcaption>
           </figure>
-          <p class="week">Week 2 · dimensional analysis and proportionality</p>
           <p>In films, giant spiders walk around like ordinary animals. Could a real one?
           Double every length and the weight goes up eightfold, while the cross-section of
           each leg goes up only fourfold — so every leg carries twice the load it did before.
@@ -207,14 +270,14 @@
       <li>
         <span class="applet-title">🚗 <a href="activity-3-speedometer.html">What does the speedometer mean?</a></span>
         <div class="applet-desc">
+          <p class="week">Week 3 · limits, and what a derivative is before it is computed</p>
           <figure class="fig">
-            <img class="photo" src="img/car.jpg" width="920" height="271" loading="lazy"
+            <img class="photo" src="img/car.jpg" width="1950" height="300" loading="lazy"
                  alt="A saloon car in profile, standing on a road ruled with evenly spaced
                       distance markers">
             <figcaption>The speedometer reads 60 km/h. With a stopwatch and these markers,
               over how long an interval would you measure to check it?</figcaption>
           </figure>
-          <p class="week">Week 3 · limits, and what a derivative is before it is computed</p>
           <p>A speedometer reads 60 km/h at one instant. How would you check that, given only
           a stopwatch and distance markers? Whatever the student proposes, the next question
           is how long an interval they would measure over — and then what happens as that

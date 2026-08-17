@@ -7,8 +7,8 @@
 :root{
   --paper:#f6f2ea; --card:#fffdf8; --ink:#221f1a; --muted:#726a5f; --rule:#e4dccd;
   --ai:#2f5d6b; --ai-bg:#eef4f5; --ai-edge:#cfe0e3;
-  --stu:#9a5734; --stu-bg:#fbf0e7; --stu-edge:#eed7c3;
-  --accent:#9a5734; --ok:#4a7a55; --warn:#a8622e;
+  --stu:#3f5f7a; --stu-bg:#e7f2fb; --stu-edge:#c3daee;
+  --accent:#3f5f7a; --ok:#4a7a55; --warn:#a8622e;
   --shadow:0 1px 2px rgba(60,45,25,.05), 0 6px 20px -8px rgba(60,45,25,.14);
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC","Noto Serif CJK SC","Noto Serif SC",serif;
   --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;
@@ -287,7 +287,7 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 
 <!-- 1 · who -->
 <section id="s-setup">
-  <p class="sub" data-i18n="subtitle">Welcome! In today's class, you'll have the opportunity to explore Taylor Series with genAI. I've set up this app to collect your work. You'll need to set up an AI and enter your codes in the dialog below to get started. Your conversation is saved as you go. Nothing is uploaded to the internet. You'll download your conversation as a JSON file and submit it to me for class credit.</p>
+  <p class="sub" data-i18n="subtitle">Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit.</p>
   <div class="card">
     <h2 data-i18n="before">Before you start</h2>
     <p class="hint" style="margin:0 0 22px" data-i18n="codehint">Your instructor gave you a participant code.</p>
@@ -518,7 +518,7 @@ if(FOOTER){ $("#foottext").textContent = FOOTER; $("#foot").classList.remove("hi
    language the AI teacher is asked to work in; see apiMessages(). */
 const I18N = {
   en: {
-    title: "What does the speedometer mean?", subtitle: "Welcome! In today's class, you'll have the opportunity to explore Taylor Series with genAI. I've set up this app to collect your work. You'll need to set up an AI and enter your codes in the dialog below to get started. Your conversation is saved as you go. Nothing is uploaded to the internet. You'll download your conversation as a JSON file and submit it to me for class credit.",
+    title: "What does the speedometer mean?", subtitle: "Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit.",
     before: "Before you start",
     codehint: "Your instructor will give you a participant code and a group code. Please use those instead of your name — your name should not appear anywhere on this page.",
     pid: "Participant code", group: "Group", section: "Section",
@@ -592,8 +592,8 @@ const I18N = {
     toolerropts: "This question needs options: ",
   },
   zh: {
-    title: "AI 活动",
-    subtitle: "欢迎！在今天的课上，你将有机会借助生成式 AI 探索泰勒级数。这个应用是我为收集大家的作业而搭建的。开始之前，请先设置 AI，并在下方填写你的编号。你的对话会随时保存，不会上传到互联网。结束后请下载 JSON 文件并提交给我，作为本次课的成绩。",
+    title: "速度表到底表示什么？",
+    subtitle: "欢迎！今天你将思考：只用一只秒表和路边的距离标记，你要怎样验证速度表上的 60 km/h 是真的——以及当你测量的时间间隔越来越短时，会发生什么。开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。",
     before: "开始之前",
     codehint: "老师会给你一个参与者编号和组别编号。请使用这两个编号，不要在本页面填写你的姓名。",
     pid: "参与者编号", group: "组别", section: "班级",
