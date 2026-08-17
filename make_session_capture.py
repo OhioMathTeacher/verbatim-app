@@ -154,11 +154,21 @@ PROVIDERS = [
      "key_url": "https://openrouter.ai/keys", "blurb_zh": "一个密钥，多种模型。",
      "prefix": "sk-or-",
      "placeholder": "sk-or-\u2026"},
+    # llama-3.3-70b-versatile stopped being served on 16 August 2026. It stayed
+    # pinned here after the classroom apps were swept, so every published activity
+    # offered Groq -- the free, any-email option, and therefore the one a student
+    # without a Google account reaches for -- and returned an error on use.
+    #
+    # Pinned by hand, and it must stay that way: the classroom apps may chase
+    # whatever model is live, but the instrument records `provider` and `model`
+    # per session as covariates, and a study tool that silently changed model
+    # mid-collection would produce sessions that cannot be compared with each
+    # other. When this id retires, edit this line -- do not make it self-heal.
     {"id": "groq", "label": "Groq", "tier": "free", "api": "openai",
-     "model": "llama-3.3-70b-versatile",
+     "model": "openai/gpt-oss-120b",
      "url": "https://api.groq.com/openai/v1/chat/completions",
-     "blurb": "Free, fast, open-weight Llama models.",
-     "key_url": "https://console.groq.com/keys", "blurb_zh": "免费、快速的开源 Llama 模型。",
+     "blurb": "Free, fast, open-weight models.",
+     "key_url": "https://console.groq.com/keys", "blurb_zh": "免费、快速的开源模型。",
      "prefix": "gsk_",
      "placeholder": "gsk_\u2026"},
     {"id": "gemini", "label": "Gemini", "tier": "free", "api": "gemini",
@@ -1515,7 +1525,15 @@ async function askGemini(c, messages){
                                         parts: [{ text: m.content }] }));
   const r = await fetch(c.url, { method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": c.key },
-    body: JSON.stringify({ contents }) });
+    // No maxOutputTokens is set, so this page was never at risk of the mid-word
+    // truncation that gemini-2.5-flash's default thinking caused in the classroom
+    // apps, where a small budget capped thinking and reply together. Thinking is
+    // off anyway, and for the instrument that is the more important reason: it is
+    // an unrecorded variable. The session file stores provider and model as
+    // covariates, and the finding this study rests on is about reply length -- a
+    // hidden setting that changes how much the model writes is exactly what must
+    // not vary silently between one session and the next.
+    body: JSON.stringify({ contents, generationConfig: { thinkingConfig: { thinkingBudget: 0 } } }) });
   if(!r.ok) throw new Error(providerError(r.status, await r.text()));
   const d = await r.json();
   const out = d?.candidates?.[0]?.content?.parts?.map(x => x.text).join("");
@@ -2183,8 +2201,11 @@ def check(provs: list[dict]) -> int:
     for p in provs:
         gemini = p.get("api") == "gemini"
         if gemini:
+            # Same body shape the page sends, thinking included -- a check that
+            # exercises a different request from the students' is not a check.
             body = json.dumps({"contents": [{"role": "user",
-                               "parts": [{"text": "Reply with exactly: ok"}]}]}).encode("utf-8")
+                               "parts": [{"text": "Reply with exactly: ok"}]}],
+                               "generationConfig": {"thinkingConfig": {"thinkingBudget": 0}}}).encode("utf-8")
             headers = {"Content-Type": "application/json", "x-goog-api-key": p["key"]}
         else:
             body = json.dumps({"model": p["model"],
