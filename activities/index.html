@@ -67,6 +67,37 @@
       color: #666;
       font-style: italic;
     }
+    .sketch {
+      display: block;
+      margin: 0 0 1em 2em;
+      width: 100%;
+      max-width: 340px;
+      height: auto;
+    }
+    .sketch .stroke { fill: none; stroke: #333; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round; }
+    .sketch .thin { fill: none; stroke: #999; stroke-width: 1.5;
+      stroke-linecap: round; stroke-dasharray: 4 4; }
+    .sketch .key { fill: none; stroke: #2563eb; stroke-width: 2.5;
+      stroke-linecap: round; }
+    .sketch .solid { fill: #333; stroke: none; }
+    .sketch .keyfill { fill: #2563eb; stroke: none; }
+    .sketch text { font: 500 13px system-ui, sans-serif; fill: #666; }
+    .sketch text.k { fill: #2563eb; font-weight: 600; }
+    .swing { transform-origin: 170px 24px; animation: swing 3.6s ease-in-out infinite; }
+    @keyframes swing {
+      0%, 100% { transform: rotate(-17deg); }
+      50%      { transform: rotate(17deg); }
+    }
+    .shrink { animation: shrink 4.5s ease-in-out infinite; }
+    @keyframes shrink {
+      0%, 100% { transform: scaleX(1); }
+      55%      { transform: scaleX(.18); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .swing, .shrink { animation: none; }
+    }
+    @media (max-width: 600px) { .sketch { margin-left: 0; } }
     hr {
       border: none;
       border-top: 2px solid #eee;
@@ -99,6 +130,18 @@
       <li>
         <span class="applet-title">🕰️ <a href="activity-1-pendulum.html">How small is small enough?</a></span>
         <div class="applet-desc">
+          <svg class="sketch" viewBox="0 0 340 190" role="img"
+               aria-label="A pendulum swinging from a pivot, with the release angle marked">
+            <line class="stroke" x1="110" y1="24" x2="230" y2="24"/>
+            <path class="thin" d="M170 24 V 160"/>
+            <g class="swing">
+              <line class="stroke" x1="170" y1="24" x2="170" y2="146"/>
+              <circle class="solid" cx="170" cy="152" r="11"/>
+            </g>
+            <path class="key" d="M170 104 A 80 80 0 0 0 194 100"/>
+            <text class="k" x="200" y="104">angle</text>
+            <text x="236" y="30">pivot</text>
+          </svg>
           <p class="week">Week 2 · approximation for large and small values</p>
           <p>A pendulum is a weight on a string, and how long it takes to swing depends —
           surprisingly — hardly at all on how far you pull it aside. The exact relationship
@@ -118,6 +161,23 @@
       <li>
         <span class="applet-title">🕷️ <a href="activity-2-scaling.html">Why can't a spider be the size of a horse?</a></span>
         <div class="applet-desc">
+          <svg class="sketch" viewBox="0 0 340 190" role="img"
+               aria-label="A small spider beside one twice its size, with the same leg proportions">
+            <g class="stroke">
+              <ellipse cx="66" cy="128" rx="15" ry="11"/>
+              <path d="M54 122 L38 106 M54 128 L34 126 M54 134 L38 148
+                       M78 122 L94 106 M78 128 L98 126 M78 134 L94 148"/>
+            </g>
+            <text x="42" y="170">as it is</text>
+            <g class="stroke">
+              <ellipse cx="228" cy="112" rx="42" ry="30"/>
+              <path d="M194 96 L150 52 M192 112 L142 108 M194 128 L150 172
+                       M262 96 L306 52 M264 112 L314 108 M262 128 L306 172"/>
+            </g>
+            <text x="196" y="180">twice as long</text>
+            <path class="key" d="M118 128 L146 128"/>
+            <path class="keyfill" d="M146 122 l12 6 -12 6 z"/>
+          </svg>
           <p class="week">Week 2 · dimensional analysis and proportionality</p>
           <p>In films, giant spiders walk around like ordinary animals. Could a real one?
           Double every length and the weight goes up eightfold, while the cross-section of
@@ -134,6 +194,22 @@
       <li>
         <span class="applet-title">🚗 <a href="activity-3-speedometer.html">What does the speedometer mean?</a></span>
         <div class="applet-desc">
+          <svg class="sketch" viewBox="0 0 340 190" role="img"
+               aria-label="A car on a road with distance markers, and a shrinking measured interval">
+            <line class="stroke" x1="16" y1="132" x2="324" y2="132"/>
+            <g class="thin">
+              <path d="M60 132 V148 M120 132 V148 M180 132 V148 M240 132 V148 M300 132 V148"/>
+            </g>
+            <g class="stroke">
+              <path d="M128 108 h64 l16 16 h12 v10 h-108 v-10 h4 z"/>
+              <circle cx="146" cy="134" r="7"/>
+              <circle cx="196" cy="134" r="7"/>
+            </g>
+            <g class="shrink" style="transform-origin:170px 168px">
+              <path class="key" d="M110 162 V174 M230 162 V174 M110 168 H230"/>
+            </g>
+            <text class="k" x="128" y="60">how long an interval?</text>
+          </svg>
           <p class="week">Week 3 · limits, and what a derivative is before it is computed</p>
           <p>A speedometer reads 60 km/h at one instant. How would you check that, given only
           a stopwatch and distance markers? Whatever the student proposes, the next question
