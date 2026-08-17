@@ -98,6 +98,28 @@
       .swing, .shrink { animation: none; }
     }
     @media (max-width: 600px) { .sketch { margin-left: 0; } }
+    /* Photographs, where a line drawing was doing the subject no favours. The
+       caption carries what the drawing's arrows and labels used to say. */
+    figure.fig { margin: 0 0 1em 0; }
+    .photo {
+      display: block;
+      margin: 0 0 0.45em 2em;
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid #e8e4dc;
+    }
+    figure.fig figcaption {
+      margin-left: 2em;
+      max-width: 420px;
+      color: #666;
+      font-size: 0.9em;
+      line-height: 1.45;
+    }
+    @media (max-width: 600px) {
+      .photo, figure.fig figcaption { margin-left: 0; }
+    }
     hr {
       border: none;
       border-top: 2px solid #eee;
@@ -161,23 +183,14 @@
       <li>
         <span class="applet-title">🕷️ <a href="activity-2-scaling.html">Why can't a spider be the size of a horse?</a></span>
         <div class="applet-desc">
-          <svg class="sketch" viewBox="0 0 340 190" role="img"
-               aria-label="A small spider beside one twice its size, with the same leg proportions">
-            <g class="stroke">
-              <ellipse cx="66" cy="128" rx="15" ry="11"/>
-              <path d="M54 122 L38 106 M54 128 L34 126 M54 134 L38 148
-                       M78 122 L94 106 M78 128 L98 126 M78 134 L94 148"/>
-            </g>
-            <text x="42" y="170">as it is</text>
-            <g class="stroke">
-              <ellipse cx="228" cy="112" rx="42" ry="30"/>
-              <path d="M194 96 L150 52 M192 112 L142 108 M194 128 L150 172
-                       M262 96 L306 52 M264 112 L314 108 M262 128 L306 172"/>
-            </g>
-            <text x="196" y="180">twice as long</text>
-            <path class="key" d="M118 128 L146 128"/>
-            <path class="keyfill" d="M146 122 l12 6 -12 6 z"/>
-          </svg>
+          <figure class="fig">
+            <img class="photo" src="img/spiders.jpg" width="920" height="494" loading="lazy"
+                 alt="Two garden spiders of the same species photographed side by side, the
+                      right-hand one markedly larger, both with the same body plan and eight legs">
+            <figcaption>Two garden spiders of the same species. Double every length and
+              the weight goes up eightfold, while each leg's cross-section goes up only
+              fourfold.</figcaption>
+          </figure>
           <p class="week">Week 2 · dimensional analysis and proportionality</p>
           <p>In films, giant spiders walk around like ordinary animals. Could a real one?
           Double every length and the weight goes up eightfold, while the cross-section of
@@ -194,22 +207,13 @@
       <li>
         <span class="applet-title">🚗 <a href="activity-3-speedometer.html">What does the speedometer mean?</a></span>
         <div class="applet-desc">
-          <svg class="sketch" viewBox="0 0 340 190" role="img"
-               aria-label="A car on a road with distance markers, and a shrinking measured interval">
-            <line class="stroke" x1="16" y1="132" x2="324" y2="132"/>
-            <g class="thin">
-              <path d="M60 132 V148 M120 132 V148 M180 132 V148 M240 132 V148 M300 132 V148"/>
-            </g>
-            <g class="stroke">
-              <path d="M128 108 h64 l16 16 h12 v10 h-108 v-10 h4 z"/>
-              <circle cx="146" cy="134" r="7"/>
-              <circle cx="196" cy="134" r="7"/>
-            </g>
-            <g class="shrink" style="transform-origin:170px 168px">
-              <path class="key" d="M110 162 V174 M230 162 V174 M110 168 H230"/>
-            </g>
-            <text class="k" x="128" y="60">how long an interval?</text>
-          </svg>
+          <figure class="fig">
+            <img class="photo" src="img/car.jpg" width="920" height="271" loading="lazy"
+                 alt="A saloon car in profile, standing on a road ruled with evenly spaced
+                      distance markers">
+            <figcaption>The speedometer reads 60 km/h. With a stopwatch and these markers,
+              over how long an interval would you measure to check it?</figcaption>
+          </figure>
           <p class="week">Week 3 · limits, and what a derivative is before it is computed</p>
           <p>A speedometer reads 60 km/h at one instant. How would you check that, given only
           a stopwatch and distance markers? Whatever the student proposes, the next question
