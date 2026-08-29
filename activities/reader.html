@@ -92,6 +92,8 @@ pre{font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;background:var
   background: var(--card); border: 1px solid var(--rule); border-radius: 7px; padding: 3px 9px; }
 .calcuse .cw { font-style: italic; }
 .calcuse .cm { font-family: var(--mono); font-size: 10.5px; opacity: .7; }
+.calcuse.failed code { border-style: dashed; color: var(--muted); }
+.calcuse .cn { color: var(--warn); font-size: 12px; }
 
 /* This reader's own build, said as quietly as the activity says its own. */
 .ver{margin:26px 0 0;text-align:center;font-family:var(--mono);font-size:11px;
@@ -467,7 +469,7 @@ body {
 <p id="err"></p>
 
 <div id="out" class="hide"></div>
-<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.0.0 · 667d5c1a</p>
+<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.0.0 · 08e8ce89</p>
 </div>
 
 <!-- Temml (MIT), vendored from vendor/temml.min.js and inlined so this file
@@ -663,7 +665,7 @@ const T = {
     swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
     reach:"Services that answered", noreach:"not recorded", schema:"Schema",
     madeby:"Recorded with", calcs:"Worked out", calcn:"used the calculator",
-    calceval:"worked out", calcgraph:"graphed", calctable:"tabulated",
+    calceval:"worked out", calcgraph:"graphed", calctable:"tabulated", calctried:"tried",
     latency:"replied in", compose:"typed for", elapsed:"at", inserts:"maths palette used",
     badfile:"That does not look like a session file from the activity.",
     badjson:"That file is not readable JSON.", question:"Question", answer:"Answer",
@@ -681,7 +683,7 @@ const T = {
     swords:"学生", awords:"AI", promptsha:"指令 SHA-256", psource:"指令来源",
     reach:"有响应的服务", noreach:"未记录", schema:"数据格式",
     madeby:"记录工具", calcs:"计算次数", calcn:"次使用计算器",
-    calceval:"计算了", calcgraph:"作图", calctable:"列表",
+    calceval:"计算了", calcgraph:"作图", calctable:"列表", calctried:"尝试了",
     latency:"回复用时", compose:"输入用时", elapsed:"发生于", inserts:"使用数学面板",
     badfile:"这似乎不是活动生成的会话文件。",
     badjson:"该文件不是可读的 JSON。", question:"问题", answer:"回答",
@@ -746,11 +748,15 @@ function render(d){
     const num = n => !isFinite(n) ? String(n)
       : (Number.isInteger(n) && Math.abs(n) < 1e15) ? String(n)
       : parseFloat(n.toPrecision(12)).toString();
-    const what = u.kind === "evaluate" && u.result != null
+    // An attempt that failed is named as an attempt, not reported as a result.
+    const what = (!u.error && u.kind === "evaluate" && u.result != null)
       ? `${esc(u.expr)} = ${esc(num(u.result))}`
       : esc(u.expr || "");
-    return `<div class="calcuse"><span class="cw">${esc(tr(KIND[u.kind] || "calceval"))}</span>`
-         + `<code>${what}</code><span class="cm">${u.deg ? "deg" : "rad"}</span></div>`;
+    const word = u.error ? "calctried" : (KIND[u.kind] || "calceval");
+    return `<div class="calcuse${u.error ? " failed" : ""}">`
+         + `<span class="cw">${esc(tr(word))}</span><code>${what}</code>`
+         + (u.error ? `<span class="cn">${esc(u.error)}</span>` : "")
+         + `<span class="cm">${u.deg ? "deg" : "rad"}</span></div>`;
   }).join("");
 
   h += calcAt(-1);

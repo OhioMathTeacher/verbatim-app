@@ -402,14 +402,28 @@ const Calculator = (() => {
         ans = v;
         t.value = "";
         onUse({ kind: "evaluate", expr: src, result: v, deg });
-      } catch(err){ history.push({ expr: src, err: err.message }); }
+      } catch(err){
+        /* An attempt that did not parse is still an attempt. Recording only the
+           ones that worked would make the file a record of what succeeded
+           rather than of what the student did, and where a student got stuck is
+           worth as much as where they did not. The input is left alone so it
+           can be corrected and tried again. */
+        history.push({ expr: src, err: err.message });
+        onUse({ kind: "evaluate", expr: src, error: err.message, deg });
+      }
       drawHistory();
       $("#cal-live").textContent = "";
       return;
     }
-    if(pane === "graph"){ graph(); onUse({ kind: "graph", expr: src, deg }); }
-    if(pane === "table"){ table(); onUse({ kind: "table", expr: src, deg,
-                            from: parseFloat($("#cal-from").value), step: parseFloat($("#cal-step").value) }); }
+    /* Same for a function that will not compile: it is recorded as attempted,
+       with what went wrong, rather than as though nothing was asked for. */
+    let error = null;
+    try { Calc.compile(src); } catch(e){ error = e.message; }
+    const note = error ? { error } : {};
+    if(pane === "graph"){ graph(); onUse(Object.assign({ kind: "graph", expr: src, deg }, note)); }
+    if(pane === "table"){ table(); onUse(Object.assign({ kind: "table", expr: src, deg,
+                            from: parseFloat($("#cal-from").value),
+                            step: parseFloat($("#cal-step").value) }, note)); }
   }
 
   /* A quiet preview under the input while typing, so the tape only ever holds

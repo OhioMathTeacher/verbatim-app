@@ -136,7 +136,19 @@ Written rather than borrowed, and each part of that was a decision:
 - **Implicit multiplication reads left to right.** `2x`, `3(x+1)` and `2sin(x)` all work, and
   `1/2x` means `(1/2)·x`. Powers group right, so `2^3^2` is 512, and `-2^2` is −4.
 
-**Every use is recorded**, in `tool_uses`, beside the turns and deliberately not among them:
+**Every attempt is recorded**, in `tool_uses`, beside the turns and deliberately not among
+them — including the ones that did not work. An expression that will not parse is written
+down with what went wrong:
+
+```json
+{ "after_turn": 2, "ts": "…", "kind": "evaluate", "expr": "sin(",
+  "error": "the expression stops early", "deg": false }
+```
+
+Recording only what succeeded would make the file a record of what worked rather than of
+what the student did, and where somebody got stuck is worth as much as where they did not.
+Both the report and the reader name a failed attempt as an attempt, rather than printing a
+result that never existed. A successful one carries `result` instead:
 
 ```json
 "tool_uses": [

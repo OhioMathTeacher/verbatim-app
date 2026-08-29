@@ -539,6 +539,8 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 .rcalc .rcw{font-style:italic}
 .rcalc code{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--paper);
   border:1px solid var(--rule);border-radius:7px;padding:3px 9px}
+.rcalc.failed code{border-style:dashed;color:var(--muted)}
+.rcalc .rcn{font-size:12px;color:var(--warn)}
 .gone{margin:0 0 16px;padding:9px 15px;border:1px dashed var(--rule);border-radius:12px;
   color:var(--muted);font-size:13.5px;font-style:italic;text-align:center}
 __RICHTEXT_CSS__
@@ -855,6 +857,7 @@ const I18N = {
     dlcopy: "Download the file again", backconv: "Back to the conversation",
     aiteacher: "AI teacher", you: "You",
     rcalced: "you worked out", rcalcgraph: "you graphed", rcalctable: "you tabulated",
+    rcalctried: "you tried",
     calc: "Calculator", calctab: "Calculate", calcgraph: "Graph", calctable: "Table",
     calcfrom: "from", calcstep: "step", calcreset: "reset", calcclose: "Close the calculator",
     calcworked: "worked out",
@@ -938,6 +941,7 @@ const I18N = {
     dlcopy: "重新下载文件", backconv: "返回对话",
     aiteacher: "AI 老师", you: "你",
     rcalced: "你计算了", rcalcgraph: "你作了图", rcalctable: "你列了表",
+    rcalctried: "你尝试了",
     calc: "计算器", calctab: "计算", calcgraph: "作图", calctable: "数值表",
     calcfrom: "起点", calcstep: "步长", calcreset: "复位", calcclose: "关闭计算器",
     calcworked: "算过",
@@ -2199,11 +2203,20 @@ function fillReport(){
       const d = document.createElement("div");
       d.className = "rcalc";
       const w = document.createElement("span"); w.className = "rcw";
-      w.textContent = tr(KINDWORD[u.kind] || "rcalced");
+      /* An attempt that failed is named as an attempt. Calling it "you worked
+         out" and printing "= undefined" would report the opposite of what
+         happened. */
+      w.textContent = tr(u.error ? "rcalctried" : (KINDWORD[u.kind] || "rcalced"));
       const c = document.createElement("code");
-      c.textContent = u.kind === "evaluate" && u.result != null
+      c.textContent = (!u.error && u.kind === "evaluate" && u.result != null)
         ? u.expr + " = " + ms0(u.result) : (u.expr || "");
       d.append(w, c);
+      if(u.error){
+        d.classList.add("failed");
+        const n = document.createElement("span"); n.className = "rcn";
+        n.textContent = u.error;
+        d.appendChild(n);
+      }
       box.appendChild(d);
     }
   };
