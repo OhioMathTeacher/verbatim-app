@@ -91,7 +91,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 # Bumped by hand, when a change is worth telling a user about.
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 # The activity is whatever prompt you point this at. `examples/` holds the one
 # from the Taylor Series study it was first built for.
 PROMPT_DEFAULT = HERE / "examples" / "taylor-series.txt"

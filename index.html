@@ -933,7 +933,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
-<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.1.0 · 1f9d4d48</p>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.1.1 · 5128a0b7</p>
 
 </div>
 
@@ -1586,6 +1586,12 @@ const Calculator = (() => {
     if(pane === "calc"){
       try {
         const v = Calc.eval(src, { ANS: ans, ans: ans }, deg);
+        /* sqrt(-1) and ln(-1) come back as NaN rather than throwing, and a NaN
+           shown as a dash is not an answer -- worse, it becomes ANS and every
+           line after it is a dash too. Say what happened instead, and leave the
+           last real answer standing. Infinity is left alone: a quantity growing
+           without bound is a thing worth showing in a calculus activity. */
+        if(Number.isNaN(v)) throw new Error("that has no real value");
         lists.calc.push({ id, expr: src, result: v });
         ans = v; t.value = "";
         onUse({ id, kind: "evaluate", expr: src, result: v, deg });
@@ -1609,12 +1615,27 @@ const Calculator = (() => {
     draw();
   }
 
+  /* The last answer still standing. Deleting a line has to move ANS, or it goes
+     on referring to something the student can no longer see -- they delete two
+     lines, the only result left on screen is the first one, and ANS quietly
+     means the second. Falls back to zero when nothing is left, which is where
+     it started. */
+  function lastResult(){
+    for(let i = lists.calc.length - 1; i >= 0; i--){
+      const e = lists.calc[i];
+      if(!e.gone && !e.err && typeof e.result === "number") return e.result;
+    }
+    return 0;
+  }
+
   function drop(id){
     const e = lists[pane].find(x => x.id === id);
     if(!e || e.gone) return;
     e.gone = true;
+    if(pane === "calc") ans = lastResult();
     onDrop(id);
     draw();
+    if(pane === "calc") preview();
   }
 
   function preview(){
@@ -1800,7 +1821,7 @@ const SCHEMA    = "tea-taylor-session/2";
    page that made it, and by the time a transcript raises a question the page is
    usually gone. Additive: nothing in /2 changed shape, so a reader written for
    /2 goes on working and simply has one more thing it may report. */
-const APP       = { name: "verbatim", version: "1.1.0", build: "1f9d4d48" };   // /2: a turn may be a tombstone (no text)
+const APP       = { name: "verbatim", version: "1.1.1", build: "5128a0b7" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --

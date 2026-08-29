@@ -398,6 +398,12 @@ const Calculator = (() => {
     if(pane === "calc"){
       try {
         const v = Calc.eval(src, { ANS: ans, ans: ans }, deg);
+        /* sqrt(-1) and ln(-1) come back as NaN rather than throwing, and a NaN
+           shown as a dash is not an answer -- worse, it becomes ANS and every
+           line after it is a dash too. Say what happened instead, and leave the
+           last real answer standing. Infinity is left alone: a quantity growing
+           without bound is a thing worth showing in a calculus activity. */
+        if(Number.isNaN(v)) throw new Error("that has no real value");
         lists.calc.push({ id, expr: src, result: v });
         ans = v; t.value = "";
         onUse({ id, kind: "evaluate", expr: src, result: v, deg });
@@ -421,12 +427,27 @@ const Calculator = (() => {
     draw();
   }
 
+  /* The last answer still standing. Deleting a line has to move ANS, or it goes
+     on referring to something the student can no longer see -- they delete two
+     lines, the only result left on screen is the first one, and ANS quietly
+     means the second. Falls back to zero when nothing is left, which is where
+     it started. */
+  function lastResult(){
+    for(let i = lists.calc.length - 1; i >= 0; i--){
+      const e = lists.calc[i];
+      if(!e.gone && !e.err && typeof e.result === "number") return e.result;
+    }
+    return 0;
+  }
+
   function drop(id){
     const e = lists[pane].find(x => x.id === id);
     if(!e || e.gone) return;
     e.gone = true;
+    if(pane === "calc") ans = lastResult();
     onDrop(id);
     draw();
+    if(pane === "calc") preview();
   }
 
   function preview(){
