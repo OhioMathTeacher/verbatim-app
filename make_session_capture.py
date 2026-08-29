@@ -89,6 +89,9 @@ import colorsys, hashlib, json, os, re, sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+
+# Bumped by hand, when a change is worth telling a user about.
+VERSION = "1.0.0"
 # The activity is whatever prompt you point this at. `examples/` holds the one
 # from the Taylor Series study it was first built for.
 PROMPT_DEFAULT = HERE / "examples" / "taylor-series.txt"
@@ -280,6 +283,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   padding:0 0 16px;margin:0 0 30px}
 .avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:0 0 auto;
   border:2px solid var(--card);box-shadow:0 0 0 1px var(--rule), var(--shadow)}
+/* Which build this page is, said quietly. Worth having on screen because the
+   page is handed out as a file and then lives on its own: by the time anyone
+   asks what made it, the answer is not anywhere else. */
+.ver{margin:24px 0 0;text-align:center;font-family:var(--mono);font-size:11px;
+  color:var(--muted);opacity:.6;user-select:all}
 .foot{margin:44px 0 0;padding:18px 0 0;border-top:1px solid var(--rule);
   display:flex;align-items:center;gap:12px;font-size:13px;line-height:1.5;color:var(--muted)}
 .foot img{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:0 0 auto;
@@ -637,6 +645,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim __VERSION__ · __BUILD__</p>
 
 </div>
 
@@ -724,7 +733,12 @@ const SECTION   = __SECTION_JSON__;
 let   SURVEY    = __SURVEY_JSON__;
 const FOOTER    = __FOOTER_JSON__;
 const DEMO      = __DEMO_JSON__;
-const SCHEMA    = "tea-taylor-session/2";   // /2: a turn may be a tombstone (no text)
+const SCHEMA    = "tea-taylor-session/2";
+/* Recorded in the session as well as shown on the page. A file outlives the
+   page that made it, and by the time a transcript raises a question the page is
+   usually gone. Additive: nothing in /2 changed shape, so a reader written for
+   /2 goes on working and simply has one more thing it may report. */
+const APP       = { name: "verbatim", version: "__VERSION__", build: "__BUILD__" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --
@@ -1437,7 +1451,7 @@ $("#go-setup").onclick = async () => {
   $("#setup-err").textContent = "";
   /* network_check is part of why a given student ended up on a given provider,
      so it travels with the session. Null when they never ran one. */
-  S = { schema: SCHEMA, participant: pid, group: grp, section: sec,
+  S = { schema: SCHEMA, app: APP, participant: pid, group: grp, section: sec,
         network_check: networkCheck(),
         session_id: rndHex(8), provider: (cfg ? cfg.id : "demo"), model: (cfg ? cfg.model : "demo"),
         started_utc: nowUTC(), exported_utc: null,
@@ -2354,6 +2368,22 @@ def with_assets(page: str) -> str:
 
 
 TEMPLATE = with_assets(TEMPLATE)
+READER_TEXT = (HERE / "reader.src.html").read_text(encoding="utf-8")
+
+# A build id, derived rather than typed. It is a digest of everything that makes
+# a page -- the assembled template with its libraries, and the reader source --
+# taken while the version marks are still tokens, so hashing cannot depend on
+# its own result. It changes when, and only when, the thing it identifies does:
+# no timestamp, so a rebuild of unchanged sources is still byte-identical, which
+# is what lets the built pages be committed and diffed.
+BUILD = hashlib.sha256((TEMPLATE + READER_TEXT).encode("utf-8")).hexdigest()[:8]
+
+
+def stamp(page: str) -> str:
+    return page.replace("__VERSION__", VERSION).replace("__BUILD__", BUILD)
+
+
+TEMPLATE = stamp(TEMPLATE)
 
 SETUP_SRC  = HERE / "setup.src.html"
 READER_SRC = HERE / "reader.src.html"
@@ -2366,7 +2396,7 @@ def build_reader() -> str:
     would misreport the session, so the reader takes its delimiters, its
     fallback and its library from the same place the activity does.
     """
-    return with_assets(READER_SRC.read_text(encoding="utf-8"))
+    return stamp(with_assets(READER_TEXT))
 
 
 def build_setup(defaults: dict) -> str:

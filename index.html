@@ -42,6 +42,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   padding:0 0 16px;margin:0 0 30px}
 .avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:0 0 auto;
   border:2px solid var(--card);box-shadow:0 0 0 1px var(--rule), var(--shadow)}
+/* Which build this page is, said quietly. Worth having on screen because the
+   page is handed out as a file and then lives on its own: by the time anyone
+   asks what made it, the answer is not anywhere else. */
+.ver{margin:24px 0 0;text-align:center;font-family:var(--mono);font-size:11px;
+  color:var(--muted);opacity:.6;user-select:all}
 .foot{margin:44px 0 0;padding:18px 0 0;border-top:1px solid var(--rule);
   display:flex;align-items:center;gap:12px;font-size:13px;line-height:1.5;color:var(--muted)}
 .foot img{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:0 0 auto;
@@ -750,6 +755,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.0.0 · 9e104c4a</p>
 
 </div>
 
@@ -1010,7 +1016,12 @@ const SECTION   = "S4";
 let   SURVEY    = [{"id": "llms_used", "type": "multi", "en": "Which large language models (LLMs) have you used before?", "zh": "你以前使用过哪些大语言模型（LLM）？", "options": [{"v": "chatgpt", "en": "ChatGPT (OpenAI)", "zh": "ChatGPT（OpenAI）"}, {"v": "deepseek", "en": "DeepSeek", "zh": "DeepSeek"}, {"v": "claude", "en": "Claude.ai", "zh": "Claude.ai"}, {"v": "other", "en": "Other (please specify)", "zh": "其他（请说明）", "specify": true}, {"v": "none", "en": "I have not used any LLMs before this course", "zh": "在本课程之前我没有使用过任何大语言模型"}]}, {"id": "how_long", "type": "single", "en": "How long have you been using LLMs?", "zh": "你使用大语言模型有多长时间了？", "options": [{"v": "lt1m", "en": "Less than 1 month", "zh": "不到 1 个月"}, {"v": "1_6m", "en": "1–6 months", "zh": "1–6 个月"}, {"v": "7_12m", "en": "7–12 months", "zh": "7–12 个月"}, {"v": "gt1y", "en": "Over 1 year", "zh": "1 年以上"}, {"v": "none", "en": "I have not used LLMs before this course", "zh": "在本课程之前我没有使用过大语言模型"}]}, {"id": "how_often", "type": "single", "en": "How often do you use LLMs?", "zh": "你使用大语言模型的频率是？", "options": [{"v": "never", "en": "Never", "zh": "从不"}, {"v": "lt_weekly", "en": "Less than once a week", "zh": "每周不到一次"}, {"v": "weekly", "en": "Once a week", "zh": "每周一次"}, {"v": "several", "en": "Several times per week", "zh": "每周数次"}, {"v": "daily", "en": "Daily", "zh": "每天"}]}, {"id": "purposes", "type": "multi", "en": "For what purposes do you typically use LLMs?", "zh": "你通常出于什么目的使用大语言模型？", "options": [{"v": "faster", "en": "To complete homework or assignments more quickly", "zh": "更快地完成作业"}, {"v": "check", "en": "To check or correct my own work", "zh": "检查或订正自己的作业"}, {"v": "learn", "en": "To help me learn or understand new topics", "zh": "帮助我学习或理解新知识"}, {"v": "search", "en": "To search for information", "zh": "查找信息"}, {"v": "fun", "en": "For entertainment or curiosity", "zh": "娱乐或出于好奇"}, {"v": "other", "en": "Other (please specify)", "zh": "其他（请说明）", "specify": true}]}, {"id": "other_courses", "type": "single", "en": "Have you used LLMs (like ChatGPT or DeepSeek) in other university courses?", "zh": "你在其他大学课程中使用过大语言模型（如 ChatGPT 或 DeepSeek）吗？", "options": [{"v": "yes_freq", "en": "Yes, frequently", "zh": "是，经常使用"}, {"v": "yes_some", "en": "Yes, sometimes", "zh": "是，有时使用"}, {"v": "only_this", "en": "No, only for this course", "zh": "没有，只在本课程中使用"}, {"v": "never", "en": "No, never", "zh": "没有，从未使用"}]}, {"id": "professor_views", "type": "single", "en": "How do your other professors view the use of AI tools like ChatGPT?", "zh": "你的其他老师如何看待使用 ChatGPT 这类 AI 工具？", "options": [{"v": "encourage", "en": "They encourage it", "zh": "他们鼓励使用"}, {"v": "allow", "en": "They allow it, but do not encourage", "zh": "他们允许使用，但不鼓励"}, {"v": "discourage", "en": "They discourage it", "zh": "他们不鼓励使用"}, {"v": "unknown", "en": "I don't know", "zh": "我不清楚"}, {"v": "na", "en": "Not applicable", "zh": "不适用"}]}, {"id": "alone_or_with", "type": "single", "en": "Did you work alone or with others for this assignment?", "zh": "本次作业你是独立完成还是与他人合作？", "options": [{"v": "alone", "en": "Alone", "zh": "独立完成"}, {"v": "classmates", "en": "With classmates (group discussion)", "zh": "与同学一起（小组讨论）"}, {"v": "other", "en": "Other (please specify)", "zh": "其他（请说明）", "specify": true}]}, {"id": "helped_learn", "type": "likert", "en": "This assignment helped me learn calculus concepts better.", "zh": "这次作业帮助我更好地理解了微积分概念。", "options": [{"v": "1", "en": "Strongly disagree", "zh": "非常不同意"}, {"v": "2", "en": "Disagree", "zh": "不同意"}, {"v": "3", "en": "Neutral", "zh": "中立"}, {"v": "4", "en": "Agree", "zh": "同意"}, {"v": "5", "en": "Strongly agree", "zh": "非常同意"}]}, {"id": "attitude_after", "type": "single", "en": "After this assignment, my attitude toward using AI for learning is:", "zh": "完成这次作业后，我对使用 AI 学习的态度是：", "options": [{"v": "much_pos", "en": "Much more positive", "zh": "积极很多"}, {"v": "some_pos", "en": "Somewhat more positive", "zh": "略微更积极"}, {"v": "same", "en": "No change", "zh": "没有变化"}, {"v": "some_neg", "en": "Somewhat more negative", "zh": "略微更消极"}, {"v": "much_neg", "en": "Much more negative", "zh": "消极很多"}]}, {"id": "comments", "type": "text", "en": "Please share any other comments about your experience using AI or LLMs for this assignment:", "zh": "关于本次作业中使用 AI 或大语言模型的体验，你还有什么想补充的？"}];
 const FOOTER    = "";
 const DEMO      = false;
-const SCHEMA    = "tea-taylor-session/2";   // /2: a turn may be a tombstone (no text)
+const SCHEMA    = "tea-taylor-session/2";
+/* Recorded in the session as well as shown on the page. A file outlives the
+   page that made it, and by the time a transcript raises a question the page is
+   usually gone. Additive: nothing in /2 changed shape, so a reader written for
+   /2 goes on working and simply has one more thing it may report. */
+const APP       = { name: "verbatim", version: "1.0.0", build: "9e104c4a" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --
@@ -1723,7 +1734,7 @@ $("#go-setup").onclick = async () => {
   $("#setup-err").textContent = "";
   /* network_check is part of why a given student ended up on a given provider,
      so it travels with the session. Null when they never ran one. */
-  S = { schema: SCHEMA, participant: pid, group: grp, section: sec,
+  S = { schema: SCHEMA, app: APP, participant: pid, group: grp, section: sec,
         network_check: networkCheck(),
         session_id: rndHex(8), provider: (cfg ? cfg.id : "demo"), model: (cfg ? cfg.model : "demo"),
         started_utc: nowUTC(), exported_utc: null,

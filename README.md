@@ -113,6 +113,34 @@ browser draws itself. Nothing is fetched: a page opened from `file://` on a clas
 machine with no network still shows mathematics. Anything Temml cannot parse falls back to
 the raw characters rather than vanishing.
 
+## Which build is this
+
+Every page says so, quietly, at the foot: `verbatim 1.0.0 · 9e104c4a`. The first half is
+the version, bumped by hand when a change is worth telling someone about. The second is a
+digest of everything that makes a page — the assembled template with its libraries, and the
+reader source — so it changes when, and only when, the thing it identifies changes.
+
+There is no timestamp in it, deliberately. A rebuild of unchanged sources stays
+byte-identical, which is what lets the built pages be committed and diffed, and it means
+two people building the same commit get the same id.
+
+The same marks go into the session file:
+
+```json
+"app": { "name": "verbatim", "version": "1.0.0", "build": "9e104c4a" }
+```
+
+A page is handed out as a file and then lives on its own; by the time a transcript raises a
+question, the page that produced it is usually long gone. The reader shows this back as
+**Recorded with**, and says `not recorded` for a session made before it was kept. The field
+is additive — nothing in `/2` changed shape, so a reader written for `/2` goes on working.
+
+Both build routes are stamped from the same place. The version is baked into the template
+when the generator loads, so a page built in the browser through `setup.html` carries the
+version of the generator that produced that `setup.html`, without `setup.src.html` having
+to remember a token. Which route built a given page is already recorded separately, in
+`activity_prompt.source`.
+
 ## Light or dark
 
 The activity follows the machine, and the ☾ button in the corner overrides it either way.
