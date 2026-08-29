@@ -537,6 +537,7 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 .gone{margin:0 0 16px;padding:9px 15px;border:1px dashed var(--rule);border-radius:12px;
   color:var(--muted);font-size:13.5px;font-style:italic;text-align:center}
 __RICHTEXT_CSS__
+__CALCULATOR_CSS__
 __TEMML_CSS__
 </style>
 
@@ -649,6 +650,8 @@ try{
 
 </div>
 
+<aside class="cal" id="cal" aria-label="Calculator"></aside>
+
 <div class="ai-modal-overlay" id="ai-modal-overlay">
   <div class="ai-modal" role="dialog" aria-labelledby="ai-modal-title" aria-modal="true">
     <button type="button" class="ai-x" id="ai-x" aria-label="Close" title="Close">&times;</button>
@@ -714,6 +717,7 @@ try{
   <div class="inner">
     <textarea id="say" rows="1" data-i18n-ph="sayph"></textarea>
     <button id="math" class="ghost mathbtn" title="Maths symbols" aria-expanded="false">&#8721;</button>
+    <button id="calcbtn" class="ghost mathbtn" aria-expanded="false"><span aria-hidden="true">&#8730;</span></button>
     <button id="send" data-i18n="send">Send</button>
   </div>
 </div>
@@ -722,6 +726,7 @@ try{
      the page must open from file:// with nothing to fetch. -->
 <script>__TEMML_JS__</script>
 <script>__RICHTEXT_JS__</script>
+<script>__CALCULATOR_JS__</script>
 
 <script>
 const PROVIDERS = __PROVIDERS_JSON__;
@@ -839,6 +844,9 @@ const I18N = {
     forgotnone: "There were no keys stored.",
     dlcopy: "Download the file again", backconv: "Back to the conversation",
     aiteacher: "AI teacher", you: "You",
+    calc: "Calculator", calctab: "Calculate", calcgraph: "Graph", calctable: "Table",
+    calcfrom: "from", calcstep: "step", calcreset: "reset", calcclose: "Close the calculator",
+    calcworked: "worked out",
     del: "Delete this exchange",
     delask: "Delete this exchange?\n\nYour words and the reply are removed from what you hand in. The file will still record that an exchange was here, and how long it was — so what you submit stays an honest account of the session.\n\nThis cannot be undone.",
     delgone: "Exchange deleted",
@@ -918,6 +926,9 @@ const I18N = {
     forgotnone: "没有已保存的密钥。",
     dlcopy: "重新下载文件", backconv: "返回对话",
     aiteacher: "AI 老师", you: "你",
+    calc: "计算器", calctab: "计算", calcgraph: "作图", calctable: "数值表",
+    calcfrom: "起点", calcstep: "步长", calcreset: "复位", calcclose: "关闭计算器",
+    calcworked: "算过",
     del: "删除这段对话",
     delask: "要删除这段对话吗？\n\n你的发言和这条回复都会从你提交的文件中移除。文件仍会记录此处曾有一段对话及其长度——这样你提交的内容依然是本次会话的如实记录。\n\n此操作无法撤销。",
     delgone: "已删除的对话",
@@ -1001,6 +1012,31 @@ $("#lang").onclick = () => {
   try{ localStorage.setItem("tea.lang", lang); }catch(e){}
   applyLang();
 };
+
+/* ---------- the calculator ----------
+   Opened from the bar, beside the symbol palette, because it is wanted while a
+   reply is being written and read. What it works out is recorded: see the note
+   in calculator.js for why it goes beside the turns rather than among them. */
+Calculator.mount({
+  host: $("#cal"),
+  tr,
+  onUse(use){
+    if(!S || !S.turns) return;
+    if(!S.tool_uses) S.tool_uses = [];
+    /* Where in the conversation it happened, so a transcript can put it back in
+       the right place. A number worked out before the AI suggested it is a
+       different thing from one worked out after. */
+    S.tool_uses.push(Object.assign({ after_turn: S.turns.length - 1, ts: nowUTC() }, use));
+    save();
+  },
+});
+Calculator.onclose = () => $("#calcbtn").setAttribute("aria-expanded", "false");
+$("#calcbtn").title = tr("calc");
+$("#calcbtn").onclick = () => {
+  Calculator.toggle();
+  $("#calcbtn").setAttribute("aria-expanded", String(Calculator.isOpen()));
+};
+addEventListener("resize", () => Calculator.redraw());
 
 /* ---------- light or dark ----------
    A preference about reading, not about the activity: stored in this browser
@@ -1451,7 +1487,7 @@ $("#go-setup").onclick = async () => {
   $("#setup-err").textContent = "";
   /* network_check is part of why a given student ended up on a given provider,
      so it travels with the session. Null when they never ran one. */
-  S = { schema: SCHEMA, app: APP, participant: pid, group: grp, section: sec,
+  S = { schema: SCHEMA, app: APP, tool_uses: [], participant: pid, group: grp, section: sec,
         network_check: networkCheck(),
         session_id: rndHex(8), provider: (cfg ? cfg.id : "demo"), model: (cfg ? cfg.model : "demo"),
         started_utc: nowUTC(), exported_utc: null,
@@ -2357,10 +2393,14 @@ TEMML_JS  = ("/*\n" + _asset("temml.LICENSE").strip()
 # so a transcript cannot come to look different from the conversation it records.
 RICHTEXT_JS  = (HERE / "richtext.js").read_text(encoding="utf-8").strip()
 RICHTEXT_CSS = (HERE / "richtext.css").read_text(encoding="utf-8").strip()
+CALCULATOR_JS  = (HERE / "calculator.js").read_text(encoding="utf-8").strip()
+CALCULATOR_CSS = (HERE / "calculator.css").read_text(encoding="utf-8").strip()
 
 
 def with_assets(page: str) -> str:
     return (page
+            .replace("__CALCULATOR_CSS__", CALCULATOR_CSS)
+            .replace("__CALCULATOR_JS__", CALCULATOR_JS)
             .replace("__RICHTEXT_CSS__", RICHTEXT_CSS)
             .replace("__RICHTEXT_JS__", RICHTEXT_JS)
             .replace("__TEMML_CSS__", TEMML_CSS)

@@ -113,6 +113,47 @@ browser draws itself. Nothing is fetched: a page opened from `file://` on a clas
 machine with no network still shows mathematics. Anything Temml cannot parse falls back to
 the raw characters rather than vanishing.
 
+## The calculator
+
+A drawer on the right, opened from √ beside the symbol palette in the reply bar. Three
+things: an expression to evaluate, a function to graph, and a table of values. It is drawn
+from the page's own colours, so it follows the light and dark the rest of the page is in.
+
+Written rather than borrowed, and each part of that was a decision:
+
+- **No TI-84 emulator.** Emulating one needs Texas Instruments' ROM, which cannot be
+  redistributed — and these pages are handed out as files, so shipping it would be
+  distributing it. An emulator would also record keystrokes, leaving what a student meant to
+  be reconstructed afterwards, which is the problem this instrument exists to remove.
+- **No Desmos, no CDN.** A third-party script would have full access to a page that records
+  a research session, and would not load at all from `file://` or from a classroom with no
+  network. The engine is about two hundred lines and carries no licence.
+- **Degrees and radians on the face.** On a real graphing calculator the mode is two menus
+  down and it silently changes the answer. Activity 1 turns on students noticing that
+  sin θ ≈ θ holds in radians and not degrees, so it is the one setting always in view.
+- **A table, not only a graph.** Activity 1 asks students to find how small an angle has to
+  be by *trying values*. A column is the tool for that; a curve is not.
+- **Implicit multiplication reads left to right.** `2x`, `3(x+1)` and `2sin(x)` all work, and
+  `1/2x` means `(1/2)·x`. Powers group right, so `2^3^2` is 512, and `-2^2` is −4.
+
+**Every use is recorded**, in `tool_uses`, beside the turns and deliberately not among them:
+
+```json
+"tool_uses": [
+  { "after_turn": 2, "ts": "…", "kind": "evaluate",
+    "expr": "0.2 - 0.2^3/3!", "result": 0.19866666666666669, "deg": false }
+]
+```
+
+A calculator whose use went unrecorded would make the file quietly incomplete again — the
+page would know the student computed something and the file would not. Putting it among the
+turns instead would put the turn counts and the words-per-speaker ratio wrong, in exactly
+the way tombstones were designed to avoid. `after_turn` says where in the conversation it
+happened, so the reader can put it back in place: a number worked out *before* the AI
+offered it is a different thing from one worked out after.
+
+The field is additive, so `/2` readers written before it go on working.
+
 ## Which build is this
 
 Every page says so, quietly, at the foot: `verbatim 1.0.0 · 9e104c4a`. The first half is

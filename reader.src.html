@@ -85,6 +85,14 @@ pre{font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;background:var
    rather than something that was never said. */
 .bubble-gone{background:transparent !important;border-style:dashed !important;box-shadow:none}
 .gonetext{margin:0;color:var(--muted);font-style:italic;font-size:14px}
+/* Something the student worked out, shown where they worked it out. */
+.calcuse { display: flex; align-items: center; gap: 9px; justify-content: center;
+  margin: 14px 0 0; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.calcuse code { font-family: var(--mono); font-size: 12.5px; color: var(--ink);
+  background: var(--card); border: 1px solid var(--rule); border-radius: 7px; padding: 3px 9px; }
+.calcuse .cw { font-style: italic; }
+.calcuse .cm { font-family: var(--mono); font-size: 10.5px; opacity: .7; }
+
 /* This reader's own build, said as quietly as the activity says its own. */
 .ver{margin:26px 0 0;text-align:center;font-family:var(--mono);font-size:11px;
   color:var(--muted);opacity:.6;user-select:all}
@@ -130,7 +138,8 @@ const T = {
     deletedat:"deleted",
     swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
     reach:"Services that answered", noreach:"not recorded", schema:"Schema",
-    madeby:"Recorded with",
+    madeby:"Recorded with", calcs:"Worked out", calcn:"used the calculator",
+    calceval:"worked out", calcgraph:"graphed", calctable:"tabulated",
     latency:"replied in", compose:"typed for", elapsed:"at", inserts:"maths palette used",
     badfile:"That does not look like a session file from the activity.",
     badjson:"That file is not readable JSON.", question:"Question", answer:"Answer",
@@ -147,7 +156,8 @@ const T = {
     deletedat:"删除于",
     swords:"学生", awords:"AI", promptsha:"指令 SHA-256", psource:"指令来源",
     reach:"有响应的服务", noreach:"未记录", schema:"数据格式",
-    madeby:"记录工具",
+    madeby:"记录工具", calcs:"计算次数", calcn:"次使用计算器",
+    calceval:"计算了", calcgraph:"作图", calctable:"列表",
     latency:"回复用时", compose:"输入用时", elapsed:"发生于", inserts:"使用数学面板",
     badfile:"这似乎不是活动生成的会话文件。",
     badjson:"该文件不是可读的 JSON。", question:"问题", answer:"回答",
@@ -201,9 +211,26 @@ function render(d){
             nc && nc.checked_utc ? nc.checked_utc : "");
   h += fact(tr("schema"), d.schema);
   h += fact(tr("madeby"), d.app ? `${d.app.name} ${d.app.version} · ${d.app.build}` : tr("noreach"));
+  const uses = Array.isArray(d.tool_uses) ? d.tool_uses : [];
+  if (uses.length) h += fact(tr("calcs"), `${uses.length} ${tr("calcn")}`);
   h += `</div>`;
 
-  for (const t of turns){
+  const KIND = { evaluate: "calceval", graph: "calcgraph", table: "calctable" };
+  const calcAt = i => uses.filter(u => (u.after_turn == null ? -1 : u.after_turn) === i).map(u => {
+    /* Twelve figures, trailing zeros gone. A transcript reading
+       0.19866666666666669 is reporting the float, not the answer. */
+    const num = n => !isFinite(n) ? String(n)
+      : (Number.isInteger(n) && Math.abs(n) < 1e15) ? String(n)
+      : parseFloat(n.toPrecision(12)).toString();
+    const what = u.kind === "evaluate" && u.result != null
+      ? `${esc(u.expr)} = ${esc(num(u.result))}`
+      : esc(u.expr || "");
+    return `<div class="calcuse"><span class="cw">${esc(tr(KIND[u.kind] || "calceval"))}</span>`
+         + `<code>${what}</code><span class="cm">${u.deg ? "deg" : "rad"}</span></div>`;
+  }).join("");
+
+  h += calcAt(-1);
+  for (const [ti, t] of turns.entries()){
     const role = t.role === "student" ? "student" : "ai";
     const bits = [];
     if (t.latency_ms != null && role === "ai")  bits.push(`${tr("latency")} ${ms(t.latency_ms)}`);
@@ -228,6 +255,7 @@ function render(d){
         <div class="text rt">${renderRich(t.text)}</div>
         ${bits.length ? `<p class="meta">${esc(bits.join("  ·  "))}</p>` : ""}
       </div></div>`;
+    h += calcAt(ti);
   }
 
   h += `<h2>${esc(tr("survey"))}</h2>`;

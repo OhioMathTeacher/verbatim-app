@@ -1,0 +1,96 @@
+/* The calculator drawer. Every colour comes from the page's own variables, so
+   it follows the light and dark the rest of the page is in without knowing
+   anything about which one it is. */
+.cal {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 370px; max-width: 92vw;
+  background: var(--card); border-left: 1px solid var(--rule);
+  box-shadow: -14px 0 40px -20px rgba(0,0,0,.32);
+  display: flex; flex-direction: column; z-index: 40;
+  transform: translateX(102%); transition: transform .22s ease;
+  font-family: var(--sans);
+}
+.cal.open { transform: none; }
+@media (prefers-reduced-motion: reduce) { .cal { transition: none; } }
+
+.cal-top { display: flex; align-items: center; gap: 10px; padding: 13px 15px;
+  border-bottom: 1px solid var(--rule); }
+.cal-name { font-family: var(--serif); font-size: 16px; flex: 1; }
+.cal-angle { display: flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.cal-angle button { background: transparent; border: 0; color: var(--muted); cursor: pointer;
+  font: 11.5px var(--sans); padding: 5px 10px; letter-spacing: .05em; }
+.cal-angle button.on { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.cal-x { background: transparent; border: 0; color: var(--muted); cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 5px 7px; border-radius: 7px; }
+.cal-x:hover { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
+
+.cal-tabs { display: flex; border-bottom: 1px solid var(--rule); }
+.cal-tabs button { flex: 1; background: transparent; border: 0; border-bottom: 2px solid transparent;
+  color: var(--muted); cursor: pointer; font: 13.5px var(--sans); padding: 9px 0; }
+.cal-tabs button.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+.cal-body { flex: 1; overflow: auto; }
+.cal-pane { display: none; flex-direction: column; gap: 9px; padding: 13px 15px; }
+.cal-pane.on { display: flex; }
+
+.cal-entry { display: flex; align-items: center; gap: 7px; min-width: 0;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 9px; padding: 9px 11px; }
+/* The page styles form labels as small uppercase headings, which turns f(x)
+   into F(X). Mathematics is case-sensitive, so opt out of it here. */
+.cal-entry label { color: var(--muted); font-size: 13px; flex: 0 0 auto;
+  display: inline; font-weight: normal; letter-spacing: 0; text-transform: none;
+  font-family: var(--mono); }
+.cal-entry input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
+  font: 15.5px var(--mono); }
+.cal-entry input:focus { outline: none; }
+.cal-out { text-align: right; font: 25px var(--mono); color: var(--ink);
+  word-break: break-all; min-height: 33px; }
+.cal-out.err { font: 13.5px var(--sans); color: var(--warn); text-align: left; line-height: 1.5; }
+.cal-err { color: var(--warn); font-size: 13px; padding: 9px 11px; margin: 0; }
+
+.cal canvas { width: 100%; height: 178px; display: block; border-radius: 9px;
+  background: var(--paper); border: 1px solid var(--rule); touch-action: none; cursor: crosshair; }
+.cal-wrow { display: flex; gap: 6px; align-items: center; }
+.cal-wrow button { background: transparent; border: 1px solid var(--rule); border-radius: 7px;
+  color: var(--muted); cursor: pointer; font: 12px var(--sans); padding: 4px 11px; }
+.cal-wrow button:hover { border-color: var(--accent); color: var(--accent); }
+.cal-sp { flex: 1; }
+.cal-rng { color: var(--muted); font: 10.5px var(--mono); }
+
+/* min-width:0 or these refuse to shrink and the row runs off the side. */
+.cal-two { display: flex; gap: 7px; }
+.cal-two .cal-entry { flex: 1; min-width: 0; padding: 8px 9px; }
+.cal-two .cal-entry label { font-size: 11.5px; }
+.cal-two .cal-entry input { font-size: 13.5px; }
+
+.cal-tbl { overflow: auto; max-height: 176px; border: 1px solid var(--rule); border-radius: 9px; }
+.cal-tbl table { width: 100%; border-collapse: collapse; font: 12.5px var(--mono); }
+.cal-tbl th, .cal-tbl td { padding: 5px 11px; text-align: right; border-bottom: 1px solid var(--rule); }
+.cal-tbl th { color: var(--muted); font-weight: normal; position: sticky; top: 0; background: var(--card); }
+.cal-tbl tr:last-child td { border-bottom: 0; }
+
+.cal-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
+  background: var(--rule); padding: 1px; border-top: 1px solid var(--rule); }
+.cal-pad button { background: var(--card); border: 0; color: var(--ink); cursor: pointer;
+  font: 16px var(--serif); padding: 13px 0; }
+.cal-pad button:hover { background: var(--paper); }
+.cal-pad button:active { background: color-mix(in srgb, var(--accent) 12%, var(--paper)); }
+.cal-pad .fn { color: var(--ai); font-size: 14px; }
+.cal-pad .op { color: var(--accent); }
+.cal-pad .act { color: var(--ok); }
+.cal-pad .del { color: var(--warn); }
+
+/* The input bar is fixed and full width. On a wide screen the drawer sits over
+   its right end, so the bar is inset to keep Send reachable; on a narrow one the
+   drawer becomes a sheet and the bar goes under it. */
+@media (min-width: 760px) {
+  body.cal-open .bar { right: 370px; }
+  .bar { transition: right .22s ease; }
+}
+@media (max-width: 759px) {
+  .cal { width: 100%; max-width: 100%; top: auto; height: 88vh; border-left: 0;
+    border-top: 1px solid var(--rule); border-radius: 16px 16px 0 0;
+    transform: translateY(102%); }
+  .cal.open { transform: none; }
+  body.cal-open .bar { display: none; }
+  .cal canvas { height: 150px; }
+}
