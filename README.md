@@ -185,7 +185,7 @@ The field is additive, so `/2` readers written before it go on working.
 
 ## Which build is this
 
-Every page says so, quietly, at the foot: `verbatim 1.0.0 · 9e104c4a`. The first half is
+Every page says so, quietly, at the foot: `verbatim 1.1.0 · 1f9d4d48`. The first half is
 the version, bumped by hand when a change is worth telling someone about. The second is a
 digest of everything that makes a page — the assembled template with its libraries, and the
 reader source — so it changes when, and only when, the thing it identifies changes.
@@ -197,7 +197,7 @@ two people building the same commit get the same id.
 The same marks go into the session file:
 
 ```json
-"app": { "name": "verbatim", "version": "1.0.0", "build": "9e104c4a" }
+"app": { "name": "verbatim", "version": "1.1.0", "build": "1f9d4d48" }
 ```
 
 A page is handed out as a file and then lives on its own; by the time a transcript raises a
