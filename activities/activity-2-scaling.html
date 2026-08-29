@@ -293,6 +293,11 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
   opacity:0;transition:opacity .12s ease, color .12s ease}
 .turn:hover .binbtn, .binbtn:focus-visible{opacity:.75}
 .binbtn:hover{opacity:1;color:var(--warn);background:color-mix(in srgb, var(--warn) 12%, transparent)}
+.rcalc{display:flex;align-items:center;gap:9px;justify-content:center;margin:0 0 14px;
+  font-size:13px;color:var(--muted);flex-wrap:wrap}
+.rcalc .rcw{font-style:italic}
+.rcalc code{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--rule);border-radius:7px;padding:3px 9px}
 .gone{margin:0 0 16px;padding:9px 15px;border:1px dashed var(--rule);border-radius:12px;
   color:var(--muted);font-size:13.5px;font-style:italic;text-align:center}
 /* Styling for what richtext.js draws. Inlined into both the activity and the
@@ -356,9 +361,31 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
   color: var(--muted); cursor: pointer; font: 13.5px var(--sans); padding: 9px 0; }
 .cal-tabs button.on { color: var(--accent); border-bottom-color: var(--accent); }
 
-.cal-body { flex: 1; overflow: auto; }
+.cal-body { flex: 1; overflow: auto; min-height: 0; }
 .cal-pane { display: none; flex-direction: column; gap: 9px; padding: 13px 15px; }
 .cal-pane.on { display: flex; }
+
+/* The running tape. Newest at the bottom, the way a conversation reads and the
+   way the home screen of the calculator this borrows from reads. */
+.cal-hist { display: flex; flex-direction: column; gap: 11px; }
+.cal-h { display: flex; flex-direction: column; gap: 2px; }
+.cal-he { font: 13px var(--mono); color: var(--muted); word-break: break-all; }
+.cal-hr { font: 19px var(--mono); color: var(--ink); text-align: right; word-break: break-all; }
+.cal-h.err .cal-hr { font: 13px var(--sans); color: var(--warn); text-align: left; line-height: 1.45; }
+
+/* The input strip, pinned above the keypad so a key lands in the line just
+   above the thumb that pressed it. */
+.cal-inputs { border-top: 1px solid var(--rule); }
+.cal-line { display: none; align-items: center; gap: 8px; padding: 10px 14px; min-width: 0; }
+.cal-line.on { display: flex; }
+.cal-line label, .cal-caret { color: var(--muted); font: 13px var(--mono); flex: 0 0 auto;
+  text-transform: none; letter-spacing: 0; font-weight: normal; display: inline; }
+.cal-line input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
+  font: 16px var(--mono); }
+.cal-line input:focus { outline: none; }
+/* What the line would come to, shown while typing, so the tape only holds
+   things the student meant to keep. */
+.cal-live { font: 13px var(--mono); color: var(--muted); flex: 0 0 auto; opacity: .8; }
 
 .cal-entry { display: flex; align-items: center; gap: 7px; min-width: 0;
   background: var(--paper); border: 1px solid var(--rule); border-radius: 9px; padding: 9px 11px; }
@@ -370,9 +397,6 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 .cal-entry input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
   font: 15.5px var(--mono); }
 .cal-entry input:focus { outline: none; }
-.cal-out { text-align: right; font: 25px var(--mono); color: var(--ink);
-  word-break: break-all; min-height: 33px; }
-.cal-out.err { font: 13.5px var(--sans); color: var(--warn); text-align: left; line-height: 1.5; }
 .cal-err { color: var(--warn); font-size: 13px; padding: 9px 11px; margin: 0; }
 
 .cal canvas { width: 100%; height: 178px; display: block; border-radius: 9px;
@@ -851,7 +875,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
-<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.0.0 · e83af234</p>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.0.0 · 667d5c1a</p>
 
 </div>
 
@@ -922,7 +946,7 @@ try{
   <div class="inner">
     <textarea id="say" rows="1" data-i18n-ph="sayph"></textarea>
     <button id="math" class="ghost mathbtn" title="Maths symbols" aria-expanded="false">&#8721;</button>
-    <button id="calcbtn" class="ghost mathbtn" aria-expanded="false"><span aria-hidden="true">&#8730;</span></button>
+    <button id="calcbtn" class="ghost mathbtn" aria-expanded="false"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="1.6" width="10" height="12.8" rx="1.6"/><rect x="5.1" y="3.7" width="5.8" height="2.4" rx=".6"/><path d="M5.4 8.6h.01M8 8.6h.01M10.6 8.6h.01M5.4 11.2h.01M8 11.2h.01M10.6 11.2h.01"/></svg></button>
     <button id="send" data-i18n="send">Send</button>
   </div>
 </div>
@@ -1330,7 +1354,8 @@ const Calc = (() => {
    in exactly the way tombstones were designed to avoid. */
 const Calculator = (() => {
   let host = null, tr = k => k, onUse = () => {}, built = false, deg = false;
-  let pane = "calc", win = null, cv = null, ctx = null, target = null;
+  let pane = "calc", win = null, cv = null, ctx = null;
+  let history = [], ans = 0;
   const RESET = { x0: -6.5, x1: 6.5, y0: -3, y1: 3 };
   const $ = s => host.querySelector(s);
 
@@ -1341,15 +1366,21 @@ const Calculator = (() => {
     if(a !== 0 && (a < 1e-6 || a >= 1e12)) return n.toExponential(6);
     return parseFloat(n.toPrecision(12)).toString();
   }
+  const esc = t => String(t).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 
+  /* One key changes with the pane. In Calculate the useful thing is the last
+     answer; in Graph and Table it is the variable. Neither means anything in
+     the other place, so the key says whichever one applies. */
   const KEYS = [
     ["sin(", "sin", "fn"], ["cos(", "cos", "fn"], ["tan(", "tan", "fn"], ["√(", "√", "fn"], ["@del", "⌫", "del"],
-    ["π", "π", "fn"], ["x", "x", "fn"], ["^", "^", "fn"], ["!", "!", "fn"], ["@clear", "C", "del"],
+    ["π", "π", "fn"], ["@var", "x", "fn"], ["^", "^", "fn"], ["!", "!", "fn"], ["@clear", "C", "del"],
     ["7", "7", ""], ["8", "8", ""], ["9", "9", ""], ["(", "(", "op"], [")", ")", "op"],
     ["4", "4", ""], ["5", "5", ""], ["6", "6", ""], ["×", "×", "op"], ["÷", "÷", "op"],
     ["1", "1", ""], ["2", "2", ""], ["3", "3", ""], ["+", "+", "op"], ["−", "−", "op"],
     ["0", "0", ""], [".", ".", ""], ["ln(", "ln", "fn"], ["log(", "log", "fn"], ["@go", "=", "act"],
   ];
+
+  const inputFor = p => $(`.cal-line[data-for="${p}"] input`);
 
   function build(){
     host.innerHTML = `
@@ -1365,13 +1396,12 @@ const Calculator = (() => {
         <button type="button" data-pane="graph">${tr("calcgraph")}</button>
         <button type="button" data-pane="table">${tr("calctable")}</button>
       </div>
-      <div class="cal-body">
+
+      <div class="cal-body" id="cal-body">
         <div class="cal-pane on" data-pane="calc">
-          <div class="cal-entry"><input id="cal-in" inputmode="text" autocomplete="off" spellcheck="false" placeholder="0.2 - 0.2^3/3!"></div>
-          <div class="cal-out" id="cal-out">&nbsp;</div>
+          <div class="cal-hist" id="cal-hist"></div>
         </div>
         <div class="cal-pane" data-pane="graph">
-          <div class="cal-entry"><label>y =</label><input id="cal-gin" autocomplete="off" spellcheck="false" placeholder="sin(x)"></div>
           <canvas id="cal-cv"></canvas>
           <div class="cal-wrow">
             <button type="button" data-zoom="0.5">+</button><button type="button" data-zoom="2">−</button>
@@ -1380,7 +1410,6 @@ const Calculator = (() => {
           </div>
         </div>
         <div class="cal-pane" data-pane="table">
-          <div class="cal-entry"><label>f(x) =</label><input id="cal-tin" autocomplete="off" spellcheck="false" placeholder="sin(x) - x"></div>
           <div class="cal-two">
             <div class="cal-entry"><label>${tr("calcfrom")}</label><input id="cal-from" value="0" autocomplete="off"></div>
             <div class="cal-entry"><label>${tr("calcstep")}</label><input id="cal-step" value="0.1" autocomplete="off"></div>
@@ -1388,6 +1417,17 @@ const Calculator = (() => {
           <div class="cal-tbl" id="cal-tbl"></div>
         </div>
       </div>
+
+      <div class="cal-inputs">
+        <div class="cal-line on" data-for="calc"><span class="cal-caret">&rsaquo;</span>
+          <input id="cal-in" autocomplete="off" spellcheck="false" placeholder="0.2 - 0.2^3/3!">
+          <span class="cal-live" id="cal-live"></span></div>
+        <div class="cal-line" data-for="graph"><label>y =</label>
+          <input id="cal-gin" autocomplete="off" spellcheck="false" placeholder="sin(x)"></div>
+        <div class="cal-line" data-for="table"><label>f(x) =</label>
+          <input id="cal-tin" autocomplete="off" spellcheck="false" placeholder="sin(x) - x"></div>
+      </div>
+
       <div class="cal-pad" id="cal-pad">${
         KEYS.map(([k, label, cls]) =>
           `<button type="button" class="${cls}" data-k="${k.replace(/"/g, "&quot;")}">${label}</button>`).join("")
@@ -1395,43 +1435,39 @@ const Calculator = (() => {
 
     win = Object.assign({}, RESET);
     cv = $("#cal-cv"); ctx = cv.getContext("2d");
-    target = $("#cal-in");
 
     $("#cal-angle").onclick = e => {
       const b = e.target.closest("button"); if(!b) return;
       deg = b.dataset.deg === "1";
       [...$("#cal-angle").children].forEach(x => x.classList.toggle("on", x === b));
-      refresh(false);
-    };
-    $("#cal-tabs").onclick = e => {
-      const b = e.target.closest("button"); if(!b) return;
-      pane = b.dataset.pane;
-      [...$("#cal-tabs").children].forEach(x => x.classList.toggle("on", x === b));
-      host.querySelectorAll(".cal-pane").forEach(p => p.classList.toggle("on", p.dataset.pane === pane));
-      target = host.querySelector(`.cal-pane[data-pane="${pane}"] input`);
       if(pane === "graph") graph();
       if(pane === "table") table();
     };
-    host.querySelectorAll(".cal-pane input").forEach(i => {
-      i.addEventListener("focus", e => target = e.target);
-      i.addEventListener("input", () => refresh(false));
-      i.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); refresh(true); } });
+    $("#cal-tabs").onclick = e => {
+      const b = e.target.closest("button"); if(!b) return;
+      setPane(b.dataset.pane);
+    };
+    host.querySelectorAll(".cal-line input, .cal-two input").forEach(i => {
+      i.addEventListener("input", () => live());
+      i.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); commit(); } });
     });
     $("#cal-pad").onclick = e => {
       const b = e.target.closest("button"); if(!b) return;
-      const t = target && t_ok(target) ? target : host.querySelector(`.cal-pane[data-pane="${pane}"] input`);
-      const k = b.dataset.k;
-      if(k === "@clear") t.value = "";
+      const t = inputFor(pane);
+      let k = b.dataset.k;
+      if(k === "@clear"){ t.value = ""; }
       else if(k === "@del"){
         const p = t.selectionStart;
         if(p > 0){ t.value = t.value.slice(0, p - 1) + t.value.slice(t.selectionEnd); t.setSelectionRange(p - 1, p - 1); }
-      } else if(k === "@go"){ refresh(true); t.focus(); return; }
+      }
+      else if(k === "@go"){ commit(); t.focus(); return; }
       else {
+        if(k === "@var") k = pane === "calc" ? "ANS" : "x";
         const s = t.selectionStart, e2 = t.selectionEnd;
         t.value = t.value.slice(0, s) + k + t.value.slice(e2);
         t.setSelectionRange(s + k.length, s + k.length);
       }
-      t.focus(); refresh(false);
+      t.focus(); live();
     };
     $(".cal-wrow").onclick = e => {
       const b = e.target.closest("button"); if(!b) return;
@@ -1457,12 +1493,65 @@ const Calculator = (() => {
     cv.addEventListener("pointerup", () => drag = null);
     $("#cal-close").onclick = () => api.close();
     built = true;
+    setPane("calc");
   }
-  const t_ok = t => t && t.isConnected;
 
-  /* Drawn from the page's own colours, read at paint time, so the drawer
-     follows the light and dark the rest of the page is in. */
+  function setPane(p){
+    pane = p;
+    [...$("#cal-tabs").children].forEach(x => x.classList.toggle("on", x.dataset.pane === p));
+    host.querySelectorAll(".cal-pane").forEach(el => el.classList.toggle("on", el.dataset.pane === p));
+    host.querySelectorAll(".cal-line").forEach(el => el.classList.toggle("on", el.dataset.for === p));
+    const varKey = host.querySelector('[data-k="@var"]');
+    if(varKey) varKey.textContent = p === "calc" ? "ANS" : "x";
+    if(p === "graph") requestAnimationFrame(graph);
+    if(p === "table") table();
+  }
+
   const ink = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  /* ---- calculate, as a running tape ----
+     Entries stay on screen and ANS carries the last result forward, so a
+     student can build on what they just worked out instead of copying a number
+     back in by hand -- the way the calculator they already know behaves. */
+  function drawHistory(){
+    const h = $("#cal-hist");
+    h.innerHTML = history.map(e => e.err
+      ? `<div class="cal-h err"><div class="cal-he">${esc(e.expr)}</div><div class="cal-hr">${esc(e.err)}</div></div>`
+      : `<div class="cal-h"><div class="cal-he">${esc(e.expr)}</div><div class="cal-hr">${esc(show(e.result))}</div></div>`
+    ).join("");
+    $("#cal-body").scrollTop = $("#cal-body").scrollHeight;
+  }
+
+  function commit(){
+    const t = inputFor(pane), src = t.value.trim();
+    if(!src) return;
+    if(pane === "calc"){
+      try {
+        const v = Calc.eval(src, { ANS: ans, ans: ans }, deg);
+        history.push({ expr: src, result: v });
+        ans = v;
+        t.value = "";
+        onUse({ kind: "evaluate", expr: src, result: v, deg });
+      } catch(err){ history.push({ expr: src, err: err.message }); }
+      drawHistory();
+      $("#cal-live").textContent = "";
+      return;
+    }
+    if(pane === "graph"){ graph(); onUse({ kind: "graph", expr: src, deg }); }
+    if(pane === "table"){ table(); onUse({ kind: "table", expr: src, deg,
+                            from: parseFloat($("#cal-from").value), step: parseFloat($("#cal-step").value) }); }
+  }
+
+  /* A quiet preview under the input while typing, so the tape only ever holds
+     things the student meant to keep. */
+  function live(){
+    if(pane === "graph"){ graph(); return; }
+    if(pane === "table"){ table(); return; }
+    const src = $("#cal-in").value.trim(), out = $("#cal-live");
+    if(!src){ out.textContent = ""; return; }
+    try { out.textContent = show(Calc.eval(src, { ANS: ans, ans: ans }, deg)); out.classList.remove("err"); }
+    catch(e){ out.textContent = ""; }
+  }
 
   function graph(){
     const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
@@ -1473,12 +1562,10 @@ const Calculator = (() => {
     const X = x => (x - win.x0) / (win.x1 - win.x0) * w;
     const Y = y => h - (y - win.y0) / (win.y1 - win.y0) * h;
     ctx.clearRect(0, 0, w, h);
-
     const st = (span, n) => { const raw = span / n, p = Math.pow(10, Math.floor(Math.log10(raw))), q = raw / p;
                               return (q < 1.5 ? 1 : q < 3 ? 2 : q < 7 ? 5 : 10) * p; };
     const sx = st(win.x1 - win.x0, 8), sy = st(win.y1 - win.y0, 5);
-    ctx.lineWidth = 1; ctx.strokeStyle = ink("--rule");
-    ctx.beginPath();
+    ctx.lineWidth = 1; ctx.strokeStyle = ink("--rule"); ctx.beginPath();
     for(let x = Math.ceil(win.x0 / sx) * sx; x <= win.x1; x += sx){ ctx.moveTo(X(x), 0); ctx.lineTo(X(x), h); }
     for(let y = Math.ceil(win.y0 / sy) * sy; y <= win.y1; y += sy){ ctx.moveTo(0, Y(y)); ctx.lineTo(w, Y(y)); }
     ctx.stroke();
@@ -1487,12 +1574,10 @@ const Calculator = (() => {
     if(win.x0 < 0 && win.x1 > 0){ ctx.moveTo(X(0), 0); ctx.lineTo(X(0), h); }
     ctx.stroke();
     $("#cal-rng").textContent = `x [${show(win.x0)}, ${show(win.x1)}]`;
-
-    const src = $("#cal-gin").value.trim();
+    const src = ($("#cal-gin").value || "").trim();
     if(!src) return;
     let f; try { f = Calc.fn(src, deg); } catch(e){ return; }
-    ctx.strokeStyle = ink("--ai") || "#2f5d6b"; ctx.lineWidth = 1.8;
-    ctx.beginPath();
+    ctx.strokeStyle = ink("--ai") || "#2f5d6b"; ctx.lineWidth = 1.8; ctx.beginPath();
     let pen = false, prev = null;
     const jump = (win.y1 - win.y0) * 1.5;
     for(let px = 0; px <= w; px++){
@@ -1506,13 +1591,13 @@ const Calculator = (() => {
   }
 
   function table(){
-    const src = $("#cal-tin").value.trim(), h = $("#cal-tbl");
+    const src = ($("#cal-tin").value || "").trim(), h = $("#cal-tbl");
     if(!src){ h.innerHTML = ""; return; }
     const from = parseFloat($("#cal-from").value), by = parseFloat($("#cal-step").value);
     if(!isFinite(from) || !isFinite(by) || by === 0){ h.innerHTML = ""; return; }
     let f;
     try { f = Calc.fn(src, deg); }
-    catch(e){ h.innerHTML = `<p class="cal-err">${e.message}</p>`; return; }
+    catch(e){ h.innerHTML = `<p class="cal-err">${esc(e.message)}</p>`; return; }
     let rows = "";
     for(let i = 0; i < 20; i++){
       const x = from + i * by, y = f(x);
@@ -1521,41 +1606,14 @@ const Calculator = (() => {
     h.innerHTML = `<table><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  function calc(record){
-    const src = $("#cal-in").value.trim(), out = $("#cal-out");
-    out.classList.remove("err");
-    if(!src){ out.innerHTML = "&nbsp;"; return; }
-    try {
-      const v = Calc.eval(src, {}, deg);
-      out.textContent = show(v);
-      if(record) onUse({ kind: "evaluate", expr: src, result: v, deg });
-    } catch(err){ out.classList.add("err"); out.textContent = err.message; }
-  }
-
-  function refresh(record){
-    if(pane === "calc") calc(record);
-    if(pane === "graph"){
-      graph();
-      const e = $("#cal-gin").value.trim();
-      if(record && e) onUse({ kind: "graph", expr: e, deg });
-    }
-    if(pane === "table"){
-      table();
-      const e = $("#cal-tin").value.trim();
-      if(record && e) onUse({ kind: "table", expr: e, deg,
-                              from: parseFloat($("#cal-from").value), step: parseFloat($("#cal-step").value) });
-    }
-  }
-
   const api = {
     mount(opts){ host = opts.host; tr = opts.tr || tr; onUse = opts.onUse || onUse; },
     open(){
       if(!built) build();
       host.classList.add("open");
       document.body.classList.add("cal-open");
-      $("#cal-btn-state") && 0;
       if(pane === "graph") requestAnimationFrame(graph);
-      const t = host.querySelector(`.cal-pane[data-pane="${pane}"] input`);
+      const t = inputFor(pane);
       if(t && window.matchMedia("(min-width:760px)").matches) t.focus();
     },
     close(){ host.classList.remove("open"); document.body.classList.remove("cal-open"); if(api.onclose) api.onclose(); },
@@ -1581,7 +1639,7 @@ const SCHEMA    = "tea-taylor-session/2";
    page that made it, and by the time a transcript raises a question the page is
    usually gone. Additive: nothing in /2 changed shape, so a reader written for
    /2 goes on working and simply has one more thing it may report. */
-const APP       = { name: "verbatim", version: "1.0.0", build: "e83af234" };   // /2: a turn may be a tombstone (no text)
+const APP       = { name: "verbatim", version: "1.0.0", build: "667d5c1a" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --
@@ -1616,6 +1674,11 @@ function countWords(s){
   return n;
 }
 const meas = t => ({ word_count: countWords(t), char_count: [...(t||"")].length });
+/* Twelve figures, trailing zeros gone. A report reading 0.19866666666666669 is
+   showing the float rather than the answer. */
+const ms0 = n => !isFinite(n) ? String(n)
+  : (Number.isInteger(n) && Math.abs(n) < 1e15) ? String(n)
+  : parseFloat(n.toPrecision(12)).toString();
 const nowUTC = () => new Date().toISOString().replace(/\.\d+Z$/, "Z");
 const rndHex = n => [...crypto.getRandomValues(new Uint8Array(n))]
                       .map(b => b.toString(16).padStart(2,"0")).join("");
@@ -1682,6 +1745,7 @@ const I18N = {
     forgotnone: "There were no keys stored.",
     dlcopy: "Download the file again", backconv: "Back to the conversation",
     aiteacher: "AI teacher", you: "You",
+    rcalced: "you worked out", rcalcgraph: "you graphed", rcalctable: "you tabulated",
     calc: "Calculator", calctab: "Calculate", calcgraph: "Graph", calctable: "Table",
     calcfrom: "from", calcstep: "step", calcreset: "reset", calcclose: "Close the calculator",
     calcworked: "worked out",
@@ -1764,6 +1828,7 @@ const I18N = {
     forgotnone: "没有已保存的密钥。",
     dlcopy: "重新下载文件", backconv: "返回对话",
     aiteacher: "AI 老师", you: "你",
+    rcalced: "你计算了", rcalcgraph: "你作了图", rcalctable: "你列了表",
     calc: "计算器", calctab: "计算", calcgraph: "作图", calctable: "数值表",
     calcfrom: "起点", calcstep: "步长", calcreset: "复位", calcclose: "关闭计算器",
     calcworked: "算过",
@@ -3015,7 +3080,26 @@ function fillReport(){
     box.appendChild(e); return e;
   };
 
-  for(const t of S.turns){
+  /* Calculations belong in the report for the same reason they belong in the
+     file: a student checking what they are about to hand in should see all of
+     it. Placed where they happened, as the reader places them. */
+  const uses = Array.isArray(S.tool_uses) ? S.tool_uses : [];
+  const KINDWORD = { evaluate: "rcalced", graph: "rcalcgraph", table: "rcalctable" };
+  const calcAt = i => {
+    for(const u of uses.filter(u => (u.after_turn == null ? -1 : u.after_turn) === i)){
+      const d = document.createElement("div");
+      d.className = "rcalc";
+      const w = document.createElement("span"); w.className = "rcw";
+      w.textContent = tr(KINDWORD[u.kind] || "rcalced");
+      const c = document.createElement("code");
+      c.textContent = u.kind === "evaluate" && u.result != null
+        ? u.expr + " = " + ms0(u.result) : (u.expr || "");
+      d.append(w, c);
+      box.appendChild(d);
+    }
+  };
+  calcAt(-1);
+  for(const [ti, t] of S.turns.entries()){
     if(isGone(t)){
       const g = document.createElement("div");
       g.className = "gone";
@@ -3040,6 +3124,7 @@ function fillReport(){
       m.className = "rmeta"; m.textContent = bits.join("  ·  ");
       d.appendChild(m);
     }
+    calcAt(ti);
     box.appendChild(d);
   }
 

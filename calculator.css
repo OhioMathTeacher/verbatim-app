@@ -28,9 +28,31 @@
   color: var(--muted); cursor: pointer; font: 13.5px var(--sans); padding: 9px 0; }
 .cal-tabs button.on { color: var(--accent); border-bottom-color: var(--accent); }
 
-.cal-body { flex: 1; overflow: auto; }
+.cal-body { flex: 1; overflow: auto; min-height: 0; }
 .cal-pane { display: none; flex-direction: column; gap: 9px; padding: 13px 15px; }
 .cal-pane.on { display: flex; }
+
+/* The running tape. Newest at the bottom, the way a conversation reads and the
+   way the home screen of the calculator this borrows from reads. */
+.cal-hist { display: flex; flex-direction: column; gap: 11px; }
+.cal-h { display: flex; flex-direction: column; gap: 2px; }
+.cal-he { font: 13px var(--mono); color: var(--muted); word-break: break-all; }
+.cal-hr { font: 19px var(--mono); color: var(--ink); text-align: right; word-break: break-all; }
+.cal-h.err .cal-hr { font: 13px var(--sans); color: var(--warn); text-align: left; line-height: 1.45; }
+
+/* The input strip, pinned above the keypad so a key lands in the line just
+   above the thumb that pressed it. */
+.cal-inputs { border-top: 1px solid var(--rule); }
+.cal-line { display: none; align-items: center; gap: 8px; padding: 10px 14px; min-width: 0; }
+.cal-line.on { display: flex; }
+.cal-line label, .cal-caret { color: var(--muted); font: 13px var(--mono); flex: 0 0 auto;
+  text-transform: none; letter-spacing: 0; font-weight: normal; display: inline; }
+.cal-line input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
+  font: 16px var(--mono); }
+.cal-line input:focus { outline: none; }
+/* What the line would come to, shown while typing, so the tape only holds
+   things the student meant to keep. */
+.cal-live { font: 13px var(--mono); color: var(--muted); flex: 0 0 auto; opacity: .8; }
 
 .cal-entry { display: flex; align-items: center; gap: 7px; min-width: 0;
   background: var(--paper); border: 1px solid var(--rule); border-radius: 9px; padding: 9px 11px; }
@@ -42,9 +64,6 @@
 .cal-entry input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
   font: 15.5px var(--mono); }
 .cal-entry input:focus { outline: none; }
-.cal-out { text-align: right; font: 25px var(--mono); color: var(--ink);
-  word-break: break-all; min-height: 33px; }
-.cal-out.err { font: 13.5px var(--sans); color: var(--warn); text-align: left; line-height: 1.5; }
 .cal-err { color: var(--warn); font-size: 13px; padding: 9px 11px; margin: 0; }
 
 .cal canvas { width: 100%; height: 178px; display: block; border-radius: 9px;

@@ -534,6 +534,11 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
   opacity:0;transition:opacity .12s ease, color .12s ease}
 .turn:hover .binbtn, .binbtn:focus-visible{opacity:.75}
 .binbtn:hover{opacity:1;color:var(--warn);background:color-mix(in srgb, var(--warn) 12%, transparent)}
+.rcalc{display:flex;align-items:center;gap:9px;justify-content:center;margin:0 0 14px;
+  font-size:13px;color:var(--muted);flex-wrap:wrap}
+.rcalc .rcw{font-style:italic}
+.rcalc code{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--paper);
+  border:1px solid var(--rule);border-radius:7px;padding:3px 9px}
 .gone{margin:0 0 16px;padding:9px 15px;border:1px dashed var(--rule);border-radius:12px;
   color:var(--muted);font-size:13.5px;font-style:italic;text-align:center}
 __RICHTEXT_CSS__
@@ -717,7 +722,7 @@ try{
   <div class="inner">
     <textarea id="say" rows="1" data-i18n-ph="sayph"></textarea>
     <button id="math" class="ghost mathbtn" title="Maths symbols" aria-expanded="false">&#8721;</button>
-    <button id="calcbtn" class="ghost mathbtn" aria-expanded="false"><span aria-hidden="true">&#8730;</span></button>
+    <button id="calcbtn" class="ghost mathbtn" aria-expanded="false"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="1.6" width="10" height="12.8" rx="1.6"/><rect x="5.1" y="3.7" width="5.8" height="2.4" rx=".6"/><path d="M5.4 8.6h.01M8 8.6h.01M10.6 8.6h.01M5.4 11.2h.01M8 11.2h.01M10.6 11.2h.01"/></svg></button>
     <button id="send" data-i18n="send">Send</button>
   </div>
 </div>
@@ -778,6 +783,11 @@ function countWords(s){
   return n;
 }
 const meas = t => ({ word_count: countWords(t), char_count: [...(t||"")].length });
+/* Twelve figures, trailing zeros gone. A report reading 0.19866666666666669 is
+   showing the float rather than the answer. */
+const ms0 = n => !isFinite(n) ? String(n)
+  : (Number.isInteger(n) && Math.abs(n) < 1e15) ? String(n)
+  : parseFloat(n.toPrecision(12)).toString();
 const nowUTC = () => new Date().toISOString().replace(/\.\d+Z$/, "Z");
 const rndHex = n => [...crypto.getRandomValues(new Uint8Array(n))]
                       .map(b => b.toString(16).padStart(2,"0")).join("");
@@ -844,6 +854,7 @@ const I18N = {
     forgotnone: "There were no keys stored.",
     dlcopy: "Download the file again", backconv: "Back to the conversation",
     aiteacher: "AI teacher", you: "You",
+    rcalced: "you worked out", rcalcgraph: "you graphed", rcalctable: "you tabulated",
     calc: "Calculator", calctab: "Calculate", calcgraph: "Graph", calctable: "Table",
     calcfrom: "from", calcstep: "step", calcreset: "reset", calcclose: "Close the calculator",
     calcworked: "worked out",
@@ -926,6 +937,7 @@ const I18N = {
     forgotnone: "没有已保存的密钥。",
     dlcopy: "重新下载文件", backconv: "返回对话",
     aiteacher: "AI 老师", you: "你",
+    rcalced: "你计算了", rcalcgraph: "你作了图", rcalctable: "你列了表",
     calc: "计算器", calctab: "计算", calcgraph: "作图", calctable: "数值表",
     calcfrom: "起点", calcstep: "步长", calcreset: "复位", calcclose: "关闭计算器",
     calcworked: "算过",
@@ -2177,7 +2189,26 @@ function fillReport(){
     box.appendChild(e); return e;
   };
 
-  for(const t of S.turns){
+  /* Calculations belong in the report for the same reason they belong in the
+     file: a student checking what they are about to hand in should see all of
+     it. Placed where they happened, as the reader places them. */
+  const uses = Array.isArray(S.tool_uses) ? S.tool_uses : [];
+  const KINDWORD = { evaluate: "rcalced", graph: "rcalcgraph", table: "rcalctable" };
+  const calcAt = i => {
+    for(const u of uses.filter(u => (u.after_turn == null ? -1 : u.after_turn) === i)){
+      const d = document.createElement("div");
+      d.className = "rcalc";
+      const w = document.createElement("span"); w.className = "rcw";
+      w.textContent = tr(KINDWORD[u.kind] || "rcalced");
+      const c = document.createElement("code");
+      c.textContent = u.kind === "evaluate" && u.result != null
+        ? u.expr + " = " + ms0(u.result) : (u.expr || "");
+      d.append(w, c);
+      box.appendChild(d);
+    }
+  };
+  calcAt(-1);
+  for(const [ti, t] of S.turns.entries()){
     if(isGone(t)){
       const g = document.createElement("div");
       g.className = "gone";
@@ -2202,6 +2233,7 @@ function fillReport(){
       m.className = "rmeta"; m.textContent = bits.join("  ·  ");
       d.appendChild(m);
     }
+    calcAt(ti);
     box.appendChild(d);
   }
 
