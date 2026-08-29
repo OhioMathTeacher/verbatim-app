@@ -115,9 +115,26 @@ the raw characters rather than vanishing.
 
 ## The calculator
 
-A drawer on the right, opened from √ beside the symbol palette in the reply bar. Three
-things: an expression to evaluate, a function to graph, and a table of values. It is drawn
-from the page's own colours, so it follows the light and dark the rest of the page is in.
+A drawer on the right, opened from the calculator button beside the symbol palette in the
+reply bar. Three panes of the same shape: what has been entered is listed at the top, the
+prompt to add another is at the bottom, and the keypad is under that, so a key lands in the
+line just above the thumb that pressed it. It is drawn from the page's own colours, so it
+follows the light and dark the rest of the page is in.
+
+**Calculate keeps a tape.** Entries stay on screen and `ANS` carries the last result
+forward, so `0.2-0.2^3/3!` then `ANS*3` builds on what came before instead of a number being
+copied back in by hand. `ANS` is untouched by a failed entry.
+
+**Graph and Table stack.** Enter several functions and they are drawn together, each in its
+own pen, taken from the page's palette so they theme with it — a function and its derivative
+can be read against one another, or `sin x` against `x - x³/6`. The table gives each one a
+column beside the same `x`. The plot carries a legend, and axis numbers that can be switched
+off if the room is wanted instead. The plot gives up height as functions are stacked, so the
+controls never get pushed out of view.
+
+**Any line can be deleted**, with the bin at its right, exactly as an exchange can. It leaves
+a tombstone for the same reason: the expression goes, and that the student reached for the
+calculator at that point in the conversation stays.
 
 Written rather than borrowed, and each part of that was a decision:
 

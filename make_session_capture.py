@@ -857,9 +857,10 @@ const I18N = {
     dlcopy: "Download the file again", backconv: "Back to the conversation",
     aiteacher: "AI teacher", you: "You",
     rcalced: "you worked out", rcalcgraph: "you graphed", rcalctable: "you tabulated",
-    rcalctried: "you tried",
+    rcalctried: "you tried", rcalcgone: "a calculation you deleted",
     calc: "Calculator", calctab: "Calculate", calcgraph: "Graph", calctable: "Table",
     calcfrom: "from", calcstep: "step", calcreset: "reset", calcclose: "Close the calculator",
+    calcdel: "Delete this line", calcgone: "deleted", calcmarks: "numbers",
     calcworked: "worked out",
     del: "Delete this exchange",
     delask: "Delete this exchange?\n\nYour words and the reply are removed from what you hand in. The file will still record that an exchange was here, and how long it was — so what you submit stays an honest account of the session.\n\nThis cannot be undone.",
@@ -941,9 +942,10 @@ const I18N = {
     dlcopy: "重新下载文件", backconv: "返回对话",
     aiteacher: "AI 老师", you: "你",
     rcalced: "你计算了", rcalcgraph: "你作了图", rcalctable: "你列了表",
-    rcalctried: "你尝试了",
+    rcalctried: "你尝试了", rcalcgone: "你删除的一次计算",
     calc: "计算器", calctab: "计算", calcgraph: "作图", calctable: "数值表",
     calcfrom: "起点", calcstep: "步长", calcreset: "复位", calcclose: "关闭计算器",
+    calcdel: "删除这一行", calcgone: "已删除", calcmarks: "刻度",
     calcworked: "算过",
     del: "删除这段对话",
     delask: "要删除这段对话吗？\n\n你的发言和这条回复都会从你提交的文件中移除。文件仍会记录此处曾有一段对话及其长度——这样你提交的内容依然是本次会话的如实记录。\n\n此操作无法撤销。",
@@ -1043,6 +1045,20 @@ Calculator.mount({
        the right place. A number worked out before the AI suggested it is a
        different thing from one worked out after. */
     S.tool_uses.push(Object.assign({ after_turn: S.turns.length - 1, ts: nowUTC() }, use));
+    save();
+  },
+  /* Deleting a line leaves a tombstone, exactly as deleting an exchange does.
+     The student's expression goes; that they reached for the calculator at that
+     point in the conversation stays, so the file does not quietly become an
+     account of only the work that was kept. */
+  onDrop(id){
+    if(!S || !Array.isArray(S.tool_uses)) return;
+    const u = S.tool_uses.find(x => x.id === id);
+    if(!u || u.deleted_utc) return;
+    S.tool_uses[S.tool_uses.indexOf(u)] = {
+      id: u.id, kind: u.kind, after_turn: u.after_turn, ts: u.ts,
+      deg: u.deg, deleted_utc: nowUTC(),
+    };
     save();
   },
 });
@@ -2206,6 +2222,13 @@ function fillReport(){
       /* An attempt that failed is named as an attempt. Calling it "you worked
          out" and printing "= undefined" would report the opposite of what
          happened. */
+      if(u.deleted_utc){
+        d.classList.add("failed");
+        w.textContent = tr("rcalcgone");
+        d.appendChild(w);
+        box.appendChild(d);
+        continue;
+      }
       w.textContent = tr(u.error ? "rcalctried" : (KINDWORD[u.kind] || "rcalced"));
       const c = document.createElement("code");
       c.textContent = (!u.error && u.kind === "evaluate" && u.result != null)
