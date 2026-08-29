@@ -125,12 +125,23 @@ follows the light and dark the rest of the page is in.
 forward, so `0.2-0.2^3/3!` then `ANS*3` builds on what came before instead of a number being
 copied back in by hand. `ANS` is untouched by a failed entry.
 
-**Graph and Table stack.** Enter several functions and they are drawn together, each in its
-own pen, taken from the page's palette so they theme with it — a function and its derivative
-can be read against one another, or `sin x` against `x - x³/6`. The table gives each one a
-column beside the same `x`. The plot carries a legend, and axis numbers that can be switched
-off if the room is wanted instead. The plot gives up height as functions are stacked, so the
-controls never get pushed out of view.
+**Graph and Table are feeds too.** Each entry gets its own plot or its own table, one after
+another, newest at the bottom, and they scroll. A plot keeps a fixed shape and never
+stretches to fill whatever height is available — a graph two thousand pixels tall and three
+hundred wide says nothing about a function, and on a tall screen filling the space is exactly
+what you get. The controls sit under the feed rather than inside it, so stacking never pushes
+them out of view.
+
+Commas at the top level put several functions on one pair of axes — `sin(x), cos(x)` draws
+both together, each in its own pen from the page's palette, so a function and its derivative
+can be read against one another. Inside brackets a comma still belongs to `max(a, b)`. Axis
+numbers can be switched off if the room is wanted instead.
+
+**The work stays put.** Switching between Calculate, Graph and Table keeps each feed as it
+was, and so does closing the drawer — and a reload rebuilds all three from `tool_uses`, so a
+student who refreshes finds their working where they left it rather than an empty tape beside
+a conversation that survived. There is no second copy to disagree with the record: the file
+is what the feeds are read back from.
 
 **Any line can be deleted**, with the bin at its right, exactly as an exchange can. It leaves
 a tombstone for the same reason: the expression goes, and that the student reached for the

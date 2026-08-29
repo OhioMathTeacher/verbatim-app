@@ -91,7 +91,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 # Bumped by hand, when a change is worth telling a user about.
-VERSION = "1.1.1"
+VERSION = "1.2.0"
 # The activity is whatever prompt you point this at. `examples/` holds the one
 # from the Taylor Series study it was first built for.
 PROMPT_DEFAULT = HERE / "examples" / "taylor-series.txt"
@@ -2416,6 +2416,10 @@ applyLang();
   if(prev && READABLE.includes(prev.schema) && prev.activity_prompt){
     prev.schema = SCHEMA;   // saved before tombstones; nothing about it is wrong
     S = prev; render();
+    /* The calculator comes back with the session. A student who reloads should
+       find their working where they left it, not an empty tape beside a
+       conversation that survived. */
+    Calculator.restore(S.tool_uses);
     if(prev.exported_utc && SURVEY.length && !surveyDone()){
       renderSurvey(); show("s-survey");
     }else if(prev.exported_utc){

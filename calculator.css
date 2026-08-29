@@ -28,71 +28,75 @@
   color: var(--muted); cursor: pointer; font: 13.5px var(--sans); padding: 9px 0; }
 .cal-tabs button.on { color: var(--accent); border-bottom-color: var(--accent); }
 
-.cal-body { flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0;
-  overscroll-behavior: contain; }
+/* Each pane fills the drawer and never scrolls as a whole: the feed inside it
+   scrolls, and the controls under the feed stay put. */
+.cal-panes { flex: 1; min-height: 0; display: flex; }
+.cal-pane { display: none; flex: 1; min-width: 0; flex-direction: column; }
+.cal-pane.on { display: flex; }
+.cal-feed { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain; padding: 13px 14px; display: flex;
+  flex-direction: column; gap: 12px; }
 
 /* The tape scrolls, and needs to look as though it does. Overlay scrollbars stay
-   invisible until something is already moving, which leaves a long tape looking
-   like a short one that has lost its earlier lines. */
-.cal-body, .cal-fns, .cal-tbl { scrollbar-width: thin;
+   invisible until something is already moving, which leaves a long feed looking
+   like a short one that has lost its earlier entries. */
+.cal-feed, .cal-tbl { scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent) transparent; }
-.cal-body::-webkit-scrollbar, .cal-fns::-webkit-scrollbar, .cal-tbl::-webkit-scrollbar
-  { width: 9px; height: 9px; }
-.cal-body::-webkit-scrollbar-track, .cal-fns::-webkit-scrollbar-track,
-.cal-tbl::-webkit-scrollbar-track { background: transparent; }
-.cal-body::-webkit-scrollbar-thumb, .cal-fns::-webkit-scrollbar-thumb,
-.cal-tbl::-webkit-scrollbar-thumb {
+.cal-feed::-webkit-scrollbar, .cal-tbl::-webkit-scrollbar { width: 9px; height: 9px; }
+.cal-feed::-webkit-scrollbar-track, .cal-tbl::-webkit-scrollbar-track { background: transparent; }
+.cal-feed::-webkit-scrollbar-thumb, .cal-tbl::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--muted) 40%, transparent);
   border-radius: 99px; border: 2px solid transparent; background-clip: content-box; }
-.cal-body::-webkit-scrollbar-thumb:hover, .cal-fns::-webkit-scrollbar-thumb:hover,
-.cal-tbl::-webkit-scrollbar-thumb:hover
-  { background: color-mix(in srgb, var(--muted) 70%, transparent); background-clip: content-box; }
-.cal-pane { display: none; flex-direction: column; gap: 9px; padding: 13px 15px; }
-.cal-pane.on { display: flex; }
 
-/* The running tape. Newest at the bottom, the way a conversation reads and the
-   way the home screen of the calculator this borrows from reads. */
-.cal-hist { display: flex; flex-direction: column; gap: 11px; }
-.cal-h { position: relative; display: flex; flex-direction: column; gap: 2px;
-  padding-right: 26px; }
+/* A line of the tape. */
+.cal-h { position: relative; display: flex; flex-direction: column; gap: 2px; padding-right: 26px; }
 .cal-he { font: 13px var(--mono); color: var(--muted); word-break: break-all; }
 .cal-hr { font: 19px var(--mono); color: var(--ink); text-align: right; word-break: break-all; }
 .cal-h.err .cal-hr { font: 13px var(--sans); color: var(--warn); text-align: left; line-height: 1.45; }
 
-/* Deleting a line leaves it in place, marked, for the same reason a deleted
-   exchange leaves a tombstone: the record should not quietly close the gap. */
-.cal-h.gone, .cal-fn.gone { padding: 6px 10px; border: 1px dashed var(--rule); border-radius: 9px;
+/* One entry of the graph or table feed: what was asked for, then what it drew. */
+.cal-card { position: relative; border: 1px solid var(--rule); border-radius: 11px;
+  background: var(--paper); padding: 8px 9px 9px; }
+.cal-card.err { border-style: dashed; }
+.cal-card.gone { padding: 7px 10px; border-style: dashed; background: transparent;
   color: var(--muted); font: italic 12px var(--sans); text-align: center; }
-
-/* The editor: what is stacked right now, each with the pen it is drawn in. */
-/* The stack scrolls on its own rather than pushing the controls under the fold.
-   Four or five functions is more than any of these activities needs, and the
-   zoom and the numbers toggle have to stay reachable however many there are. */
-.cal-fns { display: flex; flex-direction: column; gap: 5px; max-height: 92px;
-  overflow-y: auto; flex: 0 0 auto; }
-.cal-fns:empty { display: none; }
-.cal-fn { position: relative; display: flex; align-items: center; gap: 8px;
-  background: var(--paper); border: 1px solid var(--rule); border-radius: 8px;
-  padding: 6px 26px 6px 9px; min-width: 0; }
-.cal-fn code { font: 13px var(--mono); color: var(--ink); flex: 1; min-width: 0;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cal-fn.err code { color: var(--muted); }
-.cal-fn .cal-fe { font: 11.5px var(--sans); color: var(--warn); flex: 0 1 auto; }
-.cal-sw { width: 11px; height: 11px; border-radius: 3px; flex: 0 0 auto; }
+.cal-cardhead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 0 22px 7px 2px; min-width: 0; }
+.cal-lg { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.cal-lg code { font: 12.5px var(--mono); color: var(--ink); overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; }
+.cal-sw { width: 10px; height: 10px; border-radius: 3px; flex: 0 0 auto; }
 .cal-sw.plain { background: none; width: auto; font: 11px var(--mono); color: var(--muted); }
+.cal-err { color: var(--warn); font: 12.5px var(--sans); margin: 0; padding: 2px 2px 3px; }
 
-/* Quiet until wanted, like the bin on a turn. */
-.cal-bin { position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
-  background: transparent; border: 0; cursor: pointer; color: var(--muted);
-  padding: 3px 4px; border-radius: 6px; line-height: 0; opacity: 0; }
-.cal-h .cal-bin { top: 2px; transform: none; }
-.cal-h:hover .cal-bin, .cal-fn:hover .cal-bin, .cal-bin:focus-visible { opacity: .7; }
-.cal-bin:hover { opacity: 1; color: var(--warn);
-  background: color-mix(in srgb, var(--warn) 12%, transparent); }
-@media (hover: none) { .cal-bin { opacity: .55; } }
+/* A plot keeps its shape. It does not stretch to fill whatever height is going:
+   a graph two thousand pixels tall and three hundred wide says nothing about a
+   function, and on a tall screen that is exactly what filling gives you. */
+.cal-card canvas { width: 100%; aspect-ratio: 5 / 3; max-height: 210px; display: block;
+  border-radius: 7px; background: var(--card); touch-action: none; cursor: crosshair; }
 
-/* The input strip, pinned above the keypad so a key lands in the line just
-   above the thumb that pressed it. */
+/* Pinned under the feed, so stacking never pushes the controls out of view. */
+.cal-wrow { flex: 0 0 auto; display: flex; gap: 6px; align-items: center;
+  padding: 9px 14px; border-top: 1px solid var(--rule); }
+.cal-wrow button { background: transparent; border: 1px solid var(--rule); border-radius: 7px;
+  color: var(--muted); cursor: pointer; font: 12px var(--sans); padding: 4px 10px; }
+.cal-wrow button:hover { border-color: var(--accent); color: var(--accent); }
+.cal-wrow button.on { color: var(--accent); border-color: var(--accent); }
+.cal-sp { flex: 1; }
+.cal-rng { color: var(--muted); font: 10.5px var(--mono); }
+.cal-wrow .cal-entry { flex: 1; min-width: 0; padding: 5px 8px; }
+.cal-wrow .cal-entry label { font-size: 11.5px; }
+.cal-wrow .cal-entry input { font-size: 13px; }
+
+.cal-entry { display: flex; align-items: center; gap: 7px; min-width: 0;
+  background: var(--card); border: 1px solid var(--rule); border-radius: 9px; padding: 9px 11px; }
+.cal-entry label { color: var(--muted); font: 13px var(--mono); flex: 0 0 auto;
+  display: inline; font-weight: normal; letter-spacing: 0; text-transform: none; }
+.cal-entry input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
+  font: 14px var(--mono); }
+.cal-entry input:focus { outline: none; }
+
+/* The input strip, pinned above the keypad. */
 .cal-inputs { border-top: 1px solid var(--rule); }
 .cal-line { display: none; align-items: center; gap: 8px; padding: 10px 14px; min-width: 0; }
 .cal-line.on { display: flex; }
@@ -101,47 +105,23 @@
 .cal-line input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
   font: 16px var(--mono); }
 .cal-line input:focus { outline: none; }
-/* What the line would come to, shown while typing, so the tape only holds
-   things the student meant to keep. */
 .cal-live { font: 13px var(--mono); color: var(--muted); flex: 0 0 auto; opacity: .8; }
 
-.cal-entry { display: flex; align-items: center; gap: 7px; min-width: 0;
-  background: var(--paper); border: 1px solid var(--rule); border-radius: 9px; padding: 9px 11px; }
-/* The page styles form labels as small uppercase headings, which turns f(x)
-   into F(X). Mathematics is case-sensitive, so opt out of it here. */
-.cal-entry label { color: var(--muted); font-size: 13px; flex: 0 0 auto;
-  display: inline; font-weight: normal; letter-spacing: 0; text-transform: none;
-  font-family: var(--mono); }
-.cal-entry input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink);
-  font: 15.5px var(--mono); }
-.cal-entry input:focus { outline: none; }
-.cal-err { color: var(--warn); font-size: 13px; padding: 9px 11px; margin: 0; }
-
-/* The graph pane fills the body exactly and never scrolls: the plot gives up
-   height as functions are stacked, so the zoom and the numbers toggle stay in
-   view however many there are. Stacking should not push the controls away. */
-.cal-pane[data-pane="graph"] { height: 100%; }
-.cal canvas { width: 100%; flex: 1 1 auto; min-height: 96px; display: block; border-radius: 9px;
-  background: var(--paper); border: 1px solid var(--rule); touch-action: none; cursor: crosshair; }
-.cal-wrow { flex: 0 0 auto; }
-.cal-wrow { display: flex; gap: 6px; align-items: center; }
-.cal-wrow button { background: transparent; border: 1px solid var(--rule); border-radius: 7px;
-  color: var(--muted); cursor: pointer; font: 12px var(--sans); padding: 4px 11px; }
-.cal-wrow button:hover { border-color: var(--accent); color: var(--accent); }
-.cal-sp { flex: 1; }
-.cal-rng { color: var(--muted); font: 10.5px var(--mono); }
-
-/* min-width:0 or these refuse to shrink and the row runs off the side. */
-.cal-two { display: flex; gap: 7px; }
-.cal-two .cal-entry { flex: 1; min-width: 0; padding: 8px 9px; }
-.cal-two .cal-entry label { font-size: 11.5px; }
-.cal-two .cal-entry input { font-size: 13.5px; }
-
-.cal-tbl { overflow: auto; max-height: 176px; border: 1px solid var(--rule); border-radius: 9px; }
+.cal-tbl { overflow: auto; max-height: 176px; border: 1px solid var(--rule); border-radius: 8px; }
 .cal-tbl table { width: 100%; border-collapse: collapse; font: 12.5px var(--mono); }
-.cal-tbl th, .cal-tbl td { padding: 5px 11px; text-align: right; border-bottom: 1px solid var(--rule); }
-.cal-tbl th { color: var(--muted); font-weight: normal; position: sticky; top: 0; background: var(--card); }
+.cal-tbl th, .cal-tbl td { padding: 4px 10px; text-align: right; border-bottom: 1px solid var(--rule); }
+.cal-tbl th { color: var(--muted); font-weight: normal; position: sticky; top: 0; background: var(--paper); }
 .cal-tbl tr:last-child td { border-bottom: 0; }
+
+/* Quiet until wanted, like the bin on a turn. */
+.cal-bin { position: absolute; top: 6px; right: 6px; background: transparent; border: 0;
+  cursor: pointer; color: var(--muted); padding: 3px 4px; border-radius: 6px;
+  line-height: 0; opacity: 0; }
+.cal-h .cal-bin { top: 2px; }
+.cal-h:hover .cal-bin, .cal-card:hover .cal-bin, .cal-bin:focus-visible { opacity: .7; }
+.cal-bin:hover { opacity: 1; color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 12%, transparent); }
+@media (hover: none) { .cal-bin { opacity: .55; } }
 
 .cal-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
   background: var(--rule); padding: 1px; border-top: 1px solid var(--rule); }

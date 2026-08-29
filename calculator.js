@@ -215,29 +215,22 @@ const Calc = (() => {
 /* ---------- the drawer ----------
    Mounted on demand, so a student who never opens it pays nothing for it.
 
-   The three panes are the same shape: what has been entered is listed at the
-   top, the prompt to add another is at the bottom, and the keypad is under that
+   All three panes are a running feed: what has been entered stays on screen,
+   one after another, the newest at the bottom. Calculate keeps a tape of
+   results; Graph gives each entry its own plot; Table gives each its own
+   columns. The prompt to add another is at the bottom and the keypad under it,
    so a key lands in the line just above the thumb that pressed it.
 
-   Everything entered is recorded, including what did not work. A calculator
-   whose use went unrecorded would make the session file quietly incomplete --
-   the page would know the student computed something and the file would not.
-   It is kept out of S.turns on purpose: the turns are the conversation, and
-   dropping tool use among them would put the turn counts and the
-   words-per-speaker ratio wrong in the way tombstones were built to avoid. */
+   Everything entered is recorded, including what did not work, and deleting a
+   line leaves a tombstone. The turns are the conversation; tool use sits beside
+   them so the turn counts and the words-per-speaker ratio stay true. */
 const Calculator = (() => {
   let host = null, tr = k => k, onUse = () => {}, onDrop = () => {};
   let built = false, deg = false, pane = "calc";
-  let win = null, cv = null, ctx = null, ans = 0, uid = 0, marks = true;
+  let win = null, ans = 0, uid = 0, marks = true;
 
-  /* One list per pane. Deleting leaves the entry in place marked gone, for the
-     same reason a deleted exchange leaves a tombstone: the file should not
-     quietly stop being an account of what happened. */
   const lists = { calc: [], graph: [], table: [] };
   const live = p => lists[p].filter(e => !e.gone);
-
-  /* Colours for stacked functions, taken from the page so they theme with it
-     and stay distinguishable in light and dark alike. */
   const PENS = ["--ai", "--stu", "--ok", "--warn", "--accent"];
   const RESET = { x0: -6.5, x1: 6.5, y0: -3, y1: 3 };
   const $ = s => host.querySelector(s);
@@ -251,6 +244,21 @@ const Calculator = (() => {
     return parseFloat(n.toPrecision(12)).toString();
   }
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* Commas at the top level separate functions, so one entry can carry a
+     function and its derivative and draw them on the same axes. Inside
+     brackets a comma still belongs to max(a, b), so depth is counted. */
+  function splitTop(src){
+    const out = []; let depth = 0, cur = "";
+    for(const c of src){
+      if(c === "(") depth++;
+      if(c === ")") depth--;
+      if(c === "," && depth === 0){ out.push(cur); cur = ""; continue; }
+      cur += c;
+    }
+    out.push(cur);
+    return out.map(t => t.trim()).filter(Boolean);
+  }
 
   const BIN = '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none"'
             + ' stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">'
@@ -283,11 +291,10 @@ const Calculator = (() => {
         <button type="button" data-pane="graph">${tr("calcgraph")}</button>
         <button type="button" data-pane="table">${tr("calctable")}</button>
       </div>
-      <div class="cal-body" id="cal-body">
-        <div class="cal-pane on" data-pane="calc"><div class="cal-hist" id="cal-hist"></div></div>
+      <div class="cal-panes">
+        <div class="cal-pane on" data-pane="calc"><div class="cal-feed" id="cal-cfeed"></div></div>
         <div class="cal-pane" data-pane="graph">
-          <div class="cal-fns" id="cal-gfns"></div>
-          <canvas id="cal-cv"></canvas>
+          <div class="cal-feed" id="cal-gfeed"></div>
           <div class="cal-wrow">
             <button type="button" data-zoom="0.5">+</button><button type="button" data-zoom="2">−</button>
             <button type="button" data-zoom="reset">${tr("calcreset")}</button>
@@ -296,12 +303,11 @@ const Calculator = (() => {
           </div>
         </div>
         <div class="cal-pane" data-pane="table">
-          <div class="cal-fns" id="cal-tfns"></div>
-          <div class="cal-two">
+          <div class="cal-feed" id="cal-tfeed"></div>
+          <div class="cal-wrow">
             <div class="cal-entry"><label>${tr("calcfrom")}</label><input id="cal-from" value="0" autocomplete="off"></div>
             <div class="cal-entry"><label>${tr("calcstep")}</label><input id="cal-step" value="0.1" autocomplete="off"></div>
           </div>
-          <div class="cal-tbl" id="cal-tbl"></div>
         </div>
       </div>
       <div class="cal-inputs">
@@ -309,7 +315,7 @@ const Calculator = (() => {
           <input id="cal-in" autocomplete="off" spellcheck="false" placeholder="0.2 - 0.2^3/3!">
           <span class="cal-live" id="cal-live"></span></div>
         <div class="cal-line" data-for="graph"><label>y =</label>
-          <input id="cal-gin" autocomplete="off" spellcheck="false" placeholder="sin(x)"></div>
+          <input id="cal-gin" autocomplete="off" spellcheck="false" placeholder="sin(x), cos(x)"></div>
         <div class="cal-line" data-for="table"><label>f(x) =</label>
           <input id="cal-tin" autocomplete="off" spellcheck="false" placeholder="sin(x) - x"></div>
       </div>
@@ -318,7 +324,6 @@ const Calculator = (() => {
       }</div>`;
 
     win = Object.assign({}, RESET);
-    cv = $("#cal-cv"); ctx = cv.getContext("2d");
 
     $("#cal-angle").onclick = e => {
       const b = e.target.closest("button"); if(!b) return;
@@ -327,11 +332,11 @@ const Calculator = (() => {
       draw();
     };
     $("#cal-tabs").onclick = e => { const b = e.target.closest("button"); if(b) setPane(b.dataset.pane); };
-    host.querySelectorAll(".cal-line input, .cal-two input").forEach(i => {
-      i.addEventListener("input", () => { if(i.closest(".cal-two")) draw(); else preview(); });
+    host.querySelectorAll(".cal-line input, .cal-wrow input").forEach(i => {
+      i.addEventListener("input", () => { if(i.closest(".cal-wrow")) draw(); else preview(); });
       i.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); commit(); } });
     });
-    $("#cal-body").onclick = e => {
+    $(".cal-panes").onclick = e => {
       const b = e.target.closest(".cal-bin"); if(!b) return;
       drop(parseInt(b.dataset.drop, 10));
     };
@@ -352,29 +357,47 @@ const Calculator = (() => {
       }
       t.focus(); preview();
     };
-    $(".cal-wrow").onclick = e => {
+    host.querySelectorAll(".cal-wrow").forEach(row => row.addEventListener("click", e => {
       const b = e.target.closest("button"); if(!b) return;
-      if(b.id === "cal-marks"){ marks = !marks; b.classList.toggle("on", marks); graph(); return; }
+      if(b.id === "cal-marks"){ marks = !marks; b.classList.toggle("on", marks); plots(); return; }
       if(b.dataset.zoom === "reset") win = Object.assign({}, RESET);
-      else {
+      else if(b.dataset.zoom){
         const k = parseFloat(b.dataset.zoom);
         const cx = (win.x0 + win.x1) / 2, cy = (win.y0 + win.y1) / 2;
         const hw = (win.x1 - win.x0) / 2 * k, hh = (win.y1 - win.y0) / 2 * k;
         win = { x0: cx - hw, x1: cx + hw, y0: cy - hh, y1: cy + hh };
       }
-      graph();
-    };
+      plots();
+    }));
+
+    /* One window for every plot in the feed, so stacked graphs can be read
+       against each other; dragging or zooming any of them moves them all. */
     let drag = null;
-    cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, w: Object.assign({}, win) }; cv.setPointerCapture(e.pointerId); });
-    cv.addEventListener("pointermove", e => {
+    const feed = $("#cal-gfeed");
+    feed.addEventListener("pointerdown", e => {
+      const c = e.target.closest("canvas"); if(!c) return;
+      drag = { x: e.clientX, y: e.clientY, w: Object.assign({}, win), c };
+      c.setPointerCapture(e.pointerId);
+    });
+    feed.addEventListener("pointermove", e => {
       if(!drag) return;
-      const r = cv.getBoundingClientRect();
+      const r = drag.c.getBoundingClientRect();
       const dx = (e.clientX - drag.x) / r.width * (drag.w.x1 - drag.w.x0);
       const dy = (e.clientY - drag.y) / r.height * (drag.w.y1 - drag.w.y0);
       win = { x0: drag.w.x0 - dx, x1: drag.w.x1 - dx, y0: drag.w.y0 + dy, y1: drag.w.y1 + dy };
-      graph();
+      plots();
     });
-    cv.addEventListener("pointerup", () => drag = null);
+    feed.addEventListener("pointerup", () => drag = null);
+    feed.addEventListener("wheel", e => {
+      if(!e.target.closest("canvas")) return;
+      e.preventDefault();
+      const k = e.deltaY > 0 ? 1.12 : 1 / 1.12;
+      const cx = (win.x0 + win.x1) / 2, cy = (win.y0 + win.y1) / 2;
+      const hw = (win.x1 - win.x0) / 2 * k, hh = (win.y1 - win.y0) / 2 * k;
+      win = { x0: cx - hw, x1: cx + hw, y0: cy - hh, y1: cy + hh };
+      plots();
+    }, { passive: false });
+
     $("#cal-close").onclick = () => api.close();
     built = true;
     setPane("calc");
@@ -390,7 +413,6 @@ const Calculator = (() => {
     draw();
   }
 
-  /* ---- entering things ---- */
   function commit(){
     const t = inputFor(pane), src = t.value.trim();
     if(!src) return;
@@ -398,26 +420,23 @@ const Calculator = (() => {
     if(pane === "calc"){
       try {
         const v = Calc.eval(src, { ANS: ans, ans: ans }, deg);
-        /* sqrt(-1) and ln(-1) come back as NaN rather than throwing, and a NaN
-           shown as a dash is not an answer -- worse, it becomes ANS and every
-           line after it is a dash too. Say what happened instead, and leave the
-           last real answer standing. Infinity is left alone: a quantity growing
-           without bound is a thing worth showing in a calculus activity. */
+        /* sqrt(-1) comes back NaN rather than throwing, and a NaN shown as a
+           dash is not an answer -- worse, it becomes ANS. Infinity is left
+           alone: growing without bound is worth showing. */
         if(Number.isNaN(v)) throw new Error("that has no real value");
         lists.calc.push({ id, expr: src, result: v });
         ans = v; t.value = "";
         onUse({ id, kind: "evaluate", expr: src, result: v, deg });
       } catch(err){
-        /* An attempt that did not parse is still an attempt, and the input is
-           left alone so it can be corrected and tried again. */
         lists.calc.push({ id, expr: src, err: err.message });
         onUse({ id, kind: "evaluate", expr: src, error: err.message, deg });
       }
       $("#cal-live").textContent = "";
     } else {
+      const parts = splitTop(src);
       let error = null;
-      try { Calc.compile(src); } catch(e){ error = e.message; }
-      lists[pane].push({ id, expr: src, err: error });
+      for(const q of parts){ try { Calc.compile(q); } catch(e){ error = e.message; break; } }
+      lists[pane].push({ id, expr: src, parts, err: error });
       if(!error) t.value = "";
       const use = { id, kind: pane, expr: src, deg };
       if(error) use.error = error;
@@ -427,11 +446,8 @@ const Calculator = (() => {
     draw();
   }
 
-  /* The last answer still standing. Deleting a line has to move ANS, or it goes
-     on referring to something the student can no longer see -- they delete two
-     lines, the only result left on screen is the first one, and ANS quietly
-     means the second. Falls back to zero when nothing is left, which is where
-     it started. */
+  /* The last answer still standing. Deleting has to move ANS, or it goes on
+     referring to a line the student can no longer see. */
   function lastResult(){
     for(let i = lists.calc.length - 1; i >= 0; i--){
       const e = lists.calc[i];
@@ -451,48 +467,67 @@ const Calculator = (() => {
   }
 
   function preview(){
-    if(pane !== "calc"){ draw(); return; }
+    if(pane !== "calc") return;
     const src = $("#cal-in").value.trim(), out = $("#cal-live");
     if(!src){ out.textContent = ""; return; }
-    try { out.textContent = show(Calc.eval(src, { ANS: ans, ans: ans }, deg)); }
-    catch(e){ out.textContent = ""; }
+    try {
+      const v = Calc.eval(src, { ANS: ans, ans: ans }, deg);
+      out.textContent = Number.isNaN(v) ? "" : show(v);
+    } catch(e){ out.textContent = ""; }
   }
 
-  /* ---- drawing ---- */
+  /* ---- the feeds ---- */
   function draw(){
     if(!built) return;
     if(pane === "calc") tape();
-    if(pane === "graph"){ fnList("#cal-gfns", "graph", true); graph(); }
-    if(pane === "table"){ fnList("#cal-tfns", "table", false); table(); }
+    if(pane === "graph"){ graphFeed(); plots(); }
+    if(pane === "table") tableFeed();
   }
 
+  const toBottom = sel => { const f = $(sel); f.scrollTop = f.scrollHeight; };
+
   function tape(){
-    const h = $("#cal-hist");
-    h.innerHTML = lists.calc.map(e => e.gone
-      ? `<div class="cal-h gone">${esc(tr("calcgone"))}</div>`
+    $("#cal-cfeed").innerHTML = lists.calc.map(e => e.gone
+      ? `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`
       : `<div class="cal-h${e.err ? " err" : ""}">${binFor(e.id)}`
         + `<div class="cal-he">${esc(e.expr)}</div>`
         + `<div class="cal-hr">${esc(e.err ? e.err : show(e.result))}</div></div>`).join("");
-    $("#cal-body").scrollTop = $("#cal-body").scrollHeight;
+    toBottom("#cal-cfeed");
   }
 
-  /* The editor: what is currently stacked, each with the pen it is drawn in. */
-  function fnList(sel, which, colours){
-    const rows = lists[which].map(e => {
-      if(e.gone) return `<div class="cal-fn gone">${esc(tr("calcgone"))}</div>`;
-      const i = live(which).indexOf(e);
-      const sw = colours ? `<span class="cal-sw" style="background:var(${PENS[i % PENS.length]})"></span>`
-                         : `<span class="cal-sw plain">${i + 1}</span>`;
-      return `<div class="cal-fn${e.err ? " err" : ""}">${sw}<code>${esc(e.expr)}</code>`
-           + (e.err ? `<span class="cal-fe">${esc(e.err)}</span>` : "") + binFor(e.id) + `</div>`;
+  const swatch = i => `<span class="cal-sw" style="background:var(${PENS[i % PENS.length]})"></span>`;
+
+  /* Each entry gets its own plot, one after another. A plot never stretches to
+     fill whatever height is going: it keeps a fixed shape, and the feed scrolls,
+     because a graph two thousand pixels tall and three hundred wide tells you
+     nothing about a function. */
+  function graphFeed(){
+    $("#cal-gfeed").innerHTML = lists.graph.map(e => {
+      if(e.gone) return `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`;
+      const head = `<div class="cal-cardhead">`
+        + e.parts.map((q, i) => `<span class="cal-lg">${swatch(i)}<code>${esc(q)}</code></span>`).join("")
+        + binFor(e.id) + `</div>`;
+      const body = e.err ? `<p class="cal-err">${esc(e.err)}</p>`
+                         : `<canvas data-plot="${e.id}"></canvas>`;
+      return `<div class="cal-card${e.err ? " err" : ""}">${head}${body}</div>`;
     }).join("");
-    $(sel).innerHTML = rows;
+    toBottom("#cal-gfeed");
   }
 
-  function graph(){
+  function plots(){
+    if(!built) return;
+    $("#cal-rng").textContent = `x [${show(win.x0)}, ${show(win.x1)}]`;
+    host.querySelectorAll("#cal-gfeed canvas[data-plot]").forEach(cv => {
+      const e = lists.graph.find(x => x.id === parseInt(cv.dataset.plot, 10));
+      if(e) plot(cv, e);
+    });
+  }
+
+  function plot(cv, entry){
     const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
-    if(!r.width) return;
+    if(!r.width || !r.height) return;
     cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+    const ctx = cv.getContext("2d");
     ctx.setTransform(d, 0, 0, d, 0, 0);
     const w = r.width, h = r.height;
     const X = x => (x - win.x0) / (win.x1 - win.x0) * w;
@@ -500,7 +535,7 @@ const Calculator = (() => {
     ctx.clearRect(0, 0, w, h);
     const st = (span, n) => { const raw = span / n, p = Math.pow(10, Math.floor(Math.log10(raw))), q = raw / p;
                               return (q < 1.5 ? 1 : q < 3 ? 2 : q < 7 ? 5 : 10) * p; };
-    const sx = st(win.x1 - win.x0, 8), sy = st(win.y1 - win.y0, 5);
+    const sx = st(win.x1 - win.x0, 7), sy = st(win.y1 - win.y0, 4);
     ctx.lineWidth = 1; ctx.strokeStyle = ink("--rule"); ctx.beginPath();
     for(let x = Math.ceil(win.x0 / sx) * sx; x <= win.x1; x += sx){ ctx.moveTo(X(x), 0); ctx.lineTo(X(x), h); }
     for(let y = Math.ceil(win.y0 / sy) * sy; y <= win.y1; y += sy){ ctx.moveTo(0, Y(y)); ctx.lineTo(w, Y(y)); }
@@ -509,37 +544,30 @@ const Calculator = (() => {
     if(win.y0 < 0 && win.y1 > 0){ ctx.moveTo(0, Y(0)); ctx.lineTo(w, Y(0)); }
     if(win.x0 < 0 && win.x1 > 0){ ctx.moveTo(X(0), 0); ctx.lineTo(X(0), h); }
     ctx.stroke();
-    /* Numbers on the axes, which a grid without them only implies. Drawn along
-       the axis where there is one and along the edge where the axis has
-       scrolled out of view, so a reading is always available. Off if the
-       student would rather have the room. */
+
     if(marks){
       ctx.fillStyle = ink("--muted");
-      ctx.font = `10px ${ink("--mono") || "monospace"}`;
+      ctx.font = "10px ui-monospace, monospace";
       ctx.textAlign = "center"; ctx.textBaseline = "top";
-      const axisY = (win.y0 < 0 && win.y1 > 0) ? Y(0) : h;
+      const ay = (win.y0 < 0 && win.y1 > 0) ? Y(0) : h;
       for(let x = Math.ceil(win.x0 / sx) * sx; x <= win.x1; x += sx){
         if(Math.abs(x) < sx / 1e6) continue;
         const px = X(x);
         if(px < 14 || px > w - 14) continue;
-        ctx.fillText(show(parseFloat(x.toPrecision(10))), px, Math.min(axisY + 3, h - 12));
+        ctx.fillText(show(parseFloat(x.toPrecision(10))), px, Math.min(ay + 3, h - 12));
       }
       ctx.textAlign = "left"; ctx.textBaseline = "middle";
-      const axisX = (win.x0 < 0 && win.x1 > 0) ? X(0) : 0;
+      const ax = (win.x0 < 0 && win.x1 > 0) ? X(0) : 0;
       for(let y = Math.ceil(win.y0 / sy) * sy; y <= win.y1; y += sy){
         if(Math.abs(y) < sy / 1e6) continue;
         const py = Y(y);
         if(py < 8 || py > h - 8) continue;
-        ctx.fillText(show(parseFloat(y.toPrecision(10))), Math.min(axisX + 4, w - 34), py);
+        ctx.fillText(show(parseFloat(y.toPrecision(10))), Math.min(ax + 4, w - 34), py);
       }
     }
-    $("#cal-rng").textContent = `x [${show(win.x0)}, ${show(win.x1)}]`;
 
-    /* Every function that is standing, each in its own pen, so a function and
-       its derivative can be read against one another. */
-    live("graph").forEach((e, i) => {
-      if(e.err) return;
-      let f; try { f = Calc.fn(e.expr, deg); } catch(err){ return; }
+    entry.parts.forEach((q, i) => {
+      let f; try { f = Calc.fn(q, deg); } catch(err){ return; }
       ctx.strokeStyle = ink(PENS[i % PENS.length]) || "#2f5d6b";
       ctx.lineWidth = 1.8; ctx.beginPath();
       let pen = false, prev = null;
@@ -553,67 +581,68 @@ const Calculator = (() => {
       }
       ctx.stroke();
     });
-
-    /* What is being looked at, on the picture rather than only above it -- so a
-       graph that is screenshotted or read on its own still says what it shows. */
-    const drawn = live("graph").filter(e => !e.err);
-    if(drawn.length){
-      ctx.font = `11px ${ink("--mono") || "monospace"}`;
-      ctx.textAlign = "left"; ctx.textBaseline = "middle";
-      const lh = 15, padX = 7;
-      const wide = Math.max(...drawn.map(e => ctx.measureText(e.expr).width));
-      const boxW = Math.min(wide + padX * 2 + 16, w - 12);
-      const boxH = drawn.length * lh + 8;
-      const bx = w - boxW - 6, by = 6;
-      ctx.fillStyle = ink("--card") || "#fff";
-      ctx.globalAlpha = .86;
-      ctx.fillRect(bx, by, boxW, boxH);
-      ctx.globalAlpha = 1;
-      ctx.strokeStyle = ink("--rule"); ctx.lineWidth = 1;
-      ctx.strokeRect(bx + .5, by + .5, boxW - 1, boxH - 1);
-      drawn.forEach((e, i) => {
-        const cy = by + 4 + lh * i + lh / 2;
-        ctx.fillStyle = ink(PENS[i % PENS.length]) || "#2f5d6b";
-        ctx.fillRect(bx + padX, cy - 4, 9, 3);
-        ctx.fillStyle = ink("--ink");
-        const label = e.expr.length > 22 ? e.expr.slice(0, 21) + "…" : e.expr;
-        ctx.fillText(label, bx + padX + 14, cy);
-      });
-    }
   }
 
-  function table(){
-    const host2 = $("#cal-tbl");
-    const fns = live("table").filter(e => !e.err);
-    if(!fns.length){ host2.innerHTML = ""; return; }
+  function tableFeed(){
     const from = parseFloat($("#cal-from").value), by = parseFloat($("#cal-step").value);
-    if(!isFinite(from) || !isFinite(by) || by === 0){ host2.innerHTML = ""; return; }
-    const cols = fns.map(e => { try { return { e, f: Calc.fn(e.expr, deg) }; } catch(err){ return null; } }).filter(Boolean);
-    let head = `<tr><th>x</th>` + cols.map((c, i) => `<th>f${i + 1}</th>`).join("") + `</tr>`;
-    let rows = "";
-    for(let i = 0; i < 20; i++){
-      const x = from + i * by;
-      rows += `<tr><td>${show(x)}</td>` + cols.map(c => {
-        const y = c.f(x); return `<td>${isFinite(y) ? show(y) : "—"}</td>`;
-      }).join("") + `</tr>`;
-    }
-    host2.innerHTML = `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+    $("#cal-tfeed").innerHTML = lists.table.map(e => {
+      if(e.gone) return `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`;
+      const head = `<div class="cal-cardhead">`
+        + e.parts.map((q, i) => `<span class="cal-lg"><span class="cal-sw plain">f${i + 1}</span><code>${esc(q)}</code></span>`).join("")
+        + binFor(e.id) + `</div>`;
+      if(e.err) return `<div class="cal-card err">${head}<p class="cal-err">${esc(e.err)}</p></div>`;
+      if(!isFinite(from) || !isFinite(by) || by === 0) return `<div class="cal-card">${head}</div>`;
+      const fs = e.parts.map(q => { try { return Calc.fn(q, deg); } catch(err){ return null; } });
+      let rows = "";
+      for(let i = 0; i < 12; i++){
+        const x = from + i * by;
+        rows += `<tr><td>${show(x)}</td>` + fs.map(f => {
+          const y = f ? f(x) : NaN; return `<td>${isFinite(y) ? show(y) : "—"}</td>`;
+        }).join("") + `</tr>`;
+      }
+      const hdr = `<tr><th>x</th>` + e.parts.map((q, i) => `<th>f${i + 1}</th>`).join("") + `</tr>`;
+      return `<div class="cal-card">${head}<div class="cal-tbl">`
+           + `<table><thead>${hdr}</thead><tbody>${rows}</tbody></table></div></div>`;
+    }).join("");
+    toBottom("#cal-tfeed");
   }
 
   const api = {
     mount(o){ host = o.host; tr = o.tr || tr; onUse = o.onUse || onUse; onDrop = o.onDrop || onDrop; },
+
+    /* Put the feeds back after a reload, from the session's own record rather
+       than from a second copy kept somewhere else. tool_uses already holds every
+       entry, every failure and every tombstone, so it is the only thing that
+       could disagree with itself -- and reading it back is what keeps a
+       student's work in front of them for the whole activity rather than only
+       until the page is refreshed. */
+    restore(uses){
+      if(!Array.isArray(uses)) return;
+      lists.calc.length = 0; lists.graph.length = 0; lists.table.length = 0;
+      for(const u of uses){
+        const id = typeof u.id === "number" ? u.id : ++uid;
+        uid = Math.max(uid, id);
+        const where = u.kind === "evaluate" ? "calc" : (u.kind === "graph" || u.kind === "table" ? u.kind : null);
+        if(!where) continue;
+        if(u.deleted_utc){ lists[where].push({ id, expr: "", parts: [], gone: true }); continue; }
+        if(where === "calc") lists.calc.push({ id, expr: u.expr, result: u.result, err: u.error });
+        else lists[where].push({ id, expr: u.expr, parts: splitTop(u.expr || ""), err: u.error });
+      }
+      ans = lastResult();
+      if(built) draw();
+    },
     open(){
       if(!built) build();
       host.classList.add("open");
       document.body.classList.add("cal-open");
-      if(pane === "graph") requestAnimationFrame(graph);
+      requestAnimationFrame(() => { if(pane === "graph") plots(); });
       const t = inputFor(pane);
       if(t && window.matchMedia("(min-width:760px)").matches) t.focus();
     },
     close(){ host.classList.remove("open"); document.body.classList.remove("cal-open"); if(api.onclose) api.onclose(); },
     toggle(){ host.classList.contains("open") ? api.close() : api.open(); },
     isOpen(){ return host.classList.contains("open"); },
-    redraw(){ if(built && pane === "graph") graph(); },
+    redraw(){ if(built && pane === "graph") plots(); },
   };
   return api;
 })();
