@@ -91,7 +91,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 # Bumped by hand, when a change is worth telling a user about.
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 # The activity is whatever prompt you point this at. `examples/` holds the one
 # from the Taylor Series study it was first built for.
 PROMPT_DEFAULT = HERE / "examples" / "taylor-series.txt"
@@ -861,6 +861,7 @@ const I18N = {
     calc: "Calculator", calctab: "Calculate", calcgraph: "Graph", calctable: "Table",
     calcfrom: "from", calcstep: "step", calcreset: "reset", calcclose: "Close the calculator",
     calcdel: "Delete this line", calcgone: "deleted", calcmarks: "numbers",
+    calcph: "type expressions here",
     calcworked: "worked out",
     del: "Delete this exchange",
     delask: "Delete this exchange?\n\nYour words and the reply are removed from what you hand in. The file will still record that an exchange was here, and how long it was — so what you submit stays an honest account of the session.\n\nThis cannot be undone.",
@@ -946,6 +947,7 @@ const I18N = {
     calc: "计算器", calctab: "计算", calcgraph: "作图", calctable: "数值表",
     calcfrom: "起点", calcstep: "步长", calcreset: "复位", calcclose: "关闭计算器",
     calcdel: "删除这一行", calcgone: "已删除", calcmarks: "刻度",
+    calcph: "在此输入算式",
     calcworked: "算过",
     del: "删除这段对话",
     delask: "要删除这段对话吗？\n\n你的发言和这条回复都会从你提交的文件中移除。文件仍会记录此处曾有一段对话及其长度——这样你提交的内容依然是本次会话的如实记录。\n\n此操作无法撤销。",
@@ -1029,6 +1031,8 @@ $("#lang").onclick = () => {
   lang = lang === "zh" ? "en" : "zh";
   try{ localStorage.setItem("tea.lang", lang); }catch(e){}
   applyLang();
+  /* The calculator builds its own markup once, so applyLang cannot reach it. */
+  Calculator.relabel();
 };
 
 /* ---------- the calculator ----------

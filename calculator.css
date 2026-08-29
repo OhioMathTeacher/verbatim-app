@@ -35,7 +35,7 @@
 .cal-pane.on { display: flex; }
 .cal-feed { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
   overscroll-behavior: contain; padding: 13px 14px; display: flex;
-  flex-direction: column; gap: 12px; }
+  flex-direction: column; gap: 10px; }
 
 /* The tape scrolls, and needs to look as though it does. Overlay scrollbars stay
    invisible until something is already moving, which leaves a long feed looking
@@ -56,12 +56,12 @@
 
 /* One entry of the graph or table feed: what was asked for, then what it drew. */
 .cal-card { position: relative; border: 1px solid var(--rule); border-radius: 11px;
-  background: var(--paper); padding: 8px 9px 9px; }
+  background: var(--paper); padding: 7px 8px 8px; }
 .cal-card.err { border-style: dashed; }
 .cal-card.gone { padding: 7px 10px; border-style: dashed; background: transparent;
   color: var(--muted); font: italic 12px var(--sans); text-align: center; }
 .cal-cardhead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 0 22px 7px 2px; min-width: 0; }
+  padding: 0 22px 6px 2px; min-width: 0; }
 .cal-lg { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
 .cal-lg code { font: 12.5px var(--mono); color: var(--ink); overflow: hidden;
   text-overflow: ellipsis; white-space: nowrap; }
@@ -72,7 +72,7 @@
 /* A plot keeps its shape. It does not stretch to fill whatever height is going:
    a graph two thousand pixels tall and three hundred wide says nothing about a
    function, and on a tall screen that is exactly what filling gives you. */
-.cal-card canvas { width: 100%; aspect-ratio: 5 / 3; max-height: 210px; display: block;
+.cal-card canvas { width: 100%; aspect-ratio: 2 / 1; max-height: 168px; display: block;
   border-radius: 7px; background: var(--card); touch-action: none; cursor: crosshair; }
 
 /* Pinned under the feed, so stacking never pushes the controls out of view. */
@@ -133,6 +133,16 @@
 .cal-pad .op { color: var(--accent); }
 .cal-pad .act { color: var(--ok); }
 .cal-pad .del { color: var(--warn); }
+
+/* On a short window the keypad is the thing eating the room, so it gives some
+   back rather than the plots being shrunk everywhere for the sake of laptops.
+   Two graphs clearing the fold together is the target. */
+@media (max-height: 899px) {
+  .cal-pad button { padding: 9px 0; font-size: 15px; }
+  .cal-card canvas { max-height: 120px; }
+  .cal-feed { padding: 9px 12px; gap: 8px; }
+  .cal-line { padding: 8px 14px; }
+}
 
 /* The input bar is fixed and full width. On a wide screen the drawer sits over
    its right end, so the bar is inset to keep Send reachable; on a narrow one the

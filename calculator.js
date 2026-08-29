@@ -282,7 +282,7 @@ const Calculator = (() => {
       <div class="cal-top">
         <span class="cal-name">${tr("calc")}</span>
         <span class="cal-angle" id="cal-angle">
-          <button type="button" data-deg="0" class="on">RAD</button><button type="button" data-deg="1">DEG</button>
+          <button type="button" data-deg="0" class="${deg ? "" : "on"}">RAD</button><button type="button" data-deg="1" class="${deg ? "on" : ""}">DEG</button>
         </span>
         <button type="button" class="cal-x" id="cal-close" aria-label="${tr("calcclose")}" title="${tr("calcclose")}">✕</button>
       </div>
@@ -298,7 +298,7 @@ const Calculator = (() => {
           <div class="cal-wrow">
             <button type="button" data-zoom="0.5">+</button><button type="button" data-zoom="2">−</button>
             <button type="button" data-zoom="reset">${tr("calcreset")}</button>
-            <button type="button" id="cal-marks" class="on">${tr("calcmarks")}</button>
+            <button type="button" id="cal-marks" class="${marks ? "on" : ""}">${tr("calcmarks")}</button>
             <span class="cal-sp"></span><span class="cal-rng" id="cal-rng"></span>
           </div>
         </div>
@@ -312,12 +312,12 @@ const Calculator = (() => {
       </div>
       <div class="cal-inputs">
         <div class="cal-line on" data-for="calc"><span class="cal-caret">&rsaquo;</span>
-          <input id="cal-in" autocomplete="off" spellcheck="false" placeholder="0.2 - 0.2^3/3!">
+          <input id="cal-in" autocomplete="off" spellcheck="false" placeholder="${esc(tr("calcph"))}">
           <span class="cal-live" id="cal-live"></span></div>
         <div class="cal-line" data-for="graph"><label>y =</label>
-          <input id="cal-gin" autocomplete="off" spellcheck="false" placeholder="sin(x), cos(x)"></div>
+          <input id="cal-gin" autocomplete="off" spellcheck="false" placeholder="${esc(tr("calcph"))}"></div>
         <div class="cal-line" data-for="table"><label>f(x) =</label>
-          <input id="cal-tin" autocomplete="off" spellcheck="false" placeholder="sin(x) - x"></div>
+          <input id="cal-tin" autocomplete="off" spellcheck="false" placeholder="${esc(tr("calcph"))}"></div>
       </div>
       <div class="cal-pad" id="cal-pad">${
         KEYS.map(([k, l, c]) => `<button type="button" class="${c}" data-k="${k.replace(/"/g, "&quot;")}">${l}</button>`).join("")
@@ -616,6 +616,19 @@ const Calculator = (() => {
        could disagree with itself -- and reading it back is what keeps a
        student's work in front of them for the whole activity rather than only
        until the page is refreshed. */
+    /* The drawer is built once, with its words baked in, so switching language
+       has to build it again -- otherwise the conversation turns Chinese and the
+       calculator stays English. State lives outside the DOM, so only what was
+       typed needs carrying across. */
+    relabel(){
+      if(!built) return;
+      const p = pane, typed = {};
+      host.querySelectorAll(".cal-line input, .cal-wrow input").forEach(i => typed[i.id] = i.value);
+      build();
+      for(const [id, v] of Object.entries(typed)){ const el = host.querySelector("#" + id); if(el) el.value = v; }
+      setPane(p);
+    },
+
     restore(uses){
       if(!Array.isArray(uses)) return;
       lists.calc.length = 0; lists.graph.length = 0; lists.table.length = 0;
