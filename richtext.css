@@ -1,0 +1,31 @@
+/* Styling for what richtext.js draws. Inlined into both the activity and the
+   reader, so a turn looks the same live as it does in a transcript.
+
+   Everything is scoped to .rt, the container the renderer's output goes into.
+   The turn itself stays pre-wrap for anything that is not rendered; inside .rt
+   the structure is real elements, so normal wrapping is what is wanted. */
+.rt{white-space:normal}
+.rt > :first-child{margin-top:0}
+.rt > :last-child{margin-bottom:0}
+.rt p{margin:0 0 9px}
+.rt .mdh{font-weight:700;margin:13px 0 5px}
+.rt strong{font-weight:700}
+.rt em{font-style:italic}
+.rt ul,.rt ol{margin:8px 0;padding-left:23px}
+.rt li{margin:3px 0}
+.rt li::marker{color:var(--muted)}
+.rt hr{border:0;border-top:1px solid var(--rule);margin:13px 0}
+.rt blockquote{margin:9px 0;padding-left:13px;border-left:3px solid var(--rule);color:var(--muted)}
+.rt code{font-family:var(--mono);font-size:.9em;padding:1px 5px;border-radius:5px;
+  background:rgba(127,127,127,.14)}
+/* A table can be wider than a bubble on a phone. Let it scroll inside its own
+   box rather than stretching the conversation. */
+.rt .mdtw{overflow-x:auto;margin:10px 0;max-width:100%}
+.rt .mdt{border-collapse:collapse;font-size:.95em}
+.rt .mdt th,.rt .mdt td{border:1px solid var(--rule);padding:6px 11px;text-align:left;
+  vertical-align:top}
+.rt .mdt th{font-weight:700}
+/* Mathematics. MathML must not inherit pre-wrap or every space inside an
+   expression becomes a gap. */
+.rt .math{white-space:normal}
+.rt .math-display{display:block;margin:11px 0}

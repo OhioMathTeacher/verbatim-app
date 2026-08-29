@@ -68,11 +68,16 @@ def ok(msg: str) -> None:
 
 
 def page_js(html: str) -> str:
-    """The page's own script block — the last one, and the only one that matters."""
+    """The page's own script block — the last one, and the only one that matters.
+
+    Taken by position, not by size. The page now inlines Temml ahead of its own
+    script, and the vendored library is the larger of the two, so picking the
+    longest block would check the maths renderer and never the page.
+    """
     blocks = re.findall(r"<script>(.*?)</script>", html, re.S)
     if not blocks:
         raise SystemExit("no <script> block found — is this a built page?")
-    return max(blocks, key=len)
+    return blocks[-1]
 
 
 def js_object(js: str, name: str) -> str:

@@ -85,7 +85,7 @@ Deployment
 from __future__ import annotations
 
 import argparse
-import colorsys, hashlib, json, os, sys
+import colorsys, hashlib, json, os, re, sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -259,6 +259,15 @@ TEMPLATE = r"""<!doctype html>
   --accent:#dda278; --ok:#8ab894; --warn:#d99a63;
   --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -10px rgba(0,0,0,.5);
 }}
+/* The same values again, for a reader who asked for dark on a light machine.
+   Keep the two blocks in step -- they are one palette written twice. */
+:root[data-theme="dark"]{
+  --paper:#16150f; --card:#1e1c16; --ink:#ece6d9; --muted:#9d968a; --rule:#332f26;
+  --ai:#8fc0cd; --ai-bg:#182428; --ai-edge:#26383d;
+  --stu:#dda278; --stu-bg:#241a13; --stu-edge:#3d2b1e;
+  --accent:#dda278; --ok:#8ab894; --warn:#d99a63;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -10px rgba(0,0,0,.5);
+}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
@@ -509,7 +518,32 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 .ai-status.ready .dot{background:var(--ok)}
 .ai-status .txt{font-size:14px}
 .ai-status button{margin-left:auto;padding:7px 14px;font-size:13.5px}
+/* The bin. Quiet until the exchange is hovered or the button is focused, so it
+   is reachable without sitting over the conversation asking to be pressed. */
+.turn{position:relative}
+.binbtn{position:absolute;top:8px;right:9px;background:transparent;border:0;cursor:pointer;
+  font-size:15px;line-height:1;padding:5px 6px;border-radius:8px;color:var(--muted);
+  opacity:0;transition:opacity .12s ease, color .12s ease}
+.turn:hover .binbtn, .binbtn:focus-visible{opacity:.75}
+.binbtn:hover{opacity:1;color:var(--warn);background:color-mix(in srgb, var(--warn) 12%, transparent)}
+.gone{margin:0 0 16px;padding:9px 15px;border:1px dashed var(--rule);border-radius:12px;
+  color:var(--muted);font-size:13.5px;font-style:italic;text-align:center}
+__RICHTEXT_CSS__
+__TEMML_CSS__
 </style>
+
+<script>
+/* Light or dark, decided before anything is drawn. The page follows the machine
+   until someone says otherwise; after that it remembers what they chose. Kept
+   here, ahead of the page's own script, so the choice is applied on the first
+   paint rather than a moment after it. */
+try{
+  var t = localStorage.getItem("tea.theme");
+  document.documentElement.dataset.theme =
+    (t === "light" || t === "dark") ? t
+    : (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+}catch(e){}
+</script>
 
 <div id="demobar" class="demo hide">DEMO MODE — replies are canned. Nothing is sent anywhere.</div>
 <div class="wrap">
@@ -518,6 +552,7 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
   <img class="avatar hide" id="avatar" alt="">
   <h1 data-i18n="title">__TITLE__</h1>
   <span class="mastbtns">
+    <button class="gear" id="theme" title="Light or dark / 浅色或深色"><span id="theme-icon" aria-hidden="true">☾</span></button>
     <button class="gear" id="lang" title="Language / 语言">中文</button>
     <button class="gear" id="gear"><span aria-hidden="true">⚙</span> <span id="gear-txt" data-i18n="aisetup">AI Setup</span></button>
   </span>
@@ -674,6 +709,11 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
   </div>
 </div>
 
+<!-- Temml (MIT), vendored from vendor/temml.min.js. Inlined rather than linked:
+     the page must open from file:// with nothing to fetch. -->
+<script>__TEMML_JS__</script>
+<script>__RICHTEXT_JS__</script>
+
 <script>
 const PROVIDERS = __PROVIDERS_JSON__;
 let   PROMPT    = __PROMPT_JSON__;
@@ -684,7 +724,7 @@ const SECTION   = __SECTION_JSON__;
 let   SURVEY    = __SURVEY_JSON__;
 const FOOTER    = __FOOTER_JSON__;
 const DEMO      = __DEMO_JSON__;
-const SCHEMA    = "tea-taylor-session/1";
+const SCHEMA    = "tea-taylor-session/2";   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --
@@ -785,6 +825,10 @@ const I18N = {
     forgotnone: "There were no keys stored.",
     dlcopy: "Download the file again", backconv: "Back to the conversation",
     aiteacher: "AI teacher", you: "You",
+    del: "Delete this exchange",
+    delask: "Delete this exchange?\n\nYour words and the reply are removed from what you hand in. The file will still record that an exchange was here, and how long it was — so what you submit stays an honest account of the session.\n\nThis cannot be undone.",
+    delgone: "Exchange deleted",
+    delcount: "deleted",
     notset: "Not set up yet", keyneeded: "key needed", demomode: "Demo mode — no AI needed",
     errfields: "Participant code, group and section are all required.",
     errcode: "The participant code should be letters and numbers only, e.g. P07. Please do not use your name.",
@@ -860,6 +904,10 @@ const I18N = {
     forgotnone: "没有已保存的密钥。",
     dlcopy: "重新下载文件", backconv: "返回对话",
     aiteacher: "AI 老师", you: "你",
+    del: "删除这段对话",
+    delask: "要删除这段对话吗？\n\n你的发言和这条回复都会从你提交的文件中移除。文件仍会记录此处曾有一段对话及其长度——这样你提交的内容依然是本次会话的如实记录。\n\n此操作无法撤销。",
+    delgone: "已删除的对话",
+    delcount: "已删除",
     notset: "尚未设置", keyneeded: "需要密钥", demomode: "演示模式 —— 无需 AI",
     errfields: "参与者编号、组别和班级都是必填项。",
     errcode: "参与者编号只能包含字母和数字，例如 P07。请不要使用姓名。",
@@ -938,6 +986,23 @@ $("#lang").onclick = () => {
   lang = lang === "zh" ? "en" : "zh";
   try{ localStorage.setItem("tea.lang", lang); }catch(e){}
   applyLang();
+};
+
+/* ---------- light or dark ----------
+   A preference about reading, not about the activity: stored in this browser
+   beside the language, and deliberately never written into the session file.
+   What a student found comfortable to look at is not data about what they did.
+
+   The glyph shows what pressing it gives you, not what you are looking at. */
+function applyTheme(t){
+  document.documentElement.dataset.theme = t;
+  $("#theme-icon").textContent = t === "dark" ? "☀" : "☾";
+}
+applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+$("#theme").onclick = () => {
+  const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  try{ localStorage.setItem("tea.theme", t); }catch(e){}
+  applyTheme(t);
 };
 
 /* ---------- AI setup ----------
@@ -1405,17 +1470,98 @@ const turnCount = n => n + " " + tr(n === 1 ? "turn1" : "turns");
 function header(){
   $("#p-id").textContent    = S.participant + " · " + S.group + " · " + S.section;
   $("#p-model").textContent = S.model;
-  $("#p-turns").textContent = turnCount(S.turns.length);
+  const gone = S.turns.filter(isGone).length;
+  $("#p-turns").textContent = turnCount(S.turns.length)
+                            + (gone ? "  ·  " + gone + " " + tr("delcount") : "");
 }
+
+/* ---------- deleting an exchange ----------
+   A student may take back what they said. The turns are grouped as they appear
+   on screen -- an AI turn and the reply to it -- and removing one takes both.
+
+   What is left behind is a tombstone: the position, the speaker, the length and
+   the moment it was deleted, with the words gone. This is the whole of the
+   argument. A file that silently dropped the turns would stop being evidence of
+   its own completeness, and the turn counts and the words-per-speaker ratio --
+   which are measurements this instrument exists to make -- would quietly become
+   wrong. A file that kept the text would hand back the very sentence a student
+   was trying to withdraw, which on a page that insists on codes rather than
+   names is worse. Counted, but gone.
+
+   There is still deliberately no "start over": see the note further down. This
+   is the narrower thing, and it is bounded by leaving a trace. */
+const isGone = t => !!t.deleted_utc;
+
+/* Groups of turns as they are read: each AI turn opens a group, and whatever
+   the student says next belongs to it. Written as a scan rather than assuming
+   strict alternation, because a failed request leaves no AI turn behind. */
+function exchanges(){
+  const out = [];
+  S.turns.forEach((t, i) => {
+    if(t.role === "ai" || !out.length) out.push([i]);
+    else out[out.length - 1].push(i);
+  });
+  return out;
+}
+
+function deleteExchange(idx){
+  if(!confirm(tr("delask"))) return;
+  const when = nowUTC();
+  for(const i of idx){
+    const t = S.turns[i];
+    if(isGone(t)) continue;
+    /* Keep what can be counted, drop what was said. Timing is kept: how long a
+       reply took is not a thing anyone asks to have removed. */
+    S.turns[i] = {
+      i: t.i, role: t.role, ts: t.ts, deleted_utc: when,
+      word_count: t.word_count, char_count: t.char_count,
+      ...(t.latency_ms != null ? { latency_ms: t.latency_ms } : {}),
+      ...(t.compose_ms != null ? { compose_ms: t.compose_ms } : {}),
+    };
+  }
+  save(); render();
+}
+
 function render(){
   const log = $("#log"); log.innerHTML = "";
-  for(const t of S.turns){
-    const d = document.createElement("div");
-    d.className = "turn " + t.role;
-    const w = document.createElement("span");
-    w.className = "who"; w.textContent = t.role === "ai" ? tr("aiteacher") : tr("you");
-    d.appendChild(w); d.appendChild(document.createTextNode(t.text));
-    log.appendChild(d);
+  for(const idx of exchanges()){
+    const gone = idx.every(i => isGone(S.turns[i]));
+    if(gone){
+      /* One line where the exchange was, rather than a gap. A student who
+         deletes something should be able to see that they did. */
+      const g = document.createElement("div");
+      g.className = "gone";
+      g.textContent = tr("delgone");
+      log.appendChild(g);
+      continue;
+    }
+    for(const i of idx){
+      const t = S.turns[i];
+      const d = document.createElement("div");
+      d.className = "turn " + t.role;
+      const w = document.createElement("span");
+      w.className = "who"; w.textContent = t.role === "ai" ? tr("aiteacher") : tr("you");
+      d.appendChild(w);
+      d.appendChild(isGone(t) ? document.createTextNode("") : rtBody(t.text));
+      /* The bin sits on the first turn of the exchange and removes the whole of
+         it, because half an exchange is not a thing anyone means to keep. */
+      if(i === idx[0]){
+        const b = document.createElement("button");
+        b.className = "binbtn"; b.type = "button";
+        b.title = tr("del"); b.setAttribute("aria-label", tr("del"));
+        /* Drawn rather than typed. The bin emoji is missing from enough system
+           fonts to come out as a blank box, and a blank box is not a thing
+           anyone will press. */
+        b.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" '
+                    + 'fill="none" stroke="currentColor" stroke-width="1.3" '
+                    + 'stroke-linecap="round" stroke-linejoin="round">'
+                    + '<path d="M2.5 4h11M6.5 4V2.6h3V4M4 4l.7 9.1a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9L12 4"/>'
+                    + '<path d="M6.6 6.8v4.6M9.4 6.8v4.6"/></svg>';
+        b.onclick = () => deleteExchange(idx);
+        d.appendChild(b);
+      }
+      log.appendChild(d);
+    }
   }
   header();
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
@@ -1982,13 +2128,21 @@ function fillReport(){
   };
 
   for(const t of S.turns){
+    if(isGone(t)){
+      const g = document.createElement("div");
+      g.className = "gone";
+      g.textContent = tr("delgone") + "  ·  " + t.word_count + " "
+                    + tr(t.word_count === 1 ? "word1" : "wordn");
+      box.appendChild(g);
+      continue;
+    }
     const d = document.createElement("div");
     d.className = "turn " + t.role;
     const w = document.createElement("span");
     w.className = "who";
     w.textContent = t.role === "ai" ? tr("aiteacher") : tr("you");
     d.appendChild(w);
-    d.appendChild(document.createTextNode(t.text));
+    d.appendChild(rtBody(t.text));
     const bits = [];
     if(t.role === "ai" && t.latency_ms != null) bits.push(tr("rreplied") + " " + ms1(t.latency_ms));
     if(t.role === "student" && t.compose_ms != null) bits.push(tr("rtyped") + " " + ms1(t.compose_ms));
@@ -2105,6 +2259,13 @@ $("#resume").onclick = () => { render(); show("s-chat"); };
    A student who wants to change direction can say so to the AI teacher, which is
    itself worth recording.
 
+   Deleting a single exchange is allowed, and the difference is the trace. A
+   deleted exchange leaves a tombstone: the position, the speaker and the length
+   stay in the file, so the turn counts and the words-per-speaker ratio remain
+   true and the session is still evidence of its own completeness. Starting over
+   would leave nothing at all, which is the thing being refused. See
+   deleteExchange() above.
+
    ?reset is for whoever is building the activity. Nothing links to it, nothing
    shows it, and it asks before it does anything. It clears the session only:
    stored keys are left alone, since "Forget all keys" is the thing for those.
@@ -2133,7 +2294,9 @@ applyLang();
 /* ---------- resume after a reload ---------- */
 (function(){
   const prev = load();
-  if(prev && prev.schema === SCHEMA && prev.activity_prompt){
+  const READABLE = [SCHEMA, "tea-taylor-session/1"];
+  if(prev && READABLE.includes(prev.schema) && prev.activity_prompt){
+    prev.schema = SCHEMA;   // saved before tombstones; nothing about it is wrong
     S = prev; render();
     if(prev.exported_utc && SURVEY.length && !surveyDone()){
       renderSurvey(); show("s-survey");
@@ -2155,7 +2318,55 @@ applyLang();
 """
 
 
-SETUP_SRC = HERE / "setup.src.html"
+VENDOR = HERE / "vendor"
+
+def _asset(name: str) -> str:
+    """A vendored file, or a clear failure. A page that silently lost its maths
+    renderer would look fine until an expression appeared in front of a class."""
+    p = VENDOR / name
+    if not p.is_file():
+        raise SystemExit(f"missing {p} -- the maths renderer is vendored, not fetched")
+    return p.read_text(encoding="utf-8")
+
+
+# Temml's stylesheet names a woff2 for script capitals that we do not ship. Drop
+# the rule rather than let a built page reach for a file that is not beside it.
+TEMML_CSS = re.sub(r"@font-face\s*\{[^}]*\}", "", _asset("temml.css")).strip()
+# MIT asks that the notice travel with the code, and the code travels into every
+# built page. The minified file carries no banner of its own, so one is added here
+# rather than left to the repository, which a handed-out HTML file is not part of.
+TEMML_JS  = ("/*\n" + _asset("temml.LICENSE").strip()
+             + "\n\nTemml 0.11.11 -- https://temml.org\n*/\n"
+             + _asset("temml.min.js").strip())
+
+# How a turn is drawn. One copy, inlined into the activity and the reader alike,
+# so a transcript cannot come to look different from the conversation it records.
+RICHTEXT_JS  = (HERE / "richtext.js").read_text(encoding="utf-8").strip()
+RICHTEXT_CSS = (HERE / "richtext.css").read_text(encoding="utf-8").strip()
+
+
+def with_assets(page: str) -> str:
+    return (page
+            .replace("__RICHTEXT_CSS__", RICHTEXT_CSS)
+            .replace("__RICHTEXT_JS__", RICHTEXT_JS)
+            .replace("__TEMML_CSS__", TEMML_CSS)
+            .replace("__TEMML_JS__", TEMML_JS))
+
+
+TEMPLATE = with_assets(TEMPLATE)
+
+SETUP_SRC  = HERE / "setup.src.html"
+READER_SRC = HERE / "reader.src.html"
+
+
+def build_reader() -> str:
+    """The transcript reader, carrying the same maths renderer as the activity.
+
+    A transcript that showed dollar signs where the student saw an expression
+    would misreport the session, so the reader takes its delimiters, its
+    fallback and its library from the same place the activity does.
+    """
+    return with_assets(READER_SRC.read_text(encoding="utf-8"))
 
 
 def build_setup(defaults: dict) -> str:
@@ -2430,10 +2641,17 @@ def main() -> int:
             "built": prompt["sha256"][:12],
         }), encoding="utf-8")
 
+    reader_out = a.out.parent / "reader.html"
+    if READER_SRC.exists() and not a.demo:
+        reader_out.write_text(build_reader(), encoding="utf-8")
+
     print(f"wrote {a.out}  ({a.out.stat().st_size/1024:.0f} KB)")
     if SETUP_SRC.exists() and not a.demo:
         print(f"wrote {setup_out}  ({setup_out.stat().st_size/1024:.0f} KB)  "
               f"— the browser builder, for making an activity without Python")
+    if READER_SRC.exists() and not a.demo:
+        print(f"wrote {reader_out}  ({reader_out.stat().st_size/1024:.0f} KB)  "
+              f"— the transcript reader")
     print(f"  prompt            : {prompt['id']}  sha256 {prompt['sha256'][:12]}…  "
           f"{len(prompt['text'])} chars")
     print(f"  survey            : {len(survey)} question(s)" if survey else "  survey            : (none)")

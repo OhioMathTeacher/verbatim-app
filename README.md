@@ -46,6 +46,80 @@ One JSON file per student, conforming to a written schema:
   be matched up afterwards.
 - **Codes, never names.** The filename carries participant, group and section only.
 
+The schema is `tea-taylor-session/2`. A `/2` file may contain tombstones, so anything
+reading one must expect a turn with no `text` — see below.
+
+## Taking an exchange back
+
+A student can delete an exchange before handing the file in: the bin at the corner of a
+turn removes it and the reply that belongs with it. This is narrower than it sounds, and
+the shape of it is the point.
+
+**What is deleted is the words. What survives is the shape.** A deleted turn keeps its
+position, its speaker, its length and the moment it was removed, and loses its `text`:
+
+```json
+{ "i": 6, "role": "ai", "ts": "…", "deleted_utc": "…", "word_count": 47, "char_count": 260 }
+```
+
+Both halves matter. A file that dropped the turns outright would stop being evidence of
+its own completeness — turn counts and the words-per-speaker ratio, which are measurements
+this instrument exists to make, would quietly become wrong, and nobody reading the file
+could tell a short session from an edited one. A file that kept the text would hand back
+the very sentence the student was trying to withdraw, which on a page that insists on codes
+rather than names is the worse failure. So: counted, but gone.
+
+There is still no "start over", and the difference is exactly the trace. Discarding a whole
+session would leave nothing behind; this leaves the outline of what was removed. The reader
+draws deleted exchanges in place, as an outline rather than a gap, for the same reason.
+
+
+## How a turn is drawn
+
+Replies arrive as Markdown with mathematics in them, whether or not anything asks for
+that. The page draws both, so a Taylor series appears as a Taylor series instead of as
+`x^3x^3x^3`, and a step appears as **Step 2** instead of `**Step 2**`.
+
+Mathematics is TeX between dollars — `$…$` inline, `$$…$$` set apart — and the activity
+prompts ask for it explicitly. Markdown is bold, italics, headings, lists, tables, inline
+code and rules.
+
+Two decisions worth knowing about, because both trade a feature for not being wrong:
+
+- **Mathematics is lifted out before Markdown is looked for.** The two languages collide:
+  `x_1` is a subscript, not an underline, and `\frac{a}{b}` is full of braces Markdown
+  would rather not see. Taking the TeX out first means the Markdown pass only ever sees
+  prose.
+- **Italics are stricter than CommonMark.** CommonMark reads `2*3*4` as an emphasised 3,
+  which in a mathematics transcript quietly eats two multiplication signs. Here an opening
+  `*` must begin a line or follow a space, so `*Hint:*` is emphasis and `2*3*4` is a
+  product. `_` is never emphasis — outside the dollars it is a subscript. A lone `$5` in a
+  sentence about money is left alone for the same reason.
+
+**The recorded turn is never touched.** Rendering builds a view of the text; the JSON the
+student hands in still holds the characters the model actually sent, asterisks and dollars
+and all. What was said and how it was displayed stay separate, which is the same reason
+`role` is recorded at creation rather than inferred later.
+
+The reply rules still tell the model not to use headings, bold or lists. That rule is about
+reading load and the sixty-word cap, and it stands. The renderer is what happens when the
+model ignores it, which it does.
+
+`richtext.js` and `richtext.css` hold all of this, in one copy, inlined into both the
+activity and the reader at build time — so a transcript read afterwards cannot come to look
+different from the conversation it recorded. Drawing the mathematics is
+[Temml](https://temml.org) (MIT), vendored in `vendor/`, converting TeX to MathML that the
+browser draws itself. Nothing is fetched: a page opened from `file://` on a classroom
+machine with no network still shows mathematics. Anything Temml cannot parse falls back to
+the raw characters rather than vanishing.
+
+## Light or dark
+
+The activity follows the machine, and the ☾ button in the corner overrides it either way.
+The choice is remembered in that browser, beside the language, and is deliberately never
+written into the session file: what a student found comfortable to read is not data about
+what they did. The reader is light only.
+
 ## Making your own activity — without installing anything
 
 **[Open the setup page →](https://ohiomathteacher.github.io/verbatim-app/setup.html)**
@@ -76,7 +150,8 @@ sends `Origin: null`, and every provider offered accepts that.
 
 `--help` lists the rest: branding, language, submission, provider selection. Every build also
 writes `setup.html` beside the activity, so the browser builder always carries the template it
-was built from.
+was built from, and `reader.html`, so the reader carries the same maths renderer the activity
+does. Both are generated — edit `setup.src.html` and `reader.src.html`, not the built files.
 
 ## Changing the activity without rebuilding
 

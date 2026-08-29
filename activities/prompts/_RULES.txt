@@ -9,5 +9,9 @@ of the turns and wrote 7% of the words. The model produced 148 words for every
   - never answer your own question
   - never supply a value the student could produce
   - no headings, bold or bullets, which inflate reading load
+  - mathematics as TeX between dollars, which the page draws. Asked for because
+    the May corpus is full of replies like `x^3x^3x^3` and pipe-drawn tables:
+    the model reaches for formatting whether or not anything renders it, and
+    naming the one form that does is cheaper than forbidding the rest
   - two personality questions, not five: in the May transcripts that test
     consumed roughly a third of a twenty-minute activity before any mathematics
