@@ -38,6 +38,7 @@ input,textarea,select{width:100%;padding:11px 13px;border:1px solid var(--rule);
   background:var(--card);color:var(--ink);font:inherit}
 textarea{resize:vertical;font-family:var(--mono);font-size:13px;line-height:1.6}
 textarea.prose{font-family:var(--sans);font-size:15px}
+input::placeholder,textarea::placeholder{font-style:italic;opacity:.62}
 input:focus,textarea:focus,select:focus{outline:0;border-color:var(--accent);
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)}
 .field{margin:0 0 20px}
@@ -122,7 +123,7 @@ code{font-family:var(--mono);font-size:.88em}
       <textarea id="subtitlezh" rows="4" class="prose"></textarea></div>
     <div class="row">
       <div class="field"><label for="section">Section code</label>
-        <input id="section" placeholder="S4">
+        <input id="section" placeholder="e.g. S4 — or leave empty">
         <p class="hint">Recorded with every session. Leave it empty to ask each student.</p></div>
       <div class="field"><label for="lang">Language it opens in</label>
         <select id="lang"><option value="en">English</option><option value="zh">中文</option></select>

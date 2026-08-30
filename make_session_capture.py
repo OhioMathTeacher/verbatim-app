@@ -305,6 +305,7 @@ label{display:block;font-size:12px;font-weight:700;letter-spacing:.07em;text-tra
 .hint{font-size:14px;color:var(--muted);margin:8px 0 0}
 input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--rule);border-radius:9px;
   background:var(--paper);color:var(--ink);font:inherit;transition:border-color .15s, box-shadow .15s}
+input::placeholder,textarea::placeholder{font-style:italic;opacity:.62}
 input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)}
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
@@ -588,11 +589,11 @@ try{
 
     <div class="field">
       <label for="pid" data-i18n="pid">Participant code</label>
-      <input id="pid" autocomplete="off" spellcheck="false" placeholder="P07">
+      <input id="pid" autocomplete="off" spellcheck="false" data-i18n-ph="pidph" placeholder="Enter code here (e.g., P07)">
     </div>
     <div class="row field">
-      <div><label for="grp" data-i18n="group">Group</label><input id="grp" autocomplete="off" spellcheck="false" placeholder="G3"></div>
-      <div id="secwrap"><label for="sec" data-i18n="section">Section</label><input id="sec" autocomplete="off" spellcheck="false" placeholder="S4"></div>
+      <div><label for="grp" data-i18n="group">Group</label><input id="grp" autocomplete="off" spellcheck="false" data-i18n-ph="grpph" placeholder="Enter group here (e.g., G3)"></div>
+      <div id="secwrap"><label for="sec" data-i18n="section">Section</label><input id="sec" autocomplete="off" spellcheck="false" data-i18n-ph="secph" placeholder="Enter section here (e.g., S4)"></div>
     </div>
     <div class="field">
       <label data-i18n="yourai">Your AI</label>
@@ -873,6 +874,9 @@ const I18N = {
     delgone: "Exchange deleted",
     delcount: "deleted",
     notset: "Not set up yet", keyneeded: "key needed", demomode: "Demo mode — no AI needed",
+    pidph: "Enter code here (e.g., P07)",
+    grpph: "Enter group here (e.g., G3)",
+    secph: "Enter section here (e.g., S4)",
     errfields: "Participant code, group and section are all required.",
     errcode: "The participant code should be letters and numbers only, e.g. P07. Please do not use your name.",
     errai: "Please set up your AI first.",
@@ -968,6 +972,9 @@ const I18N = {
     delgone: "已删除的对话",
     delcount: "已删除",
     notset: "尚未设置", keyneeded: "需要密钥", demomode: "演示模式 —— 无需 AI",
+    pidph: "在此输入编号（例如 P07）",
+    grpph: "在此输入组别（例如 G3）",
+    secph: "在此输入班级（例如 S4）",
     errfields: "参与者编号、组别和班级都是必填项。",
     errcode: "参与者编号只能包含字母和数字，例如 P07。请不要使用姓名。",
     errai: "请先设置你的 AI。",
