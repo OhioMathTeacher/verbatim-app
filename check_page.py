@@ -231,9 +231,9 @@ def check_providers(js: str) -> None:
         ok("the page makes no claim about how a student reaches a service")
 
     print("\n  what is offered, before the page probes the network:")
-    for tier in ("local", "free", "paid"):
-        if tier == "local":
-            print("      local  a model on the student's own machine — no key needed")
+    for tier in ("webgpu", "free", "paid"):
+        if tier == "webgpu":
+            print("      webgpu a model running in the student's own browser — no key needed")
             continue
         here = [p["label"] + (" (recommended)" if p.get("recommended") else "")
                 for p in provs if p.get("tier") == tier]

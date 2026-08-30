@@ -251,6 +251,11 @@ details.prompt pre{font-family:var(--mono);font-size:12.5px;line-height:1.6;whit
 .sl a{color:var(--accent);font-weight:600;text-decoration:none}
 .sl a:hover{text-decoration:underline}
 .snote{margin:11px 0 0;font-size:13px;color:var(--warn);line-height:1.45}
+.wgpu-state{margin:11px 0 0;font-size:13px;color:var(--muted);line-height:1.5}
+.wgpu-state.bad{color:var(--warn)}
+.wgpu-bar{margin:9px 0 0;height:6px;border-radius:3px;background:var(--rule);overflow:hidden}
+.wgpu-bar i{display:block;height:100%;background:var(--accent);width:0;
+  transition:width .25s ease}
 .ai-key-section{margin:14px 0 4px}
 .ai-key-hint{font-size:12.5px;color:var(--muted);margin:8px 0 0;line-height:1.5}
 .ai-key-hint a{color:var(--accent);font-weight:600}
@@ -923,7 +928,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
-<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · d7542bcd</p>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · d9acb00d</p>
 
 </div>
 
@@ -936,14 +941,14 @@ try{
     <p class="ai-modal-sub" data-i18n="modalsub">Choose where your AI teacher runs.</p>
 
     <div class="ai-tabs" role="tablist">
-      <button class="ai-tab" role="tab" data-tab="local" aria-selected="false" data-i18n="tablocal">Local / personal</button>
+      <button class="ai-tab" role="tab" data-tab="webgpu" aria-selected="false" data-i18n="tabwebgpu">WebGPU</button>
       <button class="ai-tab" role="tab" data-tab="free"  aria-selected="true" data-i18n="tabfree">Free ($0)</button>
       <button class="ai-tab" role="tab" data-tab="paid"  aria-selected="false" data-i18n="tabpaid">Paid</button>
     </div>
 
     <div id="ai-notes"></div>
     <div id="ai-provider-cards" class="ai-provider-cards"></div>
-    <div id="ai-local-help" class="localpanel hide"></div>
+    <div id="ai-webgpu" class="localpanel hide"></div>
 
     <div id="ai-key-section" class="ai-key-section" hidden>
       <input type="password" id="ai-key-input" data-i18n-ph="keyph" autocomplete="off" spellcheck="false">
@@ -1853,7 +1858,7 @@ const SCHEMA    = "tea-taylor-session/2";
    page that made it, and by the time a transcript raises a question the page is
    usually gone. Additive: nothing in /2 changed shape, so a reader written for
    /2 goes on working and simply has one more thing it may report. */
-const APP       = { name: "verbatim", version: "1.2.1", build: "d7542bcd" };   // /2: a turn may be a tombstone (no text)
+const APP       = { name: "verbatim", version: "1.2.1", build: "d9acb00d" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --
@@ -1943,8 +1948,8 @@ const I18N = {
     sayph: "Type your reply…    (Enter to send · Shift+Enter for a new line)",
     aisetup: "AI Setup",
     modalsub: "Choose where your AI teacher runs, then enter a key if it needs one. Nothing you enter here leaves this computer.",
-    tablocal: "Local / personal", tabfree: "Free ($0)", tabpaid: "Paid",
-    notefree: "Nothing here is available on this network. Two things still work: a model running on your own computer (Local / personal), or the key your instructor gives you, used with one of the services under Paid.",
+    tabwebgpu: "WebGPU", tabfree: "Free ($0)", tabpaid: "Paid",
+    notefree: "Nothing here is available on this network. Two things still work: a model running inside this page (WebGPU), or the key your instructor gives you, used with one of the services under Paid.",
     testconn: "Test connection", done: "Done",
     surveyh: "A few questions before you finish",
     surveyhint: "These are saved in the same file as your conversation. Every question is optional.",
@@ -1989,7 +1994,16 @@ const I18N = {
     addserver: "Add a server", addserverdesc: "Type the address of an OpenAI-compatible model you are running.",
     badgelocal: "Local", badgefound: "Found", badgefree: "$0", badgepaid: "Paid",
     badgerec: "Recommended",
-    localh: "Running a model on your own computer",
+    wgpuh: "A model running inside this page",
+    wgpudesc: "Runs in this browser. No key, no account.",
+    badgewgpu: "In-browser",
+    wgpuno: "This browser cannot run a model in the page. WebGPU is needed, and this browser does not offer it. Use one of the other tabs, or open this page in an up-to-date Chrome, Edge or Safari.",
+    wgpulib: "Loading the model runner\u2026",
+    wgpuliberr: "Could not load the model runner. That download needs a network the first time.",
+    wgpuget: "Downloading the model \u2014 this happens once, then it is kept in this browser.",
+    wgpuready: "Ready. Nothing you type will leave this computer.",
+    wgpupick: "Pick a model above to download it.",
+    wgpufirst: "first use downloads it",
     keyph: "Paste your key", keysaved: "Key saved — type a new one to replace it",
     keyhint1: "Your instructor may give you a key to type here. Otherwise get your own at ",
     keyhint2: ". It stays in this browser until you use Forget all keys.",
@@ -2029,8 +2043,8 @@ const I18N = {
     sayph: "输入你的回复……（Enter 发送 · Shift+Enter 换行）",
     aisetup: "AI 设置",
     modalsub: "选择你的 AI 老师在哪里运行，如需密钥请填写。你在这里填写的内容不会离开这台电脑。",
-    tablocal: "本地 / 个人", tabfree: "免费 ($0)", tabpaid: "付费",
-    notefree: "\u5728\u5f53\u524d\u7f51\u7edc\u4e0b\uff0c\u8fd9\u91cc\u6ca1\u6709\u53ef\u7528\u7684\u670d\u52a1\u3002\u4ecd\u6709\u4e24\u4e2a\u53ef\u884c\u7684\u529e\u6cd5\uff1a\u5728\u81ea\u5df1\u7684\u7535\u8111\u4e0a\u8fd0\u884c\u6a21\u578b\uff08\u201c\u672c\u5730 / \u4e2a\u4eba\u201d\uff09\uff0c\u6216\u4f7f\u7528\u8001\u5e08\u63d0\u4f9b\u7684\u5bc6\u94a5\u8bbf\u95ee\u201c\u4ed8\u8d39\u201d\u4e2d\u7684\u670d\u52a1\u3002",
+    tabwebgpu: "WebGPU（本机）", tabfree: "免费 ($0)", tabpaid: "付费",
+    notefree: "\u5728\u5f53\u524d\u7f51\u7edc\u4e0b\uff0c\u8fd9\u91cc\u6ca1\u6709\u53ef\u7528\u7684\u670d\u52a1\u3002\u4ecd\u6709\u4e24\u4e2a\u53ef\u884c\u7684\u529e\u6cd5\uff1a\u5728\u672c\u9875\u9762\u5185\u8fd0\u884c\u6a21\u578b\uff08WebGPU\uff09\uff0c\u6216\u4f7f\u7528\u8001\u5e08\u63d0\u4f9b\u7684\u5bc6\u94a5\u8bbf\u95ee\u201c\u4ed8\u8d39\u201d\u4e2d\u7684\u670d\u52a1\u3002",
     testconn: "测试连接", done: "完成",
     surveyh: "结束前的几个问题",
     surveyhint: "这些回答会与你的对话保存在同一个文件中。所有问题均为选填。",
@@ -2075,7 +2089,16 @@ const I18N = {
     addserver: "添加服务器", addserverdesc: "输入你正在运行的 OpenAI 兼容模型的地址。",
     badgelocal: "本地", badgefound: "已发现", badgefree: "免费", badgepaid: "付费",
     badgerec: "推荐",
-    localh: "在自己的电脑上运行模型",
+    wgpuh: "在本页面内运行的模型",
+    wgpudesc: "在浏览器中运行。无需密钥，无需账号。",
+    badgewgpu: "浏览器内",
+    wgpuno: "本浏览器无法在页面内运行模型。这需要 WebGPU，而本浏览器不支持。请使用其他选项卡，或用较新版本的 Chrome、Edge 或 Safari 打开本页。",
+    wgpulib: "正在加载模型运行器…",
+    wgpuliberr: "无法加载模型运行器。首次使用需要联网下载。",
+    wgpuget: "正在下载模型 —— 只需一次，之后会保存在本浏览器中。",
+    wgpuready: "已就绪。你输入的内容不会离开这台电脑。",
+    wgpupick: "在上方选一个模型开始下载。",
+    wgpufirst: "首次使用需下载",
     keyph: "粘贴你的密钥", keysaved: "密钥已保存 —— 输入新密钥可替换",
     keyhint1: "老师可能会给你一个密钥填在这里。也可以到这里自行获取：",
     keyhint2: "。密钥会保存在本浏览器中，直到你点击“清除所有密钥”。",
@@ -2231,6 +2254,14 @@ const setEndpoints = a  => SS.set(K_ENDS, JSON.stringify(a));
 function aiConfig(){
   const id = SS.get(K_PROV);
   if(!id) return null;
+  if(id.startsWith("webgpu:")){
+    const model = id.slice(7);
+    /* `local:true` is what makes this count as live without a key. The full MLC
+       id stays in `model` because that is what the session file records; `short`
+       exists only so the gear does not read like a filename. */
+    return { id, api:"webgpu", url:"", model, short: webgpuShort(model),
+             label:"WebGPU", key:"", local:true, webgpu:true };
+  }
   if(id.startsWith("local:")){
     const [url, model] = id.slice(6).split("|");
     return { id, api:"openai", url: url.replace(/\/+$/,"") + "/v1/chat/completions",
@@ -2249,12 +2280,18 @@ function refreshAiStatus(){
   // The gear says which provider is in use once one is working, without growing:
   // "AI Setup" is simply replaced by the provider's name.
   const live = aiLive();
-  $("#gear-txt").textContent = live ? (c.local ? c.model : c.label) : tr("aisetup");
+  $("#gear-txt").textContent = live ? (c.local ? (c.short || c.model) : c.label) : tr("aisetup");
   $("#gear").classList.toggle("ready", live);
   $("#ai-open").textContent = live ? tr("change") : tr("setup");
   $("#demobar").classList.toggle("hide", !demoActive());
   if(live){
-    $("#ai-status-txt").textContent = c.label + " · " + c.model;
+    /* A selected model counts as set up before its weights have finished
+       arriving, which is what lets a returning student pick up where they left
+       off. Saying only "ready" during that first download would be a lie the
+       student discovers by pressing Send and waiting, so the percentage is
+       carried out here, where it is visible with the dialog closed. */
+    $("#ai-status-txt").textContent = c.label + " · " + (c.short || c.model)
+      + (c.webgpu && wgpuPhase === "getting" ? "  " + Math.round(wgpuPct * 100) + "%" : "");
     el.classList.add("ready"); return;
   }
   if(demoActive()){ $("#ai-status-txt").textContent = tr("demomode"); el.classList.add("ready"); return; }
@@ -2299,56 +2336,165 @@ function card(opts){
   $("#ai-provider-cards").appendChild(b);
 }
 
-/* Where to get a model if you do not have one. ModelScope is the domestic hub and
-   hf-mirror the usual mirror of HuggingFace. All three are always listed, so no
-   student is told which side of anything they are on; only the order changes, and
-   it follows the language toggle -- a stated reading preference, which is the one
-   signal here that costs the student nothing to give. */
-const LOCAL_STEPS = [
-  { en: ["Install a model server", "Ollama or LM Studio. This is the program that runs the model and lets this page talk to it."],
-    zh: ["安装一个模型服务", "Ollama 或 LM Studio。它负责运行模型，并让本页面可以访问。"],
-    links: [["Ollama", "https://ollama.com/download"], ["LM Studio", "https://lmstudio.ai"]] },
-  { en: ["Download a model", "In Ollama: ollama pull qwen2.5 — or get model files from a hub."],
-    zh: ["下载一个模型", "在 Ollama 中执行：ollama pull qwen2.5 —— 或从模型社区下载模型文件。"],
-    // Ordered by the language the student chose. Nothing is detected and nothing
-    // is asked: the toggle in the masthead is a stated reading preference, and it
-    // is the only signal here that costs the student nothing to give.
-    links_en: [["HuggingFace", "https://huggingface.co/models"],
-               ["ModelScope \u9b54\u642d", "https://modelscope.cn/models"],
-               ["hf-mirror", "https://hf-mirror.com"]],
-    links_zh: [["ModelScope \u9b54\u642d", "https://modelscope.cn/models"],
-               ["hf-mirror", "https://hf-mirror.com"],
-               ["HuggingFace", "https://huggingface.co/models"]],
-    note: { en: "HuggingFace may not load from mainland China. ModelScope is the domestic hub and hf-mirror mirrors HuggingFace \u2014 both work either way.",
-            zh: "HuggingFace \u5728\u4e2d\u56fd\u5927\u9646\u53ef\u80fd\u65e0\u6cd5\u6253\u5f00\u3002ModelScope \u662f\u56fd\u5185\u7684\u6a21\u578b\u793e\u533a\uff0chf-mirror \u662f HuggingFace \u7684\u955c\u50cf \u2014\u2014 \u4e24\u8005\u5728\u4efb\u4f55\u60c5\u51b5\u4e0b\u90fd\u53ef\u7528\u3002" } },
-  { en: ["Let this page reach it", "Ollama refuses browsers by default. Start it with:"],
-    zh: ["允许本页面访问", "Ollama 默认拒绝浏览器访问。请这样启动："],
-    code: "OLLAMA_ORIGINS=* ollama serve" },
-  { en: ["Add it above", "Click \u201cAdd a server\u201d and enter the address:"],
-    zh: ["在上方添加", "点击\u201c添加服务器\u201d并填写地址："],
-    code: "http://localhost:11434" }
+/* A model that runs inside this page, on the student's own graphics hardware.
+
+   This replaces the four-step Ollama setup that stood here. That flow asked a
+   student to install a server, pull a model, set an environment variable and
+   type an address -- four chances to give up before the activity starts, and in
+   practice a path only an instructor ever walked. WebGPU asks for one click and
+   a wait.
+
+   What it costs instead: the weights come from a CDN the first time, so the very
+   first run needs a network and a machine with enough graphics memory, and a 1-3B
+   model is a weaker mathematician than anything under Paid. Both are recorded --
+   the session file stores this model's full id like any other -- so a transcript
+   is never ambiguous about what produced it.
+
+   The library is fetched only when this tab is opened. A student who never opens
+   it downloads nothing, and the page still runs from file:// with no network. */
+const WEBGPU_LIB = "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.84/+esm";
+
+/* Ids are checked against the library's own catalogue at load rather than
+   trusted. A hardcoded id that the upstream project retires would otherwise
+   break every student at once, mid-class -- which is exactly what a retired
+   Groq model already did to this page once. Anything no longer listed is
+   dropped quietly and the rest still work. */
+const WEBGPU_PICKS = [
+  ["Qwen2.5-1.5B-Instruct-q4f16_1-MLC",  true ],
+  ["Llama-3.2-1B-Instruct-q4f16_1-MLC",  false],
+  ["Llama-3.2-3B-Instruct-q4f16_1-MLC",  false],
+  ["Qwen2.5-3B-Instruct-q4f16_1-MLC",    false]
 ];
-function renderLocalHelp(){
-  const el = $("#ai-local-help");
-  el.classList.toggle("hide", aiTab !== "local");
-  if(aiTab !== "local") return;
+/* `navigator.gpu` existing is not the same as WebGPU working. A browser can
+   expose the object and still hand back no adapter -- no usable card, a driver
+   on the blocklist, a remote session. Asking for the adapter is the only check
+   that distinguishes them, and it is the difference between a student being
+   told plainly to use another tab and a student picking a model, waiting, and
+   getting an opaque failure. Null means not yet asked. */
+let wgpuAdapter = null;
+async function webgpuProbe(){
+  if(wgpuAdapter !== null) return wgpuAdapter;
+  if(!(typeof navigator !== "undefined" && navigator.gpu)){ wgpuAdapter = false; return false; }
+  try{ wgpuAdapter = !!(await navigator.gpu.requestAdapter()); }
+  catch(e){ wgpuAdapter = false; }
+  return wgpuAdapter;
+}
+const webgpuOK = () => wgpuAdapter !== false;
+const webgpuShort = id => id.replace(/-q4f\d+(_\d+)?-MLC$/, "").replace(/-Instruct$/, "");
+
+let wgpuLib = null, wgpuList = null, wgpuEngine = null, wgpuEngineId = null;
+let wgpuPhase = "idle";     // idle | lib | liberr | listed | getting | ready | error
+let wgpuNote = "", wgpuPct = 0;
+
+/* Load the runner, then keep only the picks it still ships. */
+async function webgpuLoad(){
+  if(wgpuList) return wgpuList;
+  wgpuPhase = "lib"; wgpuNote = ""; renderWebgpuPanel();
+  if(!(await webgpuProbe())){ renderWebgpuPanel(); renderCards(); return null; }
+  try{
+    wgpuLib = await import(WEBGPU_LIB);
+  }catch(e){
+    wgpuPhase = "liberr"; renderWebgpuPanel(); return null;
+  }
+  const have = new Map();
+  for(const m of (wgpuLib.prebuiltAppConfig || {}).model_list || []) have.set(m.model_id, m);
+  wgpuList = WEBGPU_PICKS
+    .filter(([id]) => have.has(id))
+    .map(([id, rec]) => ({ id, rec, gb: (have.get(id).vram_required_MB || 0) / 1024 }));
+  wgpuPhase = "listed"; renderWebgpuPanel(); renderCards();
+  return wgpuList;
+}
+
+/* Build the engine for one model, reporting progress into the panel. Switching
+   model throws the old engine away rather than holding two sets of weights. */
+async function webgpuEngineFor(id){
+  if(wgpuEngine && wgpuEngineId === id) return wgpuEngine;
+  await webgpuLoad();
+  if(!wgpuLib) throw new Error(tr("wgpuliberr"));
+  if(wgpuEngine){ try{ await wgpuEngine.unload(); }catch(e){} wgpuEngine = null; wgpuEngineId = null; }
+  wgpuPhase = "getting"; wgpuPct = 0; wgpuNote = ""; renderWebgpuPanel();
+  try{
+    wgpuEngine = await wgpuLib.CreateMLCEngine(id, { initProgressCallback: r => {
+      wgpuPct = Math.max(0, Math.min(1, r.progress || 0));
+      wgpuNote = r.text || "";
+      renderWebgpuPanel(); refreshAiStatus();
+    }});
+  }catch(e){
+    wgpuPhase = "error"; wgpuNote = (e && e.message) || String(e); renderWebgpuPanel();
+    throw e;
+  }
+  wgpuEngineId = id; wgpuPhase = "ready"; wgpuPct = 1; wgpuNote = "";
+  renderWebgpuPanel(); refreshAiStatus();
+  return wgpuEngine;
+}
+
+/* Three things a student needs to know before waiting on a download, in the same
+   numbered cards the Ollama steps used. */
+const WEBGPU_STEPS = [
+  { en: ["What this is", "The model runs on your own graphics hardware, inside this page. There is no key, no account, and nothing you type is sent anywhere."],
+    zh: ["这是什么", "模型在你自己的显卡上运行，就在本页面内。无需密钥，无需账号，你输入的内容不会发送到任何地方。"] },
+  { en: ["What it needs", "A browser with WebGPU — an up-to-date Chrome, Edge or Safari — and enough graphics memory for the model you pick. The sizes are on the cards above."],
+    zh: ["需要什么", "支持 WebGPU 的浏览器 —— 较新版本的 Chrome、Edge 或 Safari —— 以及足够的显存。上方每张卡片都标有大小。"] },
+  { en: ["The first run downloads it", "The model is fetched once and then kept in this browser, so later sessions start straight away. That first download is large and needs a network."],
+    zh: ["首次运行需下载", "模型只下载一次，之后保存在本浏览器中，以后可直接开始。首次下载较大，需要联网。"],
+    note: { en: "The weights come from the HuggingFace CDN, which may not load from mainland China. If it does not, use the key your instructor gives you under Paid instead.",
+            zh: "模型权重来自 HuggingFace CDN，在中国大陆可能无法访问。若无法下载，请改用老师提供的密钥（“付费”选项卡）。" } }
+];
+
+function renderWebgpuPanel(){
+  const el = $("#ai-webgpu");
+  el.classList.toggle("hide", aiTab !== "webgpu");
+  if(aiTab !== "webgpu") return;
+  /* Progress arrives many times a second for the length of a multi-gigabyte
+     download. Rebuilding the panel on each one would make the three steps
+     flicker the whole time, so a repeat of the same phase only moves the bar. */
+  if(el.dataset.phase === wgpuPhase && wgpuPhase === "getting"){
+    const st = el.querySelector(".wgpu-state"), fill = el.querySelector(".wgpu-bar i");
+    if(st)   st.textContent = tr("wgpuget") + (wgpuNote ? "  " + wgpuNote : "");
+    if(fill) fill.style.width = (wgpuPct * 100).toFixed(1) + "%";
+    return;
+  }
+  el.dataset.phase = wgpuPhase;
   el.textContent = "";
-  const h = document.createElement("h3"); h.textContent = tr("localh"); el.appendChild(h);
+  const h = document.createElement("h3"); h.textContent = tr("wgpuh"); el.appendChild(h);
+
+  // A browser without WebGPU is told so plainly, and sent somewhere that works,
+  // rather than being shown steps it cannot follow.
+  if(wgpuAdapter === false){
+    const d = document.createElement("div"); d.className = "wgpu-state bad";
+    d.textContent = tr("wgpuno"); el.appendChild(d);
+    return;
+  }
+
   const grid = document.createElement("div"); grid.className = "steps"; el.appendChild(grid);
-  LOCAL_STEPS.forEach((st, i) => {
+  WEBGPU_STEPS.forEach((st, i) => {
     const [title] = lang === "zh" ? st.zh : st.en;
     const c = document.createElement("button");
     c.type = "button"; c.className = "step";
-    const n = document.createElement("span"); n.className = "sn"; n.textContent = i + 1;
+    const nn = document.createElement("span"); nn.className = "sn"; nn.textContent = i + 1;
     const t = document.createElement("span"); t.className = "st"; t.textContent = title;
     const more = document.createElement("span"); more.className = "smore"; more.textContent = "›";
-    c.append(n, t, more);
+    c.append(nn, t, more);
     c.onclick = () => openStep(i);
     grid.appendChild(c);
   });
+
+  const msg = { lib: "wgpulib", liberr: "wgpuliberr", getting: "wgpuget",
+                ready: "wgpuready", listed: "wgpupick", idle: "wgpupick" }[wgpuPhase];
+  const d = document.createElement("div");
+  d.className = "wgpu-state" + (wgpuPhase === "liberr" || wgpuPhase === "error" ? " bad" : "");
+  d.textContent = wgpuPhase === "error" ? wgpuNote
+                : (tr(msg) + (wgpuPhase === "getting" && wgpuNote ? "  " + wgpuNote : ""));
+  el.appendChild(d);
+
+  if(wgpuPhase === "getting"){
+    const bar = document.createElement("div"); bar.className = "wgpu-bar";
+    const fill = document.createElement("i"); fill.style.width = (wgpuPct * 100).toFixed(1) + "%";
+    bar.appendChild(fill); el.appendChild(bar);
+  }
 }
 function openStep(i){
-  const st = LOCAL_STEPS[i];
+  const st = WEBGPU_STEPS[i];
   const [title, body] = lang === "zh" ? st.zh : st.en;
   $("#step-title").textContent = (i + 1) + ". " + title;
   const el = $("#step-body"); el.textContent = "";
@@ -2386,7 +2532,7 @@ function renderNotes(){
                      d.textContent = tr(k); el.appendChild(d); };
   // A tab emptied by the probe would otherwise just be blank. One line saying
   // where to go instead, in the same muted voice as every other hint here.
-  if(aiTab !== "local" && !offer(aiTab).length) add("notefree");
+  if(aiTab !== "webgpu" && !offer(aiTab).length) add("notefree");
 }
 
 /* Does this endpoint answer at all?
@@ -2451,11 +2597,24 @@ function networkCheck(){
 
 function renderCards(){
   const wrap = $("#ai-provider-cards"); wrap.innerHTML = "";
-  renderNotes(); renderLocalHelp();
+  renderNotes(); renderWebgpuPanel();
   $("#ai-err").textContent = "";
   const current = SS.get(K_PROV);
 
-  if(aiTab === "local"){
+  if(aiTab === "webgpu"){
+    for(const m of (webgpuOK() ? (wgpuList || []) : [])){
+      const id = "webgpu:" + m.id;
+      card({ title: webgpuShort(m.id),
+             model: m.gb.toFixed(1) + " GB · " + tr("wgpufirst"),
+             desc: tr("wgpudesc"), badge: tr("badgewgpu"), badgeClass: "local",
+             badge2: m.rec ? tr("badgerec") : null, selected: current === id,
+             /* Choosing the model is what starts the download. The failure is
+                already drawn in the panel, so nothing is rethrown at the page. */
+             onClick: () => { SS.set(K_PROV, id); showAddEndpoint = false;
+                              $("#ai-key-section").hidden = true; $("#ai-endpoint-section").hidden = true;
+                              renderCards(); refreshAiStatus();
+                              webgpuEngineFor(m.id).catch(() => {}); } });
+    }
     for(const url of endpoints()){
       for(const m of ((localModels[url] || {}).models || ["local"])){
         const id = "local:" + url + "|" + m;
@@ -2532,6 +2691,9 @@ async function commitKey(opts){
 async function testKey(warn){
   const c = aiConfig();
   if(!c || (!c.key && !c.local)) return;
+  // Testing a model that has not been fetched yet would start the download as a
+  // side effect of a button labelled "Test connection". Say what is missing.
+  if(c.webgpu && wgpuPhase !== "ready"){ $("#ai-err").textContent = tr("wgpupick"); return; }
   const pre = warn ? warn + "  " : "";
   $("#ai-err").textContent = pre + tr("keychecking");
   try{
@@ -2546,10 +2708,11 @@ async function testKey(warn){
 $("#gear").onclick = $("#ai-open").onclick = () => {
   $("#ai-modal-overlay").classList.add("open");
   const c = aiConfig();
-  if(c && !c.local){ const p = PROVIDERS.find(x => x.id === c.id); if(p){ aiTab = p.tier; showKeyEntry(p); } }
+  if(c && c.webgpu) aiTab = "webgpu";
+  else if(c && !c.local){ const p = PROVIDERS.find(x => x.id === c.id); if(p){ aiTab = p.tier; showKeyEntry(p); } }
   for(const t of document.querySelectorAll(".ai-tab")) t.setAttribute("aria-selected", String(t.dataset.tab === aiTab));
   renderCards();
-  if(aiTab === "local") probeWellKnown();
+  if(aiTab === "webgpu"){ probeWellKnown(); webgpuLoad(); }
 };
 const closeAi = () => { commitKey({quiet:true}); $("#ai-modal-overlay").classList.remove("open"); refreshAiStatus(); };
 $("#ai-done").onclick = closeAi;
@@ -2570,7 +2733,7 @@ for(const t of document.querySelectorAll(".ai-tab")){
     for(const o of document.querySelectorAll(".ai-tab")) o.setAttribute("aria-selected", String(o === t));
     $("#ai-key-section").hidden = true; $("#ai-endpoint-section").hidden = true;
     renderCards();
-    if(aiTab === "local") probeWellKnown();
+    if(aiTab === "webgpu"){ probeWellKnown(); webgpuLoad(); }
   };
 }
 $("#ai-key-input").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); commitKey(); } });
@@ -2610,7 +2773,7 @@ $("#ai-forget").onclick = () => {
 };
 
 // Same check the key gets on entry; the button is for trying again after a fix.
-$("#ai-test").onclick = () => commitKey();
+$("#ai-test").onclick = () => { const c = aiConfig(); if(c && c.webgpu) testKey(""); else commitKey(); };
 
 refreshAiStatus();
 probeProviders();
@@ -2830,7 +2993,19 @@ async function turnFromAI(){
 async function askModel(messages){
   const c = aiConfig();
   if(!c) throw new Error(tr("errai"));
+  if(c.api === "webgpu") return askWebGPU(c, messages);
   return c.api === "gemini" ? askGemini(c, messages) : askOpenAI(c, messages);
+}
+/* No fetch and no key: the weights are already in this browser and the reply is
+   computed here. The body is the OpenAI shape the other path uses, so the system
+   prompt and the turn history are passed exactly as they are elsewhere. */
+async function askWebGPU(c, messages){
+  const engine = await webgpuEngineFor(c.model);
+  const r = await engine.chat.completions.create({ messages, temperature: 0.7 });
+  const out = r && r.choices && r.choices[0] && r.choices[0].message
+              && r.choices[0].message.content;
+  if(!out) throw new Error("empty reply");
+  return out;
 }
 /* Providers answer a bad key with a page of JSON. A student does not need the
    JSON; they need to know it was the key and where to fix it. Anything that is
