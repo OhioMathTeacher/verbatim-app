@@ -2868,7 +2868,7 @@ def main() -> int:
                          "When set, students are not asked for it.")
     ap.add_argument("--title-zh", default="AI 活动",
                     help="Chinese title shown when the page is switched to 中文")
-    ap.add_argument("--subtitle-zh", default='欢迎！在今天的课上，你将有机会借助生成式 AI 探索泰勒级数。这个应用是我为收集大家的作业而搭建的。开始之前，请先设置 AI，并在下方填写你的编号。你的对话会随时保存，不会上传到互联网。结束后请下载 JSON 文件并提交给我，作为本次课的成绩。',
+    ap.add_argument("--subtitle-zh", default='欢迎！在今天的课上，你将有机会借助生成式 AI 探索泰勒级数。这个应用是我为收集大家的作业而搭建的。开始之前，请先设置 AI，并在下方填写你的编号。你的对话会随时保存。你发送的消息会传给 AI 服务商以获取回复，除此之外不会上传到任何其他地方。结束后请下载 JSON 文件并提交给我，作为本次课的成绩。',
                     help="Chinese opening paragraph")
     ap.add_argument("--lang", choices=("en", "zh"), default="en",
                     help="language the page opens in; students can switch either way")
@@ -2882,7 +2882,7 @@ def main() -> int:
                     help="suggested duration shown to students; 0 says nothing. "
                          "NOTE: prompts.tex says 'no more than 20 minutes' while methods.tex "
                          "says students had 'approximately 50 minutes' — resolve before class.")
-    ap.add_argument("--subtitle", default="Welcome! In today's class, you'll have the opportunity to explore Taylor Series with genAI. I've set up this app to collect your work. You'll need to set up an AI and enter your codes in the dialog below to get started. Your conversation is saved as you go. Nothing is uploaded to the internet. You'll download your conversation as a JSON file and submit it to me for class credit.")
+    ap.add_argument("--subtitle", default="Welcome! In today's class, you'll have the opportunity to explore Taylor Series with genAI. I've set up this app to collect your work. You'll need to set up an AI and enter your codes in the dialog below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. You'll download your conversation as a JSON file and submit it to me for class credit.")
     a = ap.parse_args()
 
     def pairs(items, flag):
