@@ -22,4 +22,7 @@ an earlier round of transcripts the AI was writing about eleven words for every
 one the student wrote, so every reply is capped, may ask only one question, and
 may never answer its own.
 
+`4-collatz-conjecture.txt` is a fourth, written for a class of preservice teachers;
+it predates `_RULES.txt` and keeps its longer profiler and uncapped replies on purpose.
+
 These are drafts for comment, not classroom-ready material.

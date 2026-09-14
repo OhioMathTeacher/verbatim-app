@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the three draft activities. Run from the repository root:
+# Rebuild the four draft activities. Run from the repository root:
 #     bash activities/build.sh
 #
 # Why this exists: the three were built by hand with only --prompt/--out/--title,
@@ -47,6 +47,21 @@ python3 make_session_capture.py \
   --subtitle "Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. $TAIL" \
   --subtitle-zh "欢迎！今天你将思考：只用一只秒表和路边的距离标记，你要怎样验证速度表上的 60 km/h 是真的——以及当你测量的时间间隔越来越短时，会发生什么。$TAIL_ZH"
 
+# The Collatz activity keeps its own welcome text rather than $TAIL, and bakes
+# the section in: it was written for one class of Todd's rather than for
+# Mathematical Modeling 1, and its prompt runs the full five-question
+# personality test instead of the two-question, 60-word-capped version in
+# _RULES.txt -- see its entry in index.html.
+python3 make_session_capture.py \
+  --prompt activities/prompts/4-collatz-conjecture.txt \
+  --out activities/activity-4-collatz.html \
+  --accent '#4a7a55' \
+  --section S4 \
+  --title    "Does every number come home?" \
+  --title-zh "每个数都会回到 1 吗？" \
+  --subtitle "Welcome! In today's class, you'll have the opportunity to explore the Collatz Conjecture with genAI. I've set up this app to collect your work. You'll need to set up an AI and enter your codes in the dialog below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. You'll download your conversation as a JSON file and submit it to me for class credit." \
+  --subtitle-zh "欢迎！在今天的课堂上，你将有机会借助生成式AI来探索考拉兹猜想（Collatz Conjecture）。我搭建了这个应用来收集你们的作业。开始之前，你需要先设置一个AI，并在下方的对话框中输入你的代码。你的对话会在过程中自动保存。你的消息只会发送给AI提供方以获取回复，不会发送到其他任何地方。最后，请将你的对话下载为JSON文件并提交给我，以获得课堂学分。"
+
 echo
-echo "Rebuilt three activities. Note that each run also rewrites activities/setup.html"
+echo "Rebuilt four activities. Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."

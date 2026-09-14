@@ -157,6 +157,15 @@
       .p15 { animation: none; transform: rotate(-15deg); }
       .p05 { animation: none; transform: rotate(-5deg); }
     }
+    /* The Collatz banner: one hailstone sequence, drawn to the same 6.5:1 shape.
+       The line is the whole point -- it climbs, falls, climbs again, and lands
+       on 1 -- so nothing here is animated; the shape is what the reader should
+       look at. */
+    .banner .hail  { fill: none; stroke: #333; stroke-width: 2; stroke-linejoin: round; }
+    .banner .dot   { fill: #333; }
+    .banner .peak  { fill: #2563eb; }
+    .banner .base  { fill: none; stroke: #b9b1a3; stroke-width: 1.2; stroke-dasharray: 3 3; }
+    .banner text.lbl { text-anchor: middle; }
     hr {
       border: none;
       border-top: 2px solid #eee;
@@ -171,8 +180,9 @@
 <body>
   <div class="container">
     <h1><span role="img" aria-label="conversation">💬</span> Verbatim — Draft Activities</h1>
-    <p>Three short conversations between a student and a generative AI, drafted for
-    Mathematical Modeling 1.</p>
+    <p>Four short conversations between a student and a generative AI: three drafted
+    for Mathematical Modeling 1, and one on the Collatz conjecture written for a
+    class of preservice teachers.</p>
     <p><strong>These are drafts to try, not a finished set.</strong> Open any of them,
     press <strong>AI Setup</strong>, choose a provider and paste in your own key —
     DeepSeek, or any of the eight offered — then talk to it. The key stays in your
@@ -291,18 +301,68 @@
         </div>
       </li>
 
+      <li>
+        <span class="applet-title">🔢 <a href="activity-4-collatz.html">Does every number come home?</a></span>
+        <div class="applet-desc">
+          <p class="week">Preservice teachers · conjecture, evidence and proof</p>
+          <figure class="fig">
+            <!-- The sequence from 7: 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1.
+                 x is the step, y is the value on a scale where 52 sits near the top. -->
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="The Collatz sequence starting from 7, drawn as a jagged line:
+                             it rises to 52 at the sixth step, falls, rises to 40, then
+                             drops to 1 after sixteen steps">
+              <path class="base" d="M60 84 H590"/>
+              <polyline class="hail" points="60,76 93,55 126,71 159,38 192,62 225,13 258,49 291,67 324,30 357,58 390,72 423,79 456,64 489,75 522,81 555,83 588,85"/>
+              <g class="dot">
+                <circle cx="60" cy="76" r="3.2"/><circle cx="93" cy="55" r="3.2"/><circle cx="126" cy="71" r="3.2"/>
+                <circle cx="159" cy="38" r="3.2"/><circle cx="192" cy="62" r="3.2"/>
+                <circle cx="258" cy="49" r="3.2"/><circle cx="291" cy="67" r="3.2"/><circle cx="324" cy="30" r="3.2"/>
+                <circle cx="357" cy="58" r="3.2"/><circle cx="390" cy="72" r="3.2"/><circle cx="423" cy="79" r="3.2"/>
+                <circle cx="456" cy="64" r="3.2"/><circle cx="489" cy="75" r="3.2"/><circle cx="522" cy="81" r="3.2"/>
+                <circle cx="555" cy="83" r="3.2"/><circle cx="588" cy="85" r="3.2"/>
+              </g>
+              <circle class="peak" cx="225" cy="13" r="4.2"/>
+              <text class="lbl" x="60" y="95">7</text>
+              <text class="deg" x="236" y="16" style="font-size:10px;text-anchor:start">52</text>
+              <text class="lbl" x="324" y="24">40</text>
+              <text class="lbl" x="588" y="97">1</text>
+              <text class="lbl" x="325" y="97">16 steps</text>
+            </svg>
+            <figcaption>Start at 7. Halve it if even, triple it and add one if odd. The
+              sequence climbs to 52, falls, climbs again, and reaches 1 after sixteen
+              steps. Does every start come home?</figcaption>
+          </figure>
+          <p>The rule takes one line. Even: halve it. Odd: triple it and add one. Repeat.
+          The conjecture is that every positive whole number eventually reaches 1, and
+          nobody has proved it — though it has been checked far past anything a class could
+          compute by hand.</p>
+          <p>Students do the computing. They pick a start, write out the full sequence, and
+          record how many steps it took and how high it climbed; then they collect five more,
+          look for patterns in the table, and state a conjecture of their own as a sentence
+          that could be false. The AI is told never to write out a sequence for them, and to
+          point at an arithmetic slip rather than fix it.</p>
+          <p>Then they break the rule — 3<em>n</em> − 1 instead of 3<em>n</em> + 1 — and
+          watch what happens. It closes on the question the activity is really about:
+          what is the difference between <em>checked a lot</em> and <em>proven</em>, and why
+          might something this simple be so hard to prove?</p>
+        </div>
+      </li>
+
     </ul>
     <hr>
     <h2>About these</h2>
-    <p>All three were built with <strong>Verbatim</strong>, which records a student's
+    <p>All four were built with <strong>Verbatim</strong>, which records a student's
     conversation with a generative AI as it happens — each turn marked as the student's or
     the AI's, saved on the student's own device, and handed in as a single file. Nothing is
     posted to a website.</p>
-    <p>The three share the same rules for how the AI may reply: no more than sixty words at
-    a time, one question per turn, and never answering its own question. Those came out of
-    reading an earlier round of transcripts, where the AI was writing roughly eleven words
-    for every one the student wrote. Students were holding up their half of the conversation
-    and being buried in it.</p>
+    <p>The three modeling activities share the same rules for how the AI may reply: no more
+    than sixty words at a time, one question per turn, and never answering its own question.
+    Those came out of reading an earlier round of transcripts, where the AI was writing
+    roughly eleven words for every one the student wrote. Students were holding up their
+    half of the conversation and being buried in it. The Collatz activity is an earlier
+    prompt with a longer personality test at the start and no word cap; it is included
+    partly so the two can be compared.</p>
     <p><em>Draft — for comment, not yet for classroom use.</em></p>
   </div>
 </body>
