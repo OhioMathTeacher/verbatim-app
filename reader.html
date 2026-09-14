@@ -99,6 +99,30 @@ pre{font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;background:var
 .ver{margin:26px 0 0;text-align:center;font-family:var(--mono);font-size:11px;
   color:var(--muted);opacity:.6;user-select:all}
 @media (max-width:520px){ .bubble{max-width:100%} .wrap{padding:22px 14px 70px} }
+
+/* Print. A session can run twenty minutes or more, so the type comes down and the
+   bubbles widen; the facts are one page and the conversation starts on the next;
+   no bubble, fact card or calculator line is cut by a page break; white paper. */
+@media print{
+  body{background:#fff;font-size:10.5pt;line-height:1.4}
+  .wrap{max-width:none;padding:0}
+  #lang,#drop,#err,.actions,.ver,hr,.sub{display:none !important}
+  h1{font-size:18pt}
+  h2{font-size:13pt;margin:18pt 0 6pt}
+  h2.conv{break-before:page;page-break-before:always;margin-top:0}
+  .fact,.bubble,.calcuse,tr{break-inside:avoid;page-break-inside:avoid}
+  .fact{padding:6pt 8pt;box-shadow:none;background:#fff}
+  .fact .k{font-size:7.5pt}
+  .fact .v{font-size:9.5pt}
+  .turn{margin:7pt 0 0}
+  .bubble{max-width:92%;padding:6pt 9pt;border-radius:8pt;box-shadow:none;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .who{font-size:7.5pt;margin-bottom:2pt}
+  .meta{font-size:7.5pt;margin-top:3pt}
+  .calcuse{font-size:8.5pt}
+  table{font-size:9.5pt;box-shadow:none;background:#fff}
+  @page{margin:0.6in}
+}
 /* Styling for what richtext.js draws. Inlined into both the activity and the
    reader, so a turn looks the same live as it does in a transcript.
 
@@ -469,7 +493,7 @@ body {
 <p id="err"></p>
 
 <div id="out" class="hide"></div>
-<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.2.1 · d9acb00d</p>
+<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.2.1 · ec5d03db</p>
 </div>
 
 <!-- Temml (MIT), vendored from vendor/temml.min.js and inlined so this file
@@ -655,8 +679,8 @@ function rtBody(text){
 const T = {
   en: {
     title:"Read a session", sub:"Open a session file from the activity. It is read here, in this browser — nothing is uploaded.",
-    droph:"Drop a session_….json file here", pick:"Choose a file", another:"Read another file",
-    student:"Student", ai:"AI", conversation:"The conversation", survey:"The questions at the end",
+    droph:"Drop a session_….json file here", pick:"Choose a file", another:"Read another file", print:"Print or save as PDF",
+    student:"Student", ai:"AI", session:"The session", conversation:"The conversation", survey:"The questions at the end",
     prompt:"What the AI was told", notasked:"Not answered.", nosurvey:"No questions were answered in this session.",
     participant:"Participant", group:"Group", section:"Section", provider:"AI service", model:"Model",
     started:"Started", exported:"Exported", turns:"Turns", words:"Words",
@@ -673,8 +697,8 @@ const T = {
   },
   zh: {
     title:"查看会话记录", sub:"打开活动生成的会话文件。文件只在本浏览器中读取，不会上传。",
-    droph:"把 session_….json 文件拖到这里", pick:"选择文件", another:"再看一个文件",
-    student:"学生", ai:"AI", conversation:"对话记录", survey:"结束时的问题",
+    droph:"把 session_….json 文件拖到这里", pick:"选择文件", another:"再看一个文件", print:"打印或保存为 PDF",
+    student:"学生", ai:"AI", session:"会话信息", conversation:"对话记录", survey:"结束时的问题",
     prompt:"AI 收到的指令", notasked:"未作答。", nosurvey:"本次会话没有回答任何问题。",
     participant:"参与者编号", group:"组别", section:"班级", provider:"AI 服务", model:"模型",
     started:"开始时间", exported:"导出时间", turns:"轮次", words:"字数",
@@ -714,6 +738,13 @@ function fact(k, v, title){
     title ? ` title="${esc(title)}"` : ""}>${esc(v ?? "—")}</span></div>`;
 }
 
+const folded = [];
+window.addEventListener("beforeprint", () => {
+  folded.length = 0;
+  for (const el of document.querySelectorAll("#out details:not([open])")){ el.open = true; folded.push(el); }
+});
+window.addEventListener("afterprint", () => { for (const el of folded) el.open = false; folded.length = 0; });
+
 function render(d){
   DATA = d;
   const turns = Array.isArray(d.turns) ? d.turns : [];
@@ -723,7 +754,7 @@ function render(d){
   const ap  = d.activity_prompt || {};
   const nc  = d.network_check;
 
-  let h = `<h2>${esc(tr("conversation"))}</h2><div class="facts">`;
+  let h = `<h2>${esc(tr("session"))}</h2><div class="facts">`;
   h += fact(tr("participant"), d.participant) + fact(tr("group"), d.group) + fact(tr("section"), d.section);
   h += fact(tr("provider"), d.provider) + fact(tr("model"), d.model);
   const gone = turns.filter(t => t.deleted_utc);
@@ -739,7 +770,7 @@ function render(d){
   h += fact(tr("madeby"), d.app ? `${d.app.name} ${d.app.version} · ${d.app.build}` : tr("noreach"));
   const uses = Array.isArray(d.tool_uses) ? d.tool_uses : [];
   if (uses.length) h += fact(tr("calcs"), `${uses.length} ${tr("calcn")}`);
-  h += `</div>`;
+  h += `</div><h2 class="conv">${esc(tr("conversation"))}</h2>`;
 
   const KIND = { evaluate: "calceval", graph: "calcgraph", table: "calctable" };
   const calcAt = i => uses.filter(u => (u.after_turn == null ? -1 : u.after_turn) === i).map(u => {
@@ -832,11 +863,16 @@ function render(d){
   if (ap.text){
     h += `<details><summary>${esc(tr("prompt"))}</summary><pre>${esc(ap.text)}</pre></details>`;
   }
-  h += `<hr><p style="margin:18px 0 0"><button id="again">${esc(tr("another"))}</button></p>`;
+  h += `<hr><p class="actions" style="margin:18px 0 0;display:flex;gap:10px;flex-wrap:wrap">
+    <button id="print">${esc(tr("print"))}</button><button id="again">${esc(tr("another"))}</button></p>`;
 
   $("#out").innerHTML = h;
   $("#out").classList.remove("hide");
   $("#drop").classList.add("hide");
+  // The print stylesheet is the report: facts on one page, the conversation from the
+  // next, no bubble cut in two, white paper. The prompt is part of the record, so the
+  // folded "What the AI was told" opens for the printer and closes again after.
+  $("#print").onclick = () => window.print();
   $("#again").onclick = () => {
     DATA = null; $("#out").classList.add("hide"); $("#drop").classList.remove("hide");
     $("#err").textContent = ""; $("#file").value = ""; window.scrollTo(0, 0);
