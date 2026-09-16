@@ -852,7 +852,7 @@ try{
 
 <!-- 1 · who -->
 <section id="s-setup">
-  <p class="sub" data-i18n="subtitle">Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit.</p>
+  <p class="sub" data-i18n="subtitle">Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade.</p>
   <div class="card">
     <h2 data-i18n="before">Before you start</h2>
     <p class="hint" style="margin:0 0 22px" data-i18n="codehint">Your instructor gave you a participant code.</p>
@@ -929,7 +929,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
-<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · ec5d03db</p>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · 83bca701</p>
 
 </div>
 
@@ -1859,7 +1859,7 @@ const SCHEMA    = "tea-taylor-session/2";
    page that made it, and by the time a transcript raises a question the page is
    usually gone. Additive: nothing in /2 changed shape, so a reader written for
    /2 goes on working and simply has one more thing it may report. */
-const APP       = { name: "verbatim", version: "1.2.1", build: "ec5d03db" };   // /2: a turn may be a tombstone (no text)
+const APP       = { name: "verbatim", version: "1.2.1", build: "83bca701" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --
@@ -1936,9 +1936,9 @@ if(FOOTER){ $("#foottext").textContent = FOOTER; $("#foot").classList.remove("hi
    language the AI teacher is asked to work in; see apiMessages(). */
 const I18N = {
   en: {
-    title: "Why can't a spider be the size of a horse?", subtitle: "Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit.",
+    title: "Why can't a spider be the size of a horse?", subtitle: "Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade.",
     before: "Before you start",
-    codehint: "Your instructor will give you a participant code and a group code. Please use those instead of your name — your name should not appear anywhere on this page.",
+    codehint: "Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page.",
     pid: "Participant code", group: "Group", section: "Section",
     yourai: "Your AI", setup: "Set up", change: "Change",
     aihint: "Use your own API key, or the one your instructor gives you. It is saved in this browser, alongside your conversation, so you can finish later on the same computer — it is never sent anywhere. On a shared computer, use Forget all keys when you are done. Whichever AI you use is recorded with your session.",
@@ -2034,9 +2034,9 @@ const I18N = {
   },
   zh: {
     title: "蜘蛛为什么不能长到马那么大？",
-    subtitle: "欢迎！今天你将弄清楚：为什么一只马那么大的蜘蛛会被自己的体重压垮。不需要微积分，只要想清楚把一个物体放大时，体重和腿的粗细各自会怎样变化。开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。",
+    subtitle: "欢迎！今天你将弄清楚：为什么一只马那么大的蜘蛛会被自己的体重压垮。不需要微积分，只要想清楚把一个物体放大时，体重和腿的粗细各自会怎样变化。开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。这段对话是你的课堂作业。经你同意，它也可能用于研究：少数去除姓名的记录可能由美国迈阿密大学的合作研究者进行分析。你可以在问卷上或直接告诉我拒绝用于研究，这对你的成绩没有任何影响。",
     before: "开始之前",
-    codehint: "老师会给你一个参与者编号和组别编号。请使用这两个编号，不要在本页面填写你的姓名。",
+    codehint: "你的参与者编号是你学号的后五位——与你在问卷上填写的数字相同。请不要在本页面任何地方填写你的姓名。",
     pid: "参与者编号", group: "组别", section: "班级",
     yourai: "你的 AI", setup: "设置", change: "更改",
     aihint: "可以使用你自己的 API 密钥，或老师提供的密钥。密钥与你的对话一起保存在本浏览器中，方便你稍后在同一台电脑上继续，不会发送到任何地方。如果使用公用电脑，结束后请点击“清除所有密钥”。你使用的 AI 会随会话一起记录。",

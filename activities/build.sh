@@ -17,12 +17,20 @@ cd "$(dirname "$0")/.."
 # is uploaded to the internet", which is false -- the page calls the provider's
 # API from the student's browser. What is true is that no copy comes to us until
 # the student hands the file in, and that it is posted to no website.
-TAIL="Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit."
-TAIL_ZH="开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。"
+TAIL="Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade."
+TAIL_ZH="开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。这段对话是你的课堂作业。经你同意，它也可能用于研究：少数去除姓名的记录可能由美国迈阿密大学的合作研究者进行分析。你可以在问卷上或直接告诉我拒绝用于研究，这对你的成绩没有任何影响。"
+
+# The three calculus pages key everything to the last five digits of the student
+# number (decided 15 Sep 2026): pre-survey, three activities, post-survey all
+# carry the same digits, and only Zheng can resolve them. The Collatz page keeps
+# the generator's default hint.
+CODEHINT="Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page."
+CODEHINT_ZH="你的参与者编号是你学号的后五位——与你在问卷上填写的数字相同。请不要在本页面任何地方填写你的姓名。"
 
 python3 make_session_capture.py \
   --prompt activities/prompts/1-pendulum-approximation.txt \
   --out activities/activity-1-pendulum.html \
+  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#9a5734' \
   --title    "How small is small enough?" \
   --title-zh "多小才算足够小？" \
@@ -32,6 +40,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/2-scaling-square-cube.txt \
   --out activities/activity-2-scaling.html \
+  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#7a5c1f' \
   --title    "Why can't a spider be the size of a horse?" \
   --title-zh "蜘蛛为什么不能长到马那么大？" \
@@ -41,6 +50,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/3-speedometer-limits.txt \
   --out activities/activity-3-speedometer.html \
+  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#3f5f7a' \
   --title    "What does the speedometer mean?" \
   --title-zh "速度表到底表示什么？" \

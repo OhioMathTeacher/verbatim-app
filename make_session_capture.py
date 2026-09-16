@@ -835,7 +835,7 @@ const I18N = {
   en: {
     title: __TITLE_JSON__, subtitle: __SUBTITLE_JSON__,
     before: "Before you start",
-    codehint: "Your instructor will give you a participant code and a group code. Please use those instead of your name — your name should not appear anywhere on this page.",
+    codehint: __CODEHINT_JSON__,
     pid: "Participant code", group: "Group", section: "Section",
     yourai: "Your AI", setup: "Set up", change: "Change",
     aihint: "Use your own API key, or the one your instructor gives you. It is saved in this browser, alongside your conversation, so you can finish later on the same computer — it is never sent anywhere. On a shared computer, use Forget all keys when you are done. Whichever AI you use is recorded with your session.",
@@ -933,7 +933,7 @@ const I18N = {
     title: __TITLE_ZH_JSON__,
     subtitle: __SUBTITLE_ZH_JSON__,
     before: "开始之前",
-    codehint: "老师会给你一个参与者编号和组别编号。请使用这两个编号，不要在本页面填写你的姓名。",
+    codehint: __CODEHINT_ZH_JSON__,
     pid: "参与者编号", group: "组别", section: "班级",
     yourai: "你的 AI", setup: "设置", change: "更改",
     aihint: "可以使用你自己的 API 密钥，或老师提供的密钥。密钥与你的对话一起保存在本浏览器中，方便你稍后在同一台电脑上继续，不会发送到任何地方。如果使用公用电脑，结束后请点击“清除所有密钥”。你使用的 AI 会随会话一起记录。",
@@ -2804,7 +2804,7 @@ def tint(hex_colour: str, s: float, l: float) -> str:
 
 def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
           avatar: str, footer: str, lang: str, section: str, title_zh: str,
-          subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str,
+          subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str, codehint: str, codehint_zh: str,
           accent: str) -> str:
     # Deliberately NOT published to the page: url and key. The page names a
     # provider; the student supplies the credential.
@@ -2823,6 +2823,8 @@ def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
             .replace("__SURVEY_JSON__", json.dumps(survey, ensure_ascii=False))
             .replace("__TITLE_ZH_JSON__", json.dumps(title_zh, ensure_ascii=False))
             .replace("__SUBTITLE_ZH_JSON__", json.dumps(subtitle_zh, ensure_ascii=False))
+            .replace("__CODEHINT_JSON__", json.dumps(codehint, ensure_ascii=False))
+            .replace("__CODEHINT_ZH_JSON__", json.dumps(codehint_zh, ensure_ascii=False))
             .replace("__DEMO_JSON__", "true" if demo else "false")
             .replace("__ACCENT_BG__", tint(accent, 0.71, 0.945))
             .replace("__ACCENT_EDGE__", tint(accent, 0.56, 0.849))
@@ -2877,6 +2879,10 @@ def main() -> int:
                     help="Chinese title shown when the page is switched to 中文")
     ap.add_argument("--subtitle-zh", default='欢迎！在今天的课上，你将有机会借助生成式 AI 探索泰勒级数。这个应用是我为收集大家的作业而搭建的。开始之前，请先设置 AI，并在下方填写你的编号。你的对话会随时保存。你发送的消息会传给 AI 服务商以获取回复，除此之外不会上传到任何其他地方。结束后请下载 JSON 文件并提交给我，作为本次课的成绩。',
                     help="Chinese opening paragraph")
+    ap.add_argument("--codehint", default='Your instructor will give you a participant code and a group code. Please use those instead of your name — your name should not appear anywhere on this page.',
+                    help="Text under the participant-code field, e.g. to say the code is the last five digits of a student number")
+    ap.add_argument("--codehint-zh", default='老师会给你一个参与者编号和组别编号。请使用这两个编号，不要在本页面填写你的姓名。',
+                    help="Chinese version of --codehint")
     ap.add_argument("--lang", choices=("en", "zh"), default="en",
                     help="language the page opens in; students can switch either way")
     ap.add_argument("--accent", default="#9a5734", metavar="HEX",
@@ -2954,7 +2960,7 @@ def main() -> int:
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.lang, a.section.strip().upper(),
                            a.title_zh, a.subtitle_zh, survey, a.demo, a.title, subtitle,
-                           a.accent), encoding="utf-8")
+                           a.codehint, a.codehint_zh, a.accent), encoding="utf-8")
 
     # The builder ships with the activity so a teacher can make their own without
     # Python. It embeds this exact template, so the two stay in step by construction.
