@@ -64,8 +64,8 @@ python3 make_session_capture.py \
   --accent '#6b4a6e' \
   --title    "Why was the last song the worst?" \
   --title-zh "为什么唱片上最后一首歌最不好听？" \
-  --subtitle "Welcome! Today you will work out why the last song on a vinyl record sounded worse than the first — and why the engineers who designed the compact disc made the disc change speed while it plays. $TAIL" \
-  --subtitle-zh "欢迎！今天你将弄清楚：为什么黑胶唱片上最后一首歌听起来不如第一首——以及为什么设计光盘（CD）的工程师让碟片在播放过程中改变转速。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out why the last song on a vinyl record sounded worse than the first one. Then you will find out why the engineers who designed the compact disc made it change speed as it plays. $TAIL" \
+  --subtitle-zh "欢迎！今天你将弄清楚：为什么黑胶唱片上最后一首歌听起来不如第一首。然后你会知道，设计光盘（CD）的工程师为什么要让碟片在播放过程中改变转速。$TAIL_ZH"
 
 # The Collatz activity keeps its own welcome text rather than $TAIL, and bakes
 # the section in: it was written for one class of Todd's rather than for
