@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the four draft activities. Run from the repository root:
+# Rebuild the five draft activities. Run from the repository root:
 #     bash activities/build.sh
 #
 # Why this exists: the three were built by hand with only --prompt/--out/--title,
@@ -20,8 +20,8 @@ cd "$(dirname "$0")/.."
 TAIL="Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade."
 TAIL_ZH="开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。这段对话是你的课堂作业。经你同意，它也可能用于研究：少数去除姓名的记录可能由美国迈阿密大学的合作研究者进行分析。你可以在问卷上或直接告诉我拒绝用于研究，这对你的成绩没有任何影响。"
 
-# The three calculus pages key everything to the last five digits of the student
-# number (decided 15 Sep 2026): pre-survey, three activities, post-survey all
+# The four calculus pages key everything to the last five digits of the student
+# number (decided 15 Sep 2026): pre-survey, the activities, post-survey all
 # carry the same digits, and only Zheng can resolve them. The Collatz page keeps
 # the generator's default hint.
 CODEHINT="Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page."
@@ -57,6 +57,16 @@ python3 make_session_capture.py \
   --subtitle "Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. $TAIL" \
   --subtitle-zh "欢迎！今天你将思考：只用一只秒表和路边的距离标记，你要怎样验证速度表上的 60 km/h 是真的——以及当你测量的时间间隔越来越短时，会发生什么。$TAIL_ZH"
 
+python3 make_session_capture.py \
+  --prompt activities/prompts/5-record-chain-rule.txt \
+  --out activities/activity-5-record.html \
+  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --accent '#6b4a6e' \
+  --title    "Why was the last song the worst?" \
+  --title-zh "为什么唱片上最后一首歌最不好听？" \
+  --subtitle "Welcome! Today you will work out why the last song on a vinyl record sounded worse than the first — and why the engineers who designed the compact disc made the disc change speed while it plays. $TAIL" \
+  --subtitle-zh "欢迎！今天你将弄清楚：为什么黑胶唱片上最后一首歌听起来不如第一首——以及为什么设计光盘（CD）的工程师让碟片在播放过程中改变转速。$TAIL_ZH"
+
 # The Collatz activity keeps its own welcome text rather than $TAIL, and bakes
 # the section in: it was written for one class of Todd's rather than for
 # Mathematical Modeling 1, and its prompt runs the full five-question
@@ -73,5 +83,5 @@ python3 make_session_capture.py \
   --subtitle-zh "欢迎！在今天的课堂上，你将有机会借助生成式AI来探索考拉兹猜想（Collatz Conjecture）。我搭建了这个应用来收集你们的作业。开始之前，你需要先设置一个AI，并在下方的对话框中输入你的代码。你的对话会在过程中自动保存。你的消息只会发送给AI提供方以获取回复，不会发送到其他任何地方。最后，请将你的对话下载为JSON文件并提交给我，以获得课堂学分。"
 
 echo
-echo "Rebuilt four activities. Note that each run also rewrites activities/setup.html"
+echo "Rebuilt five activities. Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."

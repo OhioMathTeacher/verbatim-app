@@ -17,12 +17,14 @@ plain-language walkthrough for anyone who has not made one before.
 Always pass `--out`. It defaults to `session_capture.html` in the repository
 root, which is a different thing.
 
-`prompts/_RULES.txt` records why all three constrain the model the same way: in
+`prompts/_RULES.txt` records why the calculus set constrains the model the same way: in
 an earlier round of transcripts the AI was writing about eleven words for every
 one the student wrote, so every reply is capped, may ask only one question, and
 may never answer its own.
 
-`4-collatz-conjecture.txt` is a fourth, written for a class of preservice teachers;
-it predates `_RULES.txt` and keeps its longer profiler and uncapped replies on purpose.
+`4-collatz-conjecture.txt` is the odd one out, written for a class of preservice
+teachers; it predates `_RULES.txt` and keeps its longer profiler and uncapped replies
+on purpose. `5-record-chain-rule.txt` is the fourth of the calculus set and numbered 5
+because the Collatz file already had 4.
 
 These are drafts for comment, not classroom-ready material.

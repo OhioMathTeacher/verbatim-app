@@ -157,6 +157,41 @@
       .p15 { animation: none; transform: rotate(-15deg); }
       .p05 { animation: none; transform: rotate(-5deg); }
     }
+    /* The record banner: a vinyl disc and a compact disc, with the quantity the
+       activity turns on drawn between them. Both turn through the same two
+       revolutions per loop -- the vinyl evenly, the CD front-loaded and then
+       coasting -- so the eye compares how the turning is spent and not how much
+       of it there is. That inversion is what the activity ends on. */
+    .banner .vinyl  { fill: #2b2724; }
+    .banner .silver { fill: #d8e0e4; }
+    .banner .hole   { fill: #faf8f4; }
+    .banner .ring   { fill: none; stroke: #534b45; stroke-width: 1; }
+    .banner .ringc  { fill: none; stroke: #a8b8c0; stroke-width: 1; }
+    .banner .plate  { fill: #6b4a6e; }
+    .banner .mark   { fill: none; stroke: #8a8078; stroke-width: 1.6; stroke-linecap: round; }
+    .banner .arm    { fill: none; stroke: #f2eee4; stroke-width: 2.2; stroke-linecap: round; }
+    .banner .tip    { fill: #f2eee4; }
+    .banner .markc  { fill: none; stroke: #7a93a0; stroke-width: 1.6; stroke-linecap: round; }
+    .banner .head   { fill: #333; }
+    .banner .axis   { fill: none; stroke: #b9b1a3; stroke-width: 1.2; }
+    .banner .flat   { fill: none; stroke: #333;    stroke-width: 2; stroke-linecap: round; }
+    .banner .fall   { fill: none; stroke: #2563eb; stroke-width: 2; stroke-linecap: round; }
+    .banner text.sm { font-size: 8.5px; }
+    /* 720 degrees, so the restart of the loop lands where it began and nothing
+       visibly jumps. The easing is the only difference between the two. */
+    .spinEven  { animation: turn2 7s linear infinite; }
+    .spinCoast { animation: turn2 7s cubic-bezier(.08,.72,.2,1) infinite; }
+    @keyframes turn2 { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
+    /* The stylus works inward over a side; the CD's laser works outward. */
+    .tracksIn  { animation: trackIn  7s linear infinite; }
+    .tracksOut { animation: trackOut 7s linear infinite; }
+    @keyframes trackIn  { from { transform: translateX(0); } to { transform: translateX(-20px); } }
+    @keyframes trackOut { from { transform: translateX(0); } to { transform: translateX(20px);  } }
+    /* With motion reduced both readers rest where they start -- stylus at the
+       rim, laser at the centre -- which is still a true picture. */
+    @media (prefers-reduced-motion: reduce) {
+      .spinEven, .spinCoast, .tracksIn, .tracksOut { animation: none; }
+    }
     /* The Collatz banner: one hailstone sequence, drawn to the same 6.5:1 shape.
        The line is the whole point -- it climbs, falls, climbs again, and lands
        on 1 -- so nothing here is animated; the shape is what the reader should
@@ -180,9 +215,9 @@
 <body>
   <div class="container">
     <h1><span role="img" aria-label="conversation">💬</span> Verbatim — Draft Activities</h1>
-    <p>Short conversations between a student and a generative AI. The first three are
+    <p>Short conversations between a student and a generative AI. The first four are
     the fall 2026 set for Zheng Yang's Calculus I at the Sichuan University–Pittsburgh
-    Institute, run about a month apart. The fourth, on the Collatz conjecture, is a
+    Institute, run about a month apart. The fifth, on the Collatz conjecture, is a
     separate activity for a class of preservice teachers at Miami University.</p>
     <p>Open any of them,
     press <strong>AI Setup</strong>, choose a provider and paste in your own key —
@@ -194,7 +229,7 @@
     <a href="getting-a-key.html">Start here</a> — it takes about three minutes and
     needs no programming.</p>
     <hr>
-    <h2>Calculus I, fall 2026 — three activities</h2>
+    <h2>Calculus I, fall 2026 — four activities</h2>
     <ul class="applet-list">
 
       <li>
@@ -274,7 +309,7 @@
           and to leg thickness themselves, put the two together, and then look for the same
           argument elsewhere — anywhere a surface and a volume both matter.</p>
           <p>This one uses almost no arithmetic and no calculus at all, which makes it the
-          most accessible of the three and a reasonable choice early in the term.</p>
+          most accessible of the four and a reasonable choice early in the term.</p>
         </div>
       </li>
 
@@ -299,6 +334,80 @@
           <p>It ends by asking whether any accuracy anyone demanded could be met by choosing
           a short enough interval. Students describe a limit in their own words, without
           having been given a definition.</p>
+        </div>
+      </li>
+
+      <li>
+        <span class="applet-title">💿 <a href="activity-5-record.html">Why was the last song the worst?</a></span>
+        <div class="applet-desc">
+          <p class="week">Activity 4 · the chain rule — a rate reached through a second rate</p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A vinyl record turning evenly while its stylus creeps inward,
+                             a graph showing the groove passing the stylus more and more
+                             slowly while a compact disc holds it constant, and a compact
+                             disc whose spin starts fast and slows as its laser works out">
+              <g>
+                <circle class="vinyl" cx="92" cy="50" r="36"/>
+                <circle class="ring" cx="92" cy="50" r="31"/>
+                <circle class="ring" cx="92" cy="50" r="26"/>
+                <circle class="ring" cx="92" cy="50" r="21"/>
+                <g class="spinEven" style="transform-origin:92px 50px">
+                  <path class="mark" d="M92 38 V 16"/>
+                </g>
+                <circle class="plate" cx="92" cy="50" r="11"/>
+                <g class="tracksIn">
+                  <path class="arm" d="M124 26 V 42"/>
+                  <path class="tip" d="M120 42 H128 L124 50 Z"/>
+                </g>
+                <text class="sm" x="92" y="97">vinyl · same spin, start to finish</text>
+              </g>
+              <g>
+                <path class="axis" d="M205 26 V 80 H 404"/>
+                <path class="flat" d="M210 32 H 394"/>
+                <path class="fall" d="M210 32 L 394 64"/>
+                <text class="sm" x="305" y="20">groove past the reader, each second</text>
+                <text class="sm" x="416" y="35">100%</text>
+                <text class="sm deg" x="416" y="67">41%</text>
+                <text class="sm" x="305" y="93">first track → last</text>
+              </g>
+              <g>
+                <circle class="silver" cx="558" cy="50" r="36"/>
+                <circle class="ringc" cx="558" cy="50" r="31"/>
+                <circle class="ringc" cx="558" cy="50" r="26"/>
+                <circle class="ringc" cx="558" cy="50" r="21"/>
+                <g class="spinCoast" style="transform-origin:558px 50px">
+                  <path class="markc" d="M558 38 V 16"/>
+                </g>
+                <circle class="hole" cx="558" cy="50" r="6"/>
+                <circle class="ringc" cx="558" cy="50" r="6"/>
+                <g class="tracksOut">
+                  <path class="rod" d="M570 72 V 58"/>
+                  <path class="head" d="M566 58 H574 L570 50 Z"/>
+                </g>
+                <text class="sm" x="558" y="97">CD · spins slower as it plays out</text>
+              </g>
+            </svg>
+            <figcaption>Both discs turn through the same two revolutions here. The vinyl
+              spends them evenly, so the groove goes past its stylus more and more slowly as
+              the stylus works inward; the compact disc holds that speed fixed instead and
+              lets the spin fall away.</figcaption>
+          </figure>
+          <p>A vinyl record turns at the same rate from the first song to the last, while
+          the needle starts near the rim and works inward. So the groove passes the needle
+          more and more slowly — by the last track it is down to about two-fifths of what
+          it was at the first, leaving that much less groove to carry the detail. Mastering
+          engineers knew it, and put the quiet song last.</p>
+          <p>Students are given two radii and the turning rate and nothing else. They work
+          out how much groove goes past the needle at each end, say what the ratio is, and
+          then meet the choice the compact disc made in 1982: hold the groove speed fixed
+          everywhere and let the spin rate be whatever that requires — which is why a CD
+          turns fast at the centre and slows as it plays outward.</p>
+          <p>That inversion is the chain rule in the only form that matters here. Groove
+          speed, radius and spin rate are tied together; the motor controls one of them, the
+          music needs another, and the radius sits in between. It closes by asking how fast
+          the spin rate is changing if the laser creeps outward at a steady rate — a rate
+          reached through a second rate, which is what the rule is for.</p>
         </div>
       </li>
     </ul>
@@ -360,7 +469,7 @@
     conversation with a generative AI as it happens — each turn marked as the student's or
     the AI's, saved on the student's own device, and handed in as a single file. Nothing is
     posted to a website.</p>
-    <p>The three calculus activities share the same rules for how the AI may reply: no more
+    <p>The four calculus activities share the same rules for how the AI may reply: no more
     than sixty words at a time, one question per turn, and never answering its own question.
     Those came out of reading an earlier round of transcripts, where the AI was writing
     roughly eleven words for every one the student wrote. Students were holding up their
