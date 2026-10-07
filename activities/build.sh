@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the five draft activities. Run from the repository root:
+# Rebuild the eight draft activities. Run from the repository root:
 #     bash activities/build.sh
 #
 # Why this exists: the three were built by hand with only --prompt/--out/--title,
@@ -20,7 +20,7 @@ cd "$(dirname "$0")/.."
 TAIL="Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade."
 TAIL_ZH="开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。这段对话是你的课堂作业。经你同意，它也可能用于研究：少数去除姓名的记录可能由美国迈阿密大学的合作研究者进行分析。你可以在问卷上或直接告诉我拒绝用于研究，这对你的成绩没有任何影响。"
 
-# The four calculus pages key everything to the last five digits of the student
+# The seven calculus pages key everything to the last five digits of the student
 # number (decided 15 Sep 2026): pre-survey, the activities, post-survey all
 # carry the same digits, and only Zheng can resolve them. The Collatz page keeps
 # the generator's default hint.
@@ -67,6 +67,41 @@ python3 make_session_capture.py \
   --subtitle "Welcome! Today you will work out why the last song on a vinyl record sounded worse than the first one. Then you will find out why the engineers who designed the compact disc made it change speed as it plays. $TAIL" \
   --subtitle-zh "欢迎！今天你将弄清楚：为什么黑胶唱片上最后一首歌听起来不如第一首。然后你会知道，设计光盘（CD）的工程师为什么要让碟片在播放过程中改变转速。$TAIL_ZH"
 
+# The three below are chain-rule alternatives to the record activity rather than
+# three more slots in the term: Zheng's set runs about a month apart and activity
+# 4 is already the record. They are built so the choice can be made by trying
+# them, and they carry the same codehint because they would run in the same set.
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/6-gears-chain-rule.txt \
+  --out activities/activity-6-gears.html \
+  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --accent '#2f6f6a' \
+  --title    "Why does the same pedalling give you different speeds?" \
+  --title-zh "为什么同样的踩踏，速度却不一样？" \
+  --subtitle "Welcome! Today you will work out how far one turn of the pedals takes you, and how fast that makes you go. Then you will decide what to change when the hill gets too steep to pedal at all. $TAIL" \
+  --subtitle-zh "欢迎！今天你将算出：踩一整圈脚踏板能让你前进多远，以及这样的速度有多快。然后，当坡陡到几乎踩不动时，你要决定改变什么。$TAIL_ZH"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/7-uphill-chain-rule.txt \
+  --out activities/activity-7-uphill.html \
+  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --accent '#6a7a2f' \
+  --title    "How much colder does it get when you walk uphill?" \
+  --title-zh "往山上走，会冷多少？" \
+  --subtitle "Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. $TAIL" \
+  --subtitle-zh "欢迎！今天你将算出：步道顶端的气温低了多少，以及你每走一公里气温降低多少。这是两个不同的数；弄清楚为什么不同，就是今天的任务。$TAIL_ZH"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/8-clock-chain-rule.txt \
+  --out activities/activity-8-clock.html \
+  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --accent '#8a3f52' \
+  --title    "How does one swing of a pendulum become an hour?" \
+  --title-zh "钟摆的一次摆动，怎么变成一个小时？" \
+  --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL" \
+  --subtitle-zh "欢迎！今天你将弄清楚：钟表是怎样把大约每秒一次的钟摆摆动，变成十二小时转一圈的指针。然后你会知道，如果钟摆稍微快了一点，这座钟会怎样。$TAIL_ZH"
+
 # The Collatz activity keeps its own welcome text rather than $TAIL, and bakes
 # the section in: it was written for one class of Todd's rather than for
 # Mathematical Modeling 1, and its prompt runs the full five-question
@@ -83,5 +118,5 @@ python3 make_session_capture.py \
   --subtitle-zh "欢迎！在今天的课堂上，你将有机会借助生成式AI来探索考拉兹猜想（Collatz Conjecture）。我搭建了这个应用来收集你们的作业。开始之前，你需要先设置一个AI，并在下方的对话框中输入你的代码。你的对话会在过程中自动保存。你的消息只会发送给AI提供方以获取回复，不会发送到其他任何地方。最后，请将你的对话下载为JSON文件并提交给我，以获得课堂学分。"
 
 echo
-echo "Rebuilt five activities. Note that each run also rewrites activities/setup.html"
+echo "Rebuilt eight activities. Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."

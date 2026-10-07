@@ -192,6 +192,51 @@
     @media (prefers-reduced-motion: reduce) {
       .spinEven, .spinCoast, .tracksIn, .tracksOut { animation: none; }
     }
+    /* The three chain-rule alternatives share one idea -- a rate handed along a
+       linkage -- so their banners share one convention: everything that turns is
+       a dashed circle, and the only difference between two of them is how fast
+       each turns. Nothing here is decoration; if a thing turns twice as fast on
+       the page, it turns twice as fast in the mechanism. */
+    .banner .teeth  { fill: none; stroke: #4a443f; stroke-width: 2.4; stroke-dasharray: 2.2 3.4; }
+    /* the cog sits inside the wheel, so its teeth have to be read against the
+       spokes rather than against the page */
+    .banner .cog    { stroke-width: 3.2; stroke-dasharray: 2.6 3.6; }
+    .banner .face   { fill: #ece7dd; stroke: #4a443f; stroke-width: 1.1; }
+    .banner .rim    { fill: none; stroke: #333; stroke-width: 2.4; }
+    .banner .spoke  { fill: none; stroke: #6b6156; stroke-width: 1.2; stroke-linecap: round; }
+    .banner .chain  { fill: none; stroke: #6b6156; stroke-width: 1.4; }
+    .banner .road   { fill: none; stroke: #b9b1a3; stroke-width: 2; stroke-dasharray: 10 8; }
+    .banner .trail  { fill: none; stroke: #333; stroke-width: 2; stroke-linecap: round; }
+    .banner .hill   { fill: #eee8dc; stroke: none; }
+    .banner .walker { fill: #2563eb; }
+    .banner .hand   { fill: none; stroke: #333; stroke-width: 2; stroke-linecap: round; }
+    .banner .hand.min { stroke: #2563eb; }
+    /* 50 teeth into 25: the back wheel turns twice for one turn of the pedals. */
+    .cr1 { animation: turnA 6s linear infinite; }
+    .cr2 { animation: turnB 6s linear infinite; }
+    @keyframes turnA { to { transform: rotate(360deg); } }
+    @keyframes turnB { to { transform: rotate(720deg); } }
+    .rolling { animation: roll 6s linear infinite; }
+    @keyframes roll { to { stroke-dashoffset: -108; } }
+    /* The same walking pace on both trails. The short steep one is done, twice
+       over, while the long one is still going -- which is the whole comparison. */
+    .walkLong  { animation: walkLong  7s linear infinite; }
+    .walkShort { animation: walkShort 3.5s linear infinite; }
+    @keyframes walkLong  { from { transform: translate(0,0); } to { transform: translate(210px,-44px); } }
+    @keyframes walkShort { from { transform: translate(0,0); } to { transform: translate(100px,-44px); } }
+    /* One rate in at the left, divided twice, and a pair of hands that hardly
+       move. The hour hand's 144s is not a mistake: it is meant to look still. */
+    .pend  { animation: pend 1.6s ease-in-out infinite; }
+    @keyframes pend { 0%,100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+    .g1    { animation: turnA 1.8s  linear infinite; }
+    .g2    { animation: turnA 5.4s  linear infinite; }
+    .g3    { animation: turnA 16.2s linear infinite; }
+    .hmin  { animation: turnA 12s   linear infinite; }
+    .hhour { animation: turnA 144s  linear infinite; }
+    @media (prefers-reduced-motion: reduce) {
+      .cr1, .cr2, .rolling, .walkLong, .walkShort,
+      .pend, .g1, .g2, .g3, .hmin, .hhour { animation: none; }
+    }
     /* The Collatz banner: one hailstone sequence, drawn to the same 6.5:1 shape.
        The line is the whole point -- it climbs, falls, climbs again, and lands
        on 1 -- so nothing here is animated; the shape is what the reader should
@@ -215,10 +260,11 @@
 <body>
   <div class="container">
     <h1><span role="img" aria-label="conversation">💬</span> Verbatim — Draft Activities</h1>
-    <p>Short conversations between a student and a generative AI. The first four are
-    the fall 2026 set for Zheng Yang's Calculus I at the Sichuan University–Pittsburgh
-    Institute, run about a month apart. The fifth, on the Collatz conjecture, is a
-    separate activity for a class of preservice teachers at Miami University.</p>
+    <p>Short conversations between a student and a generative AI. Four of them are the
+    fall 2026 set for Zheng Yang's Calculus I at the Sichuan University–Pittsburgh
+    Institute, run about a month apart. Three more are other ways into the chain rule,
+    any of which could stand in for the fourth. The last, on the Collatz conjecture, is
+    a separate activity for a class of preservice teachers at Miami University.</p>
     <p>Open any of them,
     press <strong>AI Setup</strong>, choose a provider and paste in your own key —
     DeepSeek, or any of the eight offered — then talk to it. The key stays in your
@@ -412,6 +458,179 @@
       </li>
     </ul>
 
+
+    <h2>More ways into the chain rule — three drafts</h2>
+    <p>Activity 4 is the one built for the term. These three teach the same idea
+    through a different object and any of them could take its place, so the choice
+    can be made by trying them rather than on paper. They share activity 4's reply
+    rules and its participant code.</p>
+    <ul class="applet-list">
+
+      <li>
+        <span class="applet-title">🚲 <a href="activity-6-gears.html">Why does the same pedalling give you different speeds?</a></span>
+        <div class="applet-desc">
+          <p class="week">Alternative to activity 4 · the chain rule as a literal chain</p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A bicycle drivetrain: a fifty-tooth chainring turning once
+                             while the chain carries it to a twenty-five-tooth cog, so the
+                             back wheel turns twice, and the road slides past beneath">
+              <path class="road rolling" d="M66 83 H646"/>
+              <path class="chain" d="M105 18 L480 32"/>
+              <path class="chain" d="M105 78 L480 64"/>
+              <g class="cr1" style="transform-origin:105px 48px">
+                <circle class="teeth" cx="105" cy="48" r="30"/>
+                <circle class="face" cx="105" cy="48" r="23"/>
+                <path class="spoke" d="M105 48 V 25 M105 48 V 71 M105 48 L 87 34 M105 48 L 123 62"/>
+                <circle class="walker" cx="105" cy="74" r="3.4"/>
+              </g>
+              <circle class="face" cx="105" cy="48" r="4.5"/>
+              <g class="cr2" style="transform-origin:480px 48px">
+                <circle class="rim" cx="480" cy="48" r="34"/>
+                <path class="spoke" d="M480 14 V 82 M456 24 L 504 72 M504 24 L 456 72"/>
+                <circle class="teeth cog" cx="480" cy="48" r="16"/>
+              </g>
+              <circle class="face" cx="480" cy="48" r="4"/>
+              <text class="sm" x="105" y="97">pedals · 50 teeth</text>
+              <text class="sm" x="293" y="52">one turn here, two at the wheel</text>
+              <text class="sm" x="480" y="97">back wheel · 25-tooth cog</text>
+            </svg>
+            <figcaption>One turn of the pedals, fifty teeth into twenty-five, two turns of
+              the wheel, and 2.1 m of road for each of them. Three factors, and a rider who
+              can only reach two of them.</figcaption>
+          </figure>
+          <p>Road speed is a pedalling rate multiplied by a tooth count ratio multiplied by
+          the distance round a wheel. Students are given the two tooth counts and the wheel
+          and nothing else: they work out how far one turn of the pedals takes them, choose
+          a pedalling rate they could actually hold, and say how fast that makes them go.</p>
+          <p>Then the hill. It is steep enough that they can barely turn the pedals at all,
+          and they have to say what they would change and what it costs them — the question
+          the derailleur was invented to answer, and the one that makes the ratio feel like
+          a choice rather than a given. Swapping the 25-tooth cog for an 11 makes the cost
+          explicit: why would anyone ever fit the 25 again?</p>
+          <p>It closes on a worn chain that slips, so the back ring turns 1% slower than its
+          teeth promise. The speed is down 1% too — and it would have been, wherever in the
+          chain the 1% had come from. A proportional change at any one link is a
+          proportional change at the end, which is the chain rule in the form a cyclist
+          could feel.</p>
+        </div>
+      </li>
+
+      <li>
+        <span class="applet-title">🥾 <a href="activity-7-uphill.html">How much colder does it get when you walk uphill?</a></span>
+        <div class="applet-desc">
+          <p class="week">Alternative to activity 4 · two measured rates, one nobody can measure</p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="Two trails climbing the same 300 metres, one long and gentle
+                             and one short and steep, with a walker on each going at the
+                             same pace, so the walker on the steep trail arrives twice">
+              <path class="ref" d="M70 82 H612"/>
+              <path class="ref" d="M70 38 H612"/>
+              <path class="hill" d="M90 82 L300 38 L300 82 Z"/>
+              <path class="hill" d="M380 82 L480 38 L480 82 Z"/>
+              <path class="trail" d="M90 82 L300 38"/>
+              <path class="trail" d="M380 82 L480 38"/>
+              <g class="walkLong"><circle class="walker" cx="90" cy="78" r="4"/></g>
+              <g class="walkShort"><circle class="walker" cx="380" cy="78" r="4"/></g>
+              <path class="ref" d="M612 38 V 82"/>
+              <path class="chain" d="M607 38 H 617 M607 82 H 617"/>
+              <text class="sm" x="584" y="62">300 m</text>
+              <text class="sm deg" x="300" y="31">2 °C colder</text>
+              <text class="sm deg" x="480" y="31">2 °C colder</text>
+              <text class="sm" x="195" y="97">4 km of walking</text>
+              <text class="sm" x="430" y="97">2 km of walking</text>
+            </svg>
+            <figcaption>Two trails, the same 300 m of height, the same air, and walkers at
+              the same pace. Both arrive 2 °C colder — but one of them has been getting cold
+              twice as fast all the way up.</figcaption>
+          </figure>
+          <p>The air cools about 6.5 °C for every kilometre of height. That is the only
+          number students are given, besides a trail that climbs 300 m over 4 km of walking.
+          How much colder at the top is one question; how much colder per kilometre walked
+          is a different one, and the step that usually lands is being asked what they did to
+          the two numbers to get from the first to the second.</p>
+          <p>Then the units are made to do the teaching. Their answer is in degrees per
+          kilometre walked and the height has vanished from it, so where did the metres go?
+          A steeper trail up the same mountain on the same day changes one of the two rates
+          and leaves the other exactly as it was, which is worth finding out by being asked
+          rather than by being told.</p>
+          <p>It closes with a cable car that climbs a kilometre in six minutes, and asks how
+          fast the temperature falls for a passenger, per minute. Same first rate, different
+          second one: they reuse what they built and swap out one factor. Nobody owns a
+          thermometer that reads degrees per kilometre walked, and that is the point — the
+          rate was assembled out of two rates that can be measured.</p>
+        </div>
+      </li>
+
+      <li>
+        <span class="applet-title">⏳ <a href="activity-8-clock.html">How does one swing of a pendulum become an hour?</a></span>
+        <div class="applet-desc">
+          <p class="week">Alternative to activity 4 · and a sequel to activity 1's clock</p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A pendulum swinging once a second drives a train of three
+                             toothed wheels, each turning more slowly than the last, ending
+                             at a clock face whose hour hand appears not to move at all">
+              <path class="bar" d="M28 12 H 82"/>
+              <g class="pend" style="transform-origin:55px 12px">
+                <path class="rod" d="M55 12 V 72"/>
+                <circle class="bob" cx="55" cy="78" r="6"/>
+              </g>
+              <g class="g1" style="transform-origin:150px 50px">
+                <circle class="teeth" cx="150" cy="50" r="16"/>
+                <circle class="face" cx="150" cy="50" r="10"/>
+                <path class="spoke" d="M150 50 V 38 M150 50 V 62 M150 50 H 138"/>
+              </g>
+              <g class="g2" style="transform-origin:188px 50px">
+                <circle class="teeth" cx="188" cy="50" r="22"/>
+                <circle class="face" cx="188" cy="50" r="13"/>
+                <path class="spoke" d="M188 50 V 35 M188 50 V 65 M188 50 H 173"/>
+              </g>
+              <g class="g3" style="transform-origin:236px 50px">
+                <circle class="teeth" cx="236" cy="50" r="26"/>
+                <circle class="face" cx="236" cy="50" r="15"/>
+                <path class="spoke" d="M236 50 V 33 M236 50 V 67 M236 50 H 219"/>
+              </g>
+              <path class="chain" d="M280 50 H 480"/>
+              <path class="chain" d="M472 46 L 480 50 L 472 54"/>
+              <text class="sm" x="380" y="42">÷ 8 at every pair</text>
+              <circle class="face" cx="545" cy="50" r="34"/>
+              <circle class="rim" cx="545" cy="50" r="34"/>
+              <path class="spoke" d="M545 20 V 27 M575 50 H 568 M545 80 V 73 M515 50 H 522"/>
+              <g class="hhour" style="transform-origin:545px 50px">
+                <path class="hand" d="M545 50 V 32"/>
+              </g>
+              <g class="hmin" style="transform-origin:545px 50px">
+                <path class="hand min" d="M545 50 V 24"/>
+              </g>
+              <circle class="bob" cx="545" cy="50" r="3"/>
+              <text class="sm" x="55" y="97">once a second</text>
+              <text class="sm" x="193" y="97">each pair divides it</text>
+              <text class="sm" x="545" y="97">once in twelve hours</text>
+            </svg>
+            <figcaption>One swing a second has to come out as one turn in twelve hours — a
+              factor of 43200, spent a pair of wheels at a time. The blue minute hand still
+              moves here; the hour hand is turning too, just not visibly.</figcaption>
+          </figure>
+          <p>This is activity 1's clock from the other side. That one asked how small the
+          swing has to be for a clock that must not lose a second a day; this one asks what
+          happens between the pendulum and the hands. One pair of wheels, 8 teeth driving 64,
+          divides a turning rate by eight. Students work out the factor they need — twelve
+          hours in seconds, which they are not given — and then how many pairs that takes,
+          and whether the pairs can all be the same.</p>
+          <p>Then the pendulum runs 0.1% fast and they have to say what the hand is doing
+          after a day. The answer is that the train passes the error along untouched: 0.1%
+          in, 0.1% out, about a minute and a half a day, no matter how many wheels sit in
+          between. Students are asked whether a longer train makes it worse, and are not
+          told that it does not.</p>
+          <p>So the accuracy has to be bought in the pendulum, not in the wheels. That is
+          the conclusion Harrison's life's work rests on, and it falls out of the chain rule:
+          multiply the rates and you multiply the relative errors with them.</p>
+        </div>
+      </li>
+    </ul>
+
     <h2>Separate — preservice teachers, Miami University</h2>
     <ul class="applet-list">
       <li>
@@ -469,7 +688,7 @@
     conversation with a generative AI as it happens — each turn marked as the student's or
     the AI's, saved on the student's own device, and handed in as a single file. Nothing is
     posted to a website.</p>
-    <p>The four calculus activities share the same rules for how the AI may reply: no more
+    <p>The seven calculus activities share the same rules for how the AI may reply: no more
     than sixty words at a time, one question per turn, and never answering its own question.
     Those came out of reading an earlier round of transcripts, where the AI was writing
     roughly eleven words for every one the student wrote. Students were holding up their
