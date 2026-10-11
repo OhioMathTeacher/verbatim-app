@@ -493,7 +493,7 @@ body {
 <p id="err"></p>
 
 <div id="out" class="hide"></div>
-<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.2.1 · 4b46a679</p>
+<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.2.1 · 137ed0c2</p>
 </div>
 
 <!-- Temml (MIT), vendored from vendor/temml.min.js and inlined so this file
@@ -685,6 +685,8 @@ const T = {
     participant:"Participant", group:"Group", section:"Section", provider:"AI service", model:"Model",
     started:"Started", exported:"Exported", turns:"Turns", words:"Words",
     deleted:"Deleted by the student", deletedn:"deleted by the student",
+    restarts:"Started over", restartn:"time(s); the set-aside conversation is at the end",
+    setaside:"Set aside by the student", setasideat:"set aside",
     deletedat:"deleted",
     swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
     reach:"Services that answered", noreach:"not recorded", schema:"Schema",
@@ -703,6 +705,8 @@ const T = {
     participant:"参与者编号", group:"组别", section:"班级", provider:"AI 服务", model:"模型",
     started:"开始时间", exported:"导出时间", turns:"轮次", words:"字数",
     deleted:"学生已删除", deletedn:"条由学生删除",
+    restarts:"重新开始", restartn:"次；被搁置的对话附在最后",
+    setaside:"学生搁置的对话", setasideat:"搁置于",
     deletedat:"删除于",
     swords:"学生", awords:"AI", promptsha:"指令 SHA-256", psource:"指令来源",
     reach:"有响应的服务", noreach:"未记录", schema:"数据格式",
@@ -770,6 +774,8 @@ function render(d){
   h += fact(tr("madeby"), d.app ? `${d.app.name} ${d.app.version} · ${d.app.build}` : tr("noreach"));
   const uses = Array.isArray(d.tool_uses) ? d.tool_uses : [];
   if (uses.length) h += fact(tr("calcs"), `${uses.length} ${tr("calcn")}`);
+  const aside = Array.isArray(d.set_aside) ? d.set_aside : [];
+  if (aside.length) h += fact(tr("restarts"), `${aside.length} ${tr("restartn")}`);
   h += `</div><h2 class="conv">${esc(tr("conversation"))}</h2>`;
 
   const KIND = { evaluate: "calceval", graph: "calcgraph", table: "calctable" };
@@ -821,6 +827,19 @@ function render(d){
         ${bits.length ? `<p class="meta">${esc(bits.join("  ·  "))}</p>` : ""}
       </div></div>`;
     h += calcAt(ti);
+  }
+
+  /* Conversations the student set aside with "Start over". Shown plainly, after
+     the one handed in, so a restart is visible rather than silently absent. */
+  for (const [ai_, a] of aside.entries()){
+    h += `<h2>${esc(tr("setaside"))} (${ai_ + 1})</h2><p class="sub">${esc(tr("setasideat"))} <span title="${
+      esc(a.set_aside_utc || "")}">${esc(when(a.set_aside_utc))}</span></p>`;
+    for (const t of (Array.isArray(a.turns) ? a.turns : [])){
+      const role = t.role === "student" ? "student" : "ai";
+      h += t.deleted_utc
+        ? `<div class="turn ${role}"><div class="bubble bubble-gone"><p class="who">${esc(tr(role))}</p><p class="gonetext">${esc(tr("deleted"))}</p></div></div>`
+        : `<div class="turn ${role}"><div class="bubble"><p class="who">${esc(tr(role))}</p><div class="text rt">${renderRich(t.text)}</div></div></div>`;
+    }
   }
 
   h += `<h2>${esc(tr("survey"))}</h2>`;

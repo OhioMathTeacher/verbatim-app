@@ -622,6 +622,7 @@ try{
     <span class="pill" id="p-model"></span>
     <span class="pill" id="p-turns"></span>
     <span class="sp"></span>
+    <button id="restart" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="restart">Start over</button>
     <button id="finish" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="finish">Finish &amp; export</button>
   </div>
   <div id="log"></div>
@@ -844,6 +845,8 @@ const I18N = {
     whatai: "What the AI has been told (the same for everyone)",
     finish: "Finish & export", send: "Send",
     finishconfirm: "Finish the activity and export your work?\n\nYou can come back to the conversation afterwards.",
+    restart: "Start over",
+    restartconfirm: "Start a new conversation from the beginning?\n\nThe one you have now is not deleted. It stays in your file, marked as set aside, and your teacher will see it.",
     sayph: "Type your reply…    (Enter to send · Shift+Enter for a new line)",
     aisetup: "AI Setup",
     modalsub: "Choose where your AI teacher runs, then enter a key if it needs one. Nothing you enter here leaves this computer.",
@@ -942,6 +945,8 @@ const I18N = {
     whatai: "AI 收到的指令（所有人相同）",
     finish: "完成并导出", send: "发送",
     finishconfirm: "完成活动并导出你的作业吗？\n\n之后仍可以返回对话。",
+    restart: "重新开始",
+    restartconfirm: "要从头开始一段新的对话吗？\n\n当前的对话不会被删除：它会保留在你的文件中，标记为“已搁置”，老师也会看到。",
     sayph: "输入你的回复……（Enter 发送 · Shift+Enter 换行）",
     aisetup: "AI 设置",
     modalsub: "选择你的 AI 老师在哪里运行，如需密钥请填写。你在这里填写的内容不会离开这台电脑。",
@@ -2546,6 +2551,16 @@ $("#finish").onclick = () => {
   if(SURVEY.length){ renderSurvey(surveyDraft); show("s-survey"); window.scrollTo(0, 0); return; }
   finalise();
 };
+$("#restart").onclick = async () => {
+  if(busy) return;
+  if(!S.turns.some(t => t.role === "student")){ $("#chat-err").textContent = tr("errsay"); return; }
+  if(!confirm(tr("restartconfirm"))) return;
+  (S.set_aside = S.set_aside || []).push({ set_aside_utc: nowUTC(), turns: S.turns, tool_uses: S.tool_uses || [] });
+  S.turns = []; S.tool_uses = []; Calculator.restore([]);
+  aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
+  save(); render(); header(); window.scrollTo(0, 0);
+  await turnFromAI();
+};
 $("#survey-back").onclick = () => {
   surveyDraft = collectSurvey();
   (S.back_to_chat_utc = S.back_to_chat_utc || []).push(nowUTC());
@@ -2566,13 +2581,14 @@ $("#to-survey").onclick = () => { renderSurvey(); show("s-survey"); window.scrol
 $("#redownload").onclick  = download;
 $("#resume").onclick = () => { render(); show("s-chat"); };
 
-/* There is deliberately no "start over" in the interface.
+/* "Start over" sets the conversation aside; it never discards it.
 
    A student who could discard a conversation and begin again would be selecting
    the corpus one session at a time, and the discarded one would leave no trace --
    the same silent, unrecorded variation the whole re-collection exists to remove.
-   A student who wants to change direction can say so to the AI teacher, which is
-   itself worth recording.
+   So the button (Todd, 2026-10-10) moves the turns and the calculator tape into
+   S.set_aside, stamped, and the AI opens a fresh conversation in the same
+   session. The file keeps both, and the reader shows the set-aside ones.
 
    Deleting a single exchange is allowed, and the difference is the trace. A
    deleted exchange leaves a tombstone: the position, the speaker and the length
