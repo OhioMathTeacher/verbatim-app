@@ -635,7 +635,8 @@ try{
     <p class="hint" style="margin:0 0 6px" data-i18n="surveyhint">These are saved in the same file as your conversation. Every question is optional.</p>
     <p class="hint" style="margin:0 0 4px" data-i18n="surveylater">Your work stays saved on this computer.</p>
     <div id="survey-body"></div>
-    <p style="margin:26px 0 0"><button id="survey-done" data-i18n="surveydone">Finish and download</button></p>
+    <p style="margin:26px 0 0"><button id="survey-done" data-i18n="surveydone">Finish and download</button>
+      <button id="survey-back" class="ghost" data-i18n="backconv">Back to the conversation</button></p>
   </div>
 </section>
 
@@ -2532,13 +2533,23 @@ function failover(why){
    the top-right corner. One stray click should not end the activity, so it asks.
    Nothing is lost either way -- the conversation is still there afterwards -- but
    being bounced out of it mid-thought is disorienting enough to be worth a step. */
+/* A student on the survey can go back and talk some more (Todd, 2026-10-10).
+   Answers typed so far wait in surveyDraft, so they are there again at the
+   next Finish. Each return is stamped in back_to_chat_utc: the turns after
+   it are the ones said after the student had first thought they were done. */
+let surveyDraft = null;
 $("#finish").onclick = () => {
   if(!S.turns.some(t => t.role === "student")){
     $("#chat-err").textContent = tr("errsay"); return;
   }
   if(!confirm(tr("finishconfirm"))) return;
-  if(SURVEY.length){ renderSurvey(); show("s-survey"); window.scrollTo(0, 0); return; }
+  if(SURVEY.length){ renderSurvey(surveyDraft); show("s-survey"); window.scrollTo(0, 0); return; }
   finalise();
+};
+$("#survey-back").onclick = () => {
+  surveyDraft = collectSurvey();
+  (S.back_to_chat_utc = S.back_to_chat_utc || []).push(nowUTC());
+  save(); render(); show("s-chat"); window.scrollTo(0, document.body.scrollHeight);
 };
 $("#survey-done").onclick = () => {
   const answers = collectSurvey();
