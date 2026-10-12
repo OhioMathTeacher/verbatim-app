@@ -3,8 +3,9 @@
 A single HTML file that records a student's conversation with an AI, exactly as it
 happens, and hands back one JSON file per student ready for analysis.
 
-**[Try it →](https://ohiomathteacher.github.io/verbatim-app/)** — nothing is uploaded, nothing
-is stored anywhere but your own browser.
+**[Try it →](https://ohiomathteacher.github.io/verbatim-app/)** — a student's messages go to
+the AI provider to get replies, and nowhere else. The session file is saved by the student,
+in their own browser.
 
 Three pages, each a single self-contained file:
 
@@ -72,9 +73,13 @@ could tell a short session from an edited one. A file that kept the text would h
 the very sentence the student was trying to withdraw, which on a page that insists on codes
 rather than names is the worse failure. So: counted, but gone.
 
-There is still no "start over", and the difference is exactly the trace. Discarding a whole
-session would leave nothing behind; this leaves the outline of what was removed. The reader
-draws deleted exchanges in place, as an outline rather than a gap, for the same reason.
+"Start over" follows the same rule. It sets the whole conversation aside instead of
+discarding it: the turns and the calculator tape move into `set_aside`, stamped with the
+time, and the AI opens a fresh conversation in the same session. The file still shows every
+restart, and the reader counts them among the session facts and shows each set-aside
+conversation after the one handed in. Discarding would leave nothing behind; both of these
+leave a trace. The reader draws deleted exchanges in place, as an outline rather than a gap,
+for the same reason.
 
 
 ## How a turn is drawn
