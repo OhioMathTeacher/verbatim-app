@@ -14,6 +14,9 @@ Three pages, each a single self-contained file:
 | [setup](https://ohiomathteacher.github.io/verbatim-app/setup.html) | build your own activity, without installing anything |
 | [reader](https://ohiomathteacher.github.io/verbatim-app/reader.html) | drop a session file in and read it as a transcript |
 
+Conversations exported from Alkimi can be read too, once converted: see
+[Reading Alkimi exports](#reading-alkimi-exports).
+
 ## What it is for
 
 Research on how students talk with AI usually collects *what the student produced* — a
@@ -261,6 +264,31 @@ sends `Origin: null`, and every provider offered accepts that.
 writes `setup.html` beside the activity, so the browser builder always carries the template it
 was built from, and `reader.html`, so the reader carries the same maths renderer the activity
 does. Both are generated — edit `setup.src.html` and `reader.src.html`, not the built files.
+
+## Reading Alkimi exports
+
+Alkimi saves a chat as its own kind of JSON file (`alkimi.chat-export`), which the reader
+does not open. [`convert_alkimi.py`](convert_alkimi.py) turns a batch of them into files
+it does:
+
+```bash
+# a folder of exports, converted into another folder
+python3 convert_alkimi.py ~/Downloads/alkimi-exports -o ~/Downloads/converted
+
+# or name the files; each converted copy lands beside its original
+python3 convert_alkimi.py chat1.json chat2.json
+```
+
+Each export becomes `<name>.verbatim.json`. Folders are searched all the way down. Any file
+that is not an Alkimi export is skipped and named, and nothing is overwritten unless
+`--force` is given. Then drop the converted files into the
+[reader](https://ohiomathteacher.github.io/verbatim-app/reader.html).
+
+A converted file is not a capture. Alkimi tags who said what, so `role` carries over, and so
+does how long each reply took. But the export has no prompt, no typing time and no deleted
+turns, so those are left out rather than guessed, and the `schema` field says the file was
+converted. The student's name, which Alkimi puts in every message, is dropped: participant,
+group and section are left blank.
 
 ## Changing the activity without rebuilding
 
