@@ -328,5 +328,18 @@ Python 3.9+ to build. Nothing to install. Node is optional and only used by
 
 ## Licence
 
-MIT. If you use it in research, a citation is welcome — see `CITATION.cff` in the study
+[PolyForm Noncommercial 1.0.0](LICENSE). Schools, charities, public research
+organisations, public health and safety bodies and government institutions count as
+noncommercial whatever their funding, so research use is covered without asking. Selling it,
+or using it for commercial advantage, needs a separate licence — ask.
+
+Not an open-source licence, deliberately: restricting the field of use fails both the Open
+Source Definition and the Free Software Definition. The source is published and may be read,
+run, modified and shared. "Source available" rather than open source.
+
+**Versions published before 13 October 2026 were offered under MIT** — this repository was
+public from 14 August and the README said so. Copies taken under that notice stay under MIT;
+nothing revokes them. Temml, in `vendor/`, is MIT and unaffected.
+
+If you use it in research, a citation is welcome — see `CITATION.cff` in the study
 repository.
