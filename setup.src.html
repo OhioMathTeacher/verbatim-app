@@ -227,23 +227,6 @@ $("#thumb").onchange = e => {
   r.readAsDataURL(f);
 };
 $("#thumbclear").onclick = () => { avatar = ""; $("#thumb").value = ""; showThumb(); };
-/* A prompt composed by another page. tutor-bot sends one here in the fragment, which never
-   leaves the browser; the same ?name / #name shape index.html already accepts, because a
-   page opened as a local file carries no query string. What arrives is treated exactly like
-   something typed into the box: hashed, baked in, and recorded with every session. */
-(function(){
-  const m = /[#?&]tutor-prompt=([^&]+)/.exec(location.hash + location.search);
-  if(!m) return;
-  let text;
-  try{ text = decodeURIComponent(m[1].replace(/\+/g, " ")).trim(); }catch(e){ return; }
-  if(text.length < 200) return;
-  $("#prompt").value = text;
-  const tab = document.querySelector('.tabs button[data-p="prompt"]');
-  if(tab) tab.click();
-  say("Prompt handed in by tutor-bot. Add a title and the questions at the end, then download.", "ok");
-  history.replaceState(null, "", location.pathname);
-})();
-
 $("#revert").onclick = () => { fillForm(D); say("Back to the example activity.", "ok"); };
 
 const TYPES = ["single", "multi", "likert", "text"];

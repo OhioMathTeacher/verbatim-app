@@ -102,23 +102,6 @@ python3 make_session_capture.py \
   --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL" \
   --subtitle-zh "欢迎！今天你将弄清楚：钟表是怎样把大约每秒一次的钟摆摆动，变成十二小时转一圈的指针。然后你会知道，如果钟摆稍微快了一点，这座钟会怎样。$TAIL_ZH"
 
-# A tutor rather than one of Zheng's calculus set: built by tutor-bot from
-# controls, and published so the pedagogy can be tried on a phone without
-# anybody first having to read an eight-hundred-word prompt. Deliberately no
-# research-consent wording in the subtitle -- nothing is collected here, so
-# saying otherwise would be false. Rebuild it from tutor-bot rather than by
-# editing the prompt file by hand, or the two will disagree about what the
-# tutor does.
-python3 make_session_capture.py \
-  --prompt activities/prompts/tutor-sampling-distributions.txt \
-  --out activities/tutor-sampling-distributions.html \
-  --accent '#2f5d6b' \
-  --section DEMO \
-  --title    "What does the standard error actually measure?" \
-  --title-zh "\u6807\u51c6\u8bef\u5230\u5e95\u5728\u8861\u91cf\u4ec0\u4e48\uff1f" \
-  --subtitle "A demonstration of a tutor, not a graded activity. Play the student: ask it to just give you the answer, or tell it something confidently wrong, and watch what it does with that. Set up an AI below to begin \u2014 the words you send go to the provider you choose and nowhere else, and this page posts to no website. Nothing here is collected from you; download the file at the end if you would like to read the conversation back." \
-  --subtitle-zh "\u8fd9\u662f\u4e00\u4e2a\u8f85\u5bfc\u6f14\u793a\uff0c\u5e76\u975e\u8ba1\u5206\u4f5c\u4e1a\u3002\u8bf7\u6241\u6f14\u5b66\u751f\uff1a\u76f4\u63a5\u8ba9\u5b83\u544a\u8bc9\u4f60\u7b54\u6848\uff0c\u6216\u8005\u5f88\u6709\u628a\u63e1\u5730\u8bf4\u51fa\u4e00\u4e2a\u9519\u8bef\u7684\u8bf4\u6cd5\uff0c\u770b\u5b83\u4f1a\u600e\u4e48\u505a\u3002\u8bf7\u5728\u4e0b\u65b9\u8bbe\u7f6e AI \u5f00\u59cb\u3002"
-
 # The Collatz activity keeps its own welcome text rather than $TAIL, and bakes
 # the section in: it was written for one class of Todd's rather than for
 # Mathematical Modeling 1, and its prompt runs the full five-question
@@ -135,5 +118,5 @@ python3 make_session_capture.py \
   --subtitle-zh "欢迎！在今天的课堂上，你将有机会借助生成式AI来探索考拉兹猜想（Collatz Conjecture）。我搭建了这个应用来收集你们的作业。开始之前，你需要先设置一个AI，并在下方的对话框中输入你的代码。你的对话会在过程中自动保存。你的消息只会发送给AI提供方以获取回复，不会发送到其他任何地方。最后，请将你的对话下载为JSON文件并提交给我，以获得课堂学分。"
 
 echo
-echo "Rebuilt eight activities and the tutor demo. Note that each run also rewrites activities/setup.html"
+echo "Rebuilt eight activities. Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."
