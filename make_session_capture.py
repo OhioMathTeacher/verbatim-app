@@ -112,52 +112,18 @@ PROMPT_MARKER = "------- BEGIN PROMPT HERE -------"
 # CORS matters again now that the browser calls the provider directly. Every
 # OpenAI-compatible endpoint below was preflight-verified 2026-08-14.
 PROVIDERS = [
-    # Domestic services first, since they are the ones most likely to answer from
-    # a Chengdu classroom. The rest are offered too: which of them a given student
-    # can actually reach is a question the page answers by trying, not by guessing.
-    {"id": "deepseek", "label": "DeepSeek", "tier": "paid", "api": "openai",
+    # Ordered as the other apps' AI panels are: the $0 services, then the ones
+    # billed to the student's own key. The Chinese services the Chengdu study
+    # offered (DeepSeek, Kimi, GLM, Qwen) were removed in October 2026; sessions
+    # already recorded with them still name them in `provider` and `model`.
+    {"id": "gemini", "label": "Gemini", "tier": "free", "api": "gemini",
      "recommended": True,
-     "model": "deepseek-chat",
-     "url": "https://api.deepseek.com/chat/completions",
-     "blurb": "\u6df1\u5ea6\u6c42\u7d22 \u00b7 the model the original study used.",
-     "key_url": "https://platform.deepseek.com/api_keys", "blurb_zh": "深度求索 · 原研究使用的模型。",
-     "prefix": "sk-",
-     "placeholder": "sk-\u2026"},
-    {"id": "moonshot", "label": "Kimi", "tier": "paid", "api": "openai",
-     "model": "moonshot-v1-8k",
-     "url": "https://api.moonshot.cn/v1/chat/completions",
-     "blurb": "\u6708\u4e4b\u6697\u9762 Moonshot AI.",
-     "key_url": "https://platform.moonshot.cn/console/api-keys", "blurb_zh": "月之暗面 Moonshot AI。",
-     "prefix": "sk-",
-     "placeholder": "sk-\u2026"},
-    {"id": "zhipu", "label": "GLM", "tier": "paid", "api": "openai",
-     "model": "glm-4-plus",
-     "url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
-     "blurb": "\u667a\u8c31\u6e05\u8a00 Zhipu AI.",
-     "key_url": "https://open.bigmodel.cn/usercenter/apikeys", "blurb_zh": "智谱清言 Zhipu AI。",
-     "prefix": "",
-     "placeholder": "\u2026"},
-    {"id": "qwen", "label": "Qwen", "tier": "paid", "api": "openai",
-     "model": "qwen-plus",
-     "url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
-     "blurb": "\u901a\u4e49\u5343\u95ee Alibaba Cloud.",
-     "key_url": "https://bailian.console.aliyun.com/", "blurb_zh": "通义千问 阿里云。",
-     "prefix": "sk-",
-     "placeholder": "sk-\u2026"},
-    {"id": "openai", "label": "OpenAI", "tier": "paid", "api": "openai",
-     "model": "gpt-5",
-     "url": "https://api.openai.com/v1/chat/completions",
-     "blurb": "ChatGPT's models. Bring your own key.",
-     "key_url": "https://platform.openai.com/api-keys", "blurb_zh": "ChatGPT 的模型。需自备密钥。",
-     "prefix": "sk-",
-     "placeholder": "sk-\u2026"},
-    {"id": "openrouter", "label": "OpenRouter", "tier": "paid", "api": "openai",
-     "model": "deepseek/deepseek-chat",
-     "url": "https://openrouter.ai/api/v1/chat/completions",
-     "blurb": "One key, many models.",
-     "key_url": "https://openrouter.ai/keys", "blurb_zh": "一个密钥，多种模型。",
-     "prefix": "sk-or-",
-     "placeholder": "sk-or-\u2026"},
+     "model": "gemini-2.5-flash",
+     "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+     "blurb": "Free tier via Google \u2014 use a personal Gmail account.",
+     "key_url": "https://aistudio.google.com/apikey", "blurb_zh": "谷歌免费额度。请使用个人 Gmail 账号。",
+     "prefix": "AIza",
+     "placeholder": "AIza\u2026"},
     # llama-3.3-70b-versatile stopped being served on 16 August 2026. It stayed
     # pinned here after the classroom apps were swept, so every published activity
     # offered Groq -- the free, any-email option, and therefore the one a student
@@ -171,17 +137,32 @@ PROVIDERS = [
     {"id": "groq", "label": "Groq", "tier": "free", "api": "openai",
      "model": "openai/gpt-oss-120b",
      "url": "https://api.groq.com/openai/v1/chat/completions",
-     "blurb": "Free, fast, open-weight models.",
+     "blurb": "Free tier. Any email \u2014 no Google account needed.",
      "key_url": "https://console.groq.com/keys", "blurb_zh": "免费、快速的开源模型。",
      "prefix": "gsk_",
      "placeholder": "gsk_\u2026"},
-    {"id": "gemini", "label": "Gemini", "tier": "free", "api": "gemini",
-     "model": "gemini-2.5-flash",
-     "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-     "blurb": "Google's free tier. No card required.",
-     "key_url": "https://aistudio.google.com/apikey", "blurb_zh": "谷歌免费额度。无需信用卡。",
-     "prefix": "AIza",
-     "placeholder": "AIza\u2026"},
+    # Pinned like Groq, and for the same reason. Effort is pinned in askAnthropic().
+    {"id": "anthropic", "label": "Claude", "tier": "paid", "api": "anthropic",
+     "model": "claude-opus-5-5",
+     "url": "https://api.anthropic.com/v1/messages",
+     "blurb": "Anthropic's Claude. Your own key.",
+     "key_url": "https://console.anthropic.com/settings/keys", "blurb_zh": "Anthropic 的 Claude。需自备密钥。",
+     "prefix": "sk-ant-",
+     "placeholder": "sk-ant-\u2026"},
+    {"id": "openai", "label": "OpenAI", "tier": "paid", "api": "openai",
+     "model": "gpt-5",
+     "url": "https://api.openai.com/v1/chat/completions",
+     "blurb": "ChatGPT's models. Your own key.",
+     "key_url": "https://platform.openai.com/api-keys", "blurb_zh": "ChatGPT 的模型。需自备密钥。",
+     "prefix": "sk-",
+     "placeholder": "sk-\u2026"},
+    {"id": "openrouter", "label": "OpenRouter", "tier": "paid", "api": "openai",
+     "model": "openai/gpt-oss-120b",
+     "url": "https://openrouter.ai/api/v1/chat/completions",
+     "blurb": "One key, many models.",
+     "key_url": "https://openrouter.ai/keys", "blurb_zh": "一个密钥，多种模型。",
+     "prefix": "sk-or-",
+     "placeholder": "sk-or-\u2026"},
 ]
 
 
@@ -446,30 +427,36 @@ details.prompt pre{font-family:var(--mono);font-size:12.5px;line-height:1.6;whit
 .ai-modal-sub{margin:0 0 18px;font-size:14px;color:var(--muted);line-height:1.55}
 /* Guidance, not an alarm. Nothing in this dialog gets a warning box. */
 .tabnote{margin:0 0 14px;font-size:13px;line-height:1.55;color:var(--muted)}
-.ai-tabs{display:flex;gap:5px;border-bottom:1px solid var(--rule);margin:0 0 16px}
+/* Laid out as the AI panels in the other apps are (journaler-284 is the model):
+   pill tabs with "Selected:" beside them, one full-width row per provider with
+   its badge on the right, and a line underneath saying where the key goes. */
+.ai-sub{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 10px}
+.ai-tabs{display:flex;gap:2px}
 .ai-tab{background:transparent;border:0;box-shadow:none;color:var(--muted);cursor:pointer;
-  font-size:13.5px;font-weight:600;padding:9px 14px;border-bottom:2px solid transparent;border-radius:0}
+  font-size:14.5px;font-weight:600;padding:5px 10px;border-radius:5px 5px 0 0}
 .ai-tab:hover{color:var(--ink);transform:none}
-.ai-tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
-.ai-provider-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 6px}
-@media (max-width:520px){.ai-provider-cards{grid-template-columns:1fr}}
-.ai-provider-card{position:relative;background:var(--paper);border:1.5px solid var(--rule);
-  border-radius:11px;padding:13px 14px;cursor:pointer;text-align:left;font-family:inherit;
-  color:var(--ink);box-shadow:none;transition:background .15s,border-color .15s,transform .1s}
-.ai-provider-card:hover{transform:translateY(-1px);
-  border-color:color-mix(in srgb, var(--accent) 42%, var(--rule))}
-.ai-provider-card.selected{border-color:var(--accent);
-  background:color-mix(in srgb, var(--accent) 9%, var(--card))}
-.ai-provider-card.add-server{border-style:dashed}
-.ai-card-title{font-weight:600;font-size:15px;margin:0 0 3px}
-.ai-card-model{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 5px}
-.ai-card-desc{font-size:12.5px;color:var(--muted);line-height:1.45}
-.ai-card-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-top:8px}
-.ai-badge-free{background:color-mix(in srgb,var(--ok) 22%,transparent);color:var(--ok)}
-.ai-badge-paid{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
-.ai-badge-local{background:color-mix(in srgb,var(--ai) 20%,transparent);color:var(--ai)}
-.ai-badge-rec{background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent);margin-left:6px}
+.ai-tab[aria-selected="true"]{color:#fff;background:var(--accent)}
+.ai-selected{font-size:13px;color:var(--muted)}
+.ai-selected b{color:var(--ink);font-weight:600}
+.ai-provider-cards{display:flex;flex-direction:column;gap:8px;margin:0}
+.ai-provider-card{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  background:var(--paper);border:1px solid transparent;border-radius:8px;padding:10px 12px;
+  cursor:pointer;text-align:left;font-family:inherit;color:var(--ink);box-shadow:none;transition:background .15s}
+.ai-provider-card:hover{background:color-mix(in srgb, var(--accent) 6%, var(--paper));transform:none}
+.ai-provider-card.selected{border-color:var(--accent);padding-left:15px;
+  background:color-mix(in srgb, var(--accent) 12%, var(--card));box-shadow:inset 3px 0 0 var(--accent)}
+.ai-provider-card.selected::after{content:"\2713  in use";flex:0 0 auto;font-size:12px;font-weight:700;
+  color:#fff;background:var(--accent);border-radius:4px;padding:2px 7px}
+.ai-provider-card.selected .ai-card-badges{display:none}
+.ai-provider-card.add-server{border:1px dashed var(--rule)}
+.ai-card-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ai-card-title{font-weight:600;font-size:15.5px}
+.ai-card-desc{font-size:13px;color:var(--muted);line-height:1.45}
+.ai-getkey{display:inline-block;margin-top:4px;font-size:13px;color:var(--accent);text-decoration:none}
+.ai-getkey:hover{text-decoration:underline}
+.ai-card-badges{flex:0 0 auto;display:flex;gap:6px}
+.ai-card-badge{font-size:12px;color:var(--muted);background:var(--rule);border-radius:4px;padding:2px 7px}
+.ai-foot{font-size:12.5px;color:var(--muted);margin:12px 0 6px}
 .localpanel{margin:14px 0 4px;background:var(--paper);border:1px solid var(--rule);
   border-radius:11px;padding:15px 17px}
 .localpanel h3{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
@@ -673,14 +660,18 @@ try{
     <h2 id="ai-modal-title" data-i18n="aisetup">AI Setup</h2>
     <p class="ai-modal-sub" data-i18n="modalsub">Choose where your AI teacher runs.</p>
 
-    <div class="ai-tabs" role="tablist">
-      <button class="ai-tab" role="tab" data-tab="webgpu" aria-selected="false" data-i18n="tabwebgpu">WebGPU</button>
-      <button class="ai-tab" role="tab" data-tab="free"  aria-selected="true" data-i18n="tabfree">Free ($0)</button>
-      <button class="ai-tab" role="tab" data-tab="paid"  aria-selected="false" data-i18n="tabpaid">Paid</button>
+    <div class="ai-sub">
+      <div class="ai-tabs" role="tablist">
+        <button class="ai-tab" role="tab" data-tab="webgpu" aria-selected="false" data-i18n="tabwebgpu">Local</button>
+        <button class="ai-tab" role="tab" data-tab="free"  aria-selected="true" data-i18n="tabfree">$0</button>
+        <button class="ai-tab" role="tab" data-tab="paid"  aria-selected="false" data-i18n="tabpaid">Pay (Own Key)</button>
+      </div>
+      <span class="ai-selected" id="ai-selected"></span>
     </div>
 
     <div id="ai-notes"></div>
     <div id="ai-provider-cards" class="ai-provider-cards"></div>
+    <p class="ai-foot" id="ai-foot"></p>
     <div id="ai-webgpu" class="localpanel hide"></div>
 
     <div id="ai-key-section" class="ai-key-section" hidden>
@@ -849,8 +840,12 @@ const I18N = {
     restartconfirm: "Start a new conversation from the beginning?\n\nThe one you have now is not deleted. It stays in your file, marked as set aside, and your teacher will see it.",
     sayph: "Type your reply…    (Enter to send · Shift+Enter for a new line)",
     aisetup: "AI Setup",
-    modalsub: "Choose where your AI teacher runs, then enter a key if it needs one. Nothing you enter here leaves this computer.",
-    tabwebgpu: "WebGPU", tabfree: "Free ($0)", tabpaid: "Paid",
+    modalsub: "Choose where your AI teacher runs, then enter a key if it needs one.",
+    tabwebgpu: "Local", tabfree: "$0", tabpaid: "Pay (Own Key)",
+    selected: "Selected:", selnone: "none", getkey: "Get a key \u2197",
+    footlocal: "Runs on this computer, or on a server you name. No key needed.",
+    footfree: "Free tiers. The key is stored in this browser and sent only to that provider.",
+    footpaid: "Paid providers, billed to your own account. Keys stay in this browser.",
     notefree: "Nothing here is available on this network. Two things still work: a model running inside this page (WebGPU), or the key your instructor gives you, used with one of the services under Paid.",
     testconn: "Test connection", done: "Done",
     surveyh: "A few questions before you finish",
@@ -897,7 +892,7 @@ const I18N = {
     cardlocaldesc: "Running on your own machine.",
     cardfound: "model(s) found. Click to use.",
     addserver: "Add a server", addserverdesc: "Type the address of an OpenAI-compatible model you are running.",
-    badgelocal: "Local", badgefound: "Found", badgefree: "$0", badgepaid: "Paid",
+    badgelocal: "Local", badgefound: "Found", badgefree: "Free", badgepaid: "Own key",
     badgerec: "Recommended",
     wgpuh: "A model running inside this page",
     wgpudesc: "Runs in this browser. No key, no account.",
@@ -949,8 +944,12 @@ const I18N = {
     restartconfirm: "要从头开始一段新的对话吗？\n\n当前的对话不会被删除：它会保留在你的文件中，标记为“已搁置”，老师也会看到。",
     sayph: "输入你的回复……（Enter 发送 · Shift+Enter 换行）",
     aisetup: "AI 设置",
-    modalsub: "选择你的 AI 老师在哪里运行，如需密钥请填写。你在这里填写的内容不会离开这台电脑。",
-    tabwebgpu: "WebGPU（本机）", tabfree: "免费 ($0)", tabpaid: "付费",
+    modalsub: "选择你的 AI 老师在哪里运行，如需密钥请填写。",
+    tabwebgpu: "本机", tabfree: "免费", tabpaid: "付费（自备密钥）",
+    selected: "已选择：", selnone: "无", getkey: "获取密钥 \u2197",
+    footlocal: "在这台电脑上运行，或在你指定的服务器上运行。无需密钥。",
+    footfree: "免费额度。密钥保存在本浏览器中，只会发送给该服务商。",
+    footpaid: "付费服务，费用记入你自己的账户。密钥保存在本浏览器中。",
     notefree: "\u5728\u5f53\u524d\u7f51\u7edc\u4e0b\uff0c\u8fd9\u91cc\u6ca1\u6709\u53ef\u7528\u7684\u670d\u52a1\u3002\u4ecd\u6709\u4e24\u4e2a\u53ef\u884c\u7684\u529e\u6cd5\uff1a\u5728\u672c\u9875\u9762\u5185\u8fd0\u884c\u6a21\u578b\uff08WebGPU\uff09\uff0c\u6216\u4f7f\u7528\u8001\u5e08\u63d0\u4f9b\u7684\u5bc6\u94a5\u8bbf\u95ee\u201c\u4ed8\u8d39\u201d\u4e2d\u7684\u670d\u52a1\u3002",
     testconn: "测试连接", done: "完成",
     surveyh: "结束前的几个问题",
@@ -997,7 +996,7 @@ const I18N = {
     cardlocaldesc: "在你自己的电脑上运行。",
     cardfound: "个模型可用。点击使用。",
     addserver: "添加服务器", addserverdesc: "输入你正在运行的 OpenAI 兼容模型的地址。",
-    badgelocal: "本地", badgefound: "已发现", badgefree: "免费", badgepaid: "付费",
+    badgelocal: "本地", badgefound: "已发现", badgefree: "免费", badgepaid: "自备密钥",
     badgerec: "推荐",
     wgpuh: "在本页面内运行的模型",
     wgpudesc: "在浏览器中运行。无需密钥，无需账号。",
@@ -1236,12 +1235,25 @@ function card(opts){
   const b = document.createElement("button");
   b.type = "button";
   b.className = "ai-provider-card" + (opts.selected ? " selected" : "") + (opts.extra || "");
-  const t = document.createElement("div"); t.className = "ai-card-title"; t.textContent = opts.title;
-  b.appendChild(t);
-  if(opts.model){ const m = document.createElement("div"); m.className = "ai-card-model"; m.textContent = opts.model; b.appendChild(m); }
-  if(opts.desc){ const d = document.createElement("div"); d.className = "ai-card-desc"; d.textContent = opts.desc; b.appendChild(d); }
-  if(opts.badge){ const g = document.createElement("div"); g.className = "ai-card-badge ai-badge-" + opts.badgeClass; g.textContent = opts.badge; b.appendChild(g); }
-  if(opts.badge2){ const g = document.createElement("div"); g.className = "ai-card-badge ai-badge-rec"; g.textContent = opts.badge2; b.appendChild(g); }
+  const main = document.createElement("span"); main.className = "ai-card-main";
+  const t = document.createElement("span"); t.className = "ai-card-title";
+  t.textContent = opts.title + (opts.model ? " \u00b7 " + opts.model : "");
+  main.appendChild(t);
+  if(opts.desc){ const d = document.createElement("span"); d.className = "ai-card-desc"; d.textContent = opts.desc; main.appendChild(d); }
+  if(opts.keyUrl){
+    const a = document.createElement("a"); a.className = "ai-getkey";
+    a.href = opts.keyUrl; a.target = "_blank"; a.rel = "noopener"; a.textContent = tr("getkey");
+    // Inside a button: without this, following the link also selects the card.
+    a.addEventListener("click", e => e.stopPropagation());
+    main.appendChild(a);
+  }
+  b.appendChild(main);
+  const badges = [opts.badge, opts.badge2].filter(Boolean);
+  if(badges.length){
+    const g = document.createElement("span"); g.className = "ai-card-badges";
+    for(const x of badges){ const e = document.createElement("span"); e.className = "ai-card-badge"; e.textContent = x; g.appendChild(e); }
+    b.appendChild(g);
+  }
   b.onclick = opts.onClick;
   $("#ai-provider-cards").appendChild(b);
 }
@@ -1508,6 +1520,13 @@ function networkCheck(){
 function renderCards(){
   const wrap = $("#ai-provider-cards"); wrap.innerHTML = "";
   renderNotes(); renderWebgpuPanel();
+  // Always "Selected: ...", the phrasing the other apps' panels use.
+  const live = aiConfig();
+  $("#ai-selected").textContent = tr("selected") + " ";
+  const sb = document.createElement("b");
+  sb.textContent = live ? (live.local ? (live.short || live.model) : live.label) : tr("selnone");
+  $("#ai-selected").appendChild(sb);
+  $("#ai-foot").textContent = tr(aiTab === "webgpu" ? "footlocal" : aiTab === "free" ? "footfree" : "footpaid");
   $("#ai-err").textContent = "";
   const current = SS.get(K_PROV);
 
@@ -1552,7 +1571,7 @@ function renderCards(){
 
   for(const p of offer(aiTab)){
     card({ title: p.label, model: p.model, desc: (lang === "zh" && p.blurb_zh) ? p.blurb_zh : p.blurb,
-           badge: p.tier === "free" ? tr("badgefree") : tr("badgepaid"), badgeClass: p.tier,
+           badge: p.tier === "free" ? tr("badgefree") : tr("badgepaid"), keyUrl: p.key_url,
            badge2: p.recommended ? tr("badgerec") : null,
            selected: current === p.id,
            onClick: () => { SS.set(K_PROV, p.id); showAddEndpoint = false;
@@ -1904,6 +1923,7 @@ async function askModel(messages){
   const c = aiConfig();
   if(!c) throw new Error(tr("errai"));
   if(c.api === "webgpu") return askWebGPU(c, messages);
+  if(c.api === "anthropic") return askAnthropic(c, messages);
   return c.api === "gemini" ? askGemini(c, messages) : askOpenAI(c, messages);
 }
 /* No fetch and no key: the weights are already in this browser and the reply is
@@ -1958,6 +1978,27 @@ async function askGemini(c, messages){
   if(!r.ok) throw new Error(providerError(r.status, await r.text()));
   const d = await r.json();
   const out = d?.candidates?.[0]?.content?.parts?.map(x => x.text).join("");
+  if(!out) throw new Error("empty reply");
+  return out;
+}
+/* Anthropic's Messages API, called from the browser with the student's key; the
+   last header is what lets a page do that. Effort is pinned to "low" for the same
+   reason Gemini's thinking is pinned off: the instrument records provider and
+   model, not hidden settings, so nothing that changes how much the model writes
+   may vary between sessions. This model cannot turn thinking off, so the reply is
+   the text blocks only. No server-side fallback either: it would answer some
+   turns with a different model than the session file names. */
+async function askAnthropic(c, messages){
+  const r = await fetch(c.url, { method: "POST",
+    headers: { "Content-Type": "application/json", "x-api-key": c.key,
+               "anthropic-version": "2023-06-01",
+               "anthropic-dangerous-direct-browser-access": "true" },
+    body: JSON.stringify({ model: c.model, max_tokens: 16000,
+                           output_config: { effort: "low" }, messages }) });
+  if(!r.ok) throw new Error(providerError(r.status, await r.text()));
+  const d = await r.json();
+  if(d.stop_reason === "refusal") throw new Error("Claude declined to answer that message.");
+  const out = (d.content || []).filter(b => b.type === "text").map(b => b.text).join("");
   if(!out) throw new Error("empty reply");
   return out;
 }
@@ -2864,7 +2905,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--key", action="append", default=[], metavar="ID=KEY",
-                    help="API key, e.g. --key deepseek=sk-... (repeatable). "
+                    help="API key, e.g. --key groq=gsk_... (repeatable). "
                          "Falls back to the provider's environment variable.")
     ap.add_argument("--only", help="comma-separated provider ids to offer; default is "
                                    "all of them. Which ones actually answer depends on "
