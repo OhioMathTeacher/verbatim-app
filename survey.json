@@ -64,8 +64,8 @@
     },
     {
       "id": "other_courses", "type": "single",
-      "en": "Have you used LLMs (like ChatGPT or DeepSeek) in other university courses?",
-      "zh": "你在其他大学课程中使用过大语言模型（如 ChatGPT 或 DeepSeek）吗？",
+      "en": "Have you used LLMs (like ChatGPT or DeepSeek) in other courses at your school?",
+      "zh": "你在学校的其他课程中使用过大语言模型（如 ChatGPT 或 DeepSeek）吗？",
       "options": [
         {"v": "yes_freq",  "en": "Yes, frequently", "zh": "是，经常使用"},
         {"v": "yes_some",  "en": "Yes, sometimes", "zh": "是，有时使用"},
@@ -75,7 +75,7 @@
     },
     {
       "id": "professor_views", "type": "single",
-      "en": "How do your other professors view the use of AI tools like ChatGPT?",
+      "en": "How do your other teachers view the use of AI tools like ChatGPT?",
       "zh": "你的其他老师如何看待使用 ChatGPT 这类 AI 工具？",
       "options": [
         {"v": "encourage", "en": "They encourage it", "zh": "他们鼓励使用"},

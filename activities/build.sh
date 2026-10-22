@@ -27,9 +27,35 @@ TAIL_ZH="开始前请先设置 AI，并在下方填写你的编号。你的对�
 CODEHINT="Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page."
 CODEHINT_ZH="你的参与者编号是你学号的后五位——与你在问卷上填写的数字相同。请不要在本页面任何地方填写你的姓名。"
 
+# The one content item in survey.json, helped_learn, asks whether the activity
+# "helped me learn calculus concepts better" -- wrong for the spider (no
+# calculus) and for Collatz, and too vague for the rest. Each page gets
+# survey.json with that item reworded to name what its activity is about;
+# every other question stays as written. The id is kept, so the answers still
+# line up across pages.
+SURVEYS="$(mktemp -d)"
+trap 'rm -rf "$SURVEYS"' EXIT
+learn_survey() {  # name, en, zh -> path of a survey.json with helped_learn reworded
+  python3 -I - "$SURVEYS/$1.json" "$2" "$3" <<'EOF'
+import json, sys
+out, en, zh = sys.argv[1:]
+spec = json.load(open("survey.json", encoding="utf-8"))
+qs = spec["questions"] if isinstance(spec, dict) else spec
+hit = [q for q in qs if q["id"] == "helped_learn"]
+assert len(hit) == 1, "survey.json no longer has exactly one helped_learn item"
+hit[0]["en"], hit[0]["zh"] = en, zh
+json.dump(spec, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+EOF
+  echo "$SURVEYS/$1.json"
+}
+# Activities 5-8 are alternatives for the same slot, so they share one wording.
+CHAIN_EN="This assignment helped me understand how one rate of change can be built from two others (the chain rule)."
+CHAIN_ZH="这次作业帮助我更好地理解了一个变化率如何由另外两个变化率得到（链式法则）。"
+
 python3 make_session_capture.py \
   --prompt activities/prompts/1-pendulum-approximation.txt \
   --out activities/activity-1-pendulum.html \
+  --survey "$(learn_survey pendulum "This assignment helped me understand how to decide when an approximation is good enough." "这次作业帮助我更好地理解了怎样判断一个近似是否足够好。")" \
   --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#9a5734' \
   --title    "How small is small enough?" \
@@ -40,6 +66,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/2-scaling-square-cube.txt \
   --out activities/activity-2-scaling.html \
+  --survey "$(learn_survey scaling "This assignment helped me understand how weight and strength change when something is made bigger." "这次作业帮助我更好地理解了物体放大时，重量和强度各自会怎样变化。")" \
   --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#7a5c1f' \
   --title    "Why can't a spider be the size of a horse?" \
@@ -50,6 +77,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/3-speedometer-limits.txt \
   --out activities/activity-3-speedometer.html \
+  --survey "$(learn_survey speedometer "This assignment helped me understand what speed at a single instant means." "这次作业帮助我更好地理解了“某一瞬间的速度”是什么意思。")" \
   --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#3f5f7a' \
   --title    "What does the speedometer mean?" \
@@ -60,6 +88,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/5-record-chain-rule.txt \
   --out activities/activity-5-record.html \
+  --survey "$(learn_survey record "$CHAIN_EN" "$CHAIN_ZH")" \
   --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#6b4a6e' \
   --title    "Why was the last song the worst?" \
@@ -75,6 +104,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/6-gears-chain-rule.txt \
   --out activities/activity-6-gears.html \
+  --survey "$(learn_survey gears "$CHAIN_EN" "$CHAIN_ZH")" \
   --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#2f6f6a' \
   --title    "Why does the same pedalling give you different speeds?" \
@@ -85,6 +115,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/7-uphill-chain-rule.txt \
   --out activities/activity-7-uphill.html \
+  --survey "$(learn_survey uphill "$CHAIN_EN" "$CHAIN_ZH")" \
   --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#6a7a2f' \
   --title    "How much colder does it get when you walk uphill?" \
@@ -95,6 +126,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/8-clock-chain-rule.txt \
   --out activities/activity-8-clock.html \
+  --survey "$(learn_survey clock "$CHAIN_EN" "$CHAIN_ZH")" \
   --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
   --accent '#8a3f52' \
   --title    "How does one swing of a pendulum become an hour?" \
@@ -110,6 +142,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/4-collatz-conjecture.txt \
   --out activities/activity-4-collatz.html \
+  --survey "$(learn_survey collatz "This assignment helped me understand the difference between checking many cases and proving a conjecture." "这次作业帮助我更好地理解了验证大量例子与证明一个猜想之间的区别。")" \
   --accent '#4a7a55' \
   --section S4 \
   --title    "Does every number come home?" \
