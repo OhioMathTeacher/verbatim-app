@@ -42,6 +42,9 @@ input::placeholder,textarea::placeholder{font-style:italic;opacity:.62}
 input:focus,textarea:focus,select:focus{outline:0;border-color:var(--accent);
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)}
 .field{margin:0 0 20px}
+label.check{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;letter-spacing:0;
+  text-transform:none;color:var(--ink);cursor:pointer}
+label.check input{width:auto;margin:0}
 .hint{font-size:13.5px;color:var(--muted);margin:7px 0 0}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:640px){.row{grid-template-columns:1fr}}
@@ -129,6 +132,12 @@ code{font-family:var(--mono);font-size:.88em}
         <select id="lang"><option value="en">English</option><option value="zh">中文</option></select>
         <p class="hint">Students can switch either way at any time.</p></div>
     </div>
+    <div class="field"><label class="check"><input type="checkbox" id="codes" checked>
+        Ask each student for a participant code</label>
+      <p class="hint">Turn this off for a demonstration. With it off, nobody is asked for a
+        code, group or section, and sessions record them as empty. Turn it back on
+        when a class runs the activity, so each conversation can be matched to a
+        student without a name on it.</p></div>
     <div class="field"><label for="footer">Footer line</label>
       <input id="footer" placeholder="Riverside College · Calculus II · Dr Ada Shah">
       <p class="hint">Identifies the course, so a student can see the page is yours.</p></div>
@@ -215,6 +224,7 @@ function fillForm(d){
   $("#subtitle").value = d.subtitle;    $("#subtitlezh").value = d.subtitle_zh;
   $("#section").value = d.section;      $("#footer").value = d.footer;
   $("#lang").value = d.lang;
+  $("#codes").checked = d.codes !== false;
   $("#prompt").value = d.prompt.text;
   QS = JSON.parse(JSON.stringify(d.survey));
   renderQuestions();
@@ -457,6 +467,11 @@ async function compose(){
     .split("__TITLE_ZH_JSON__").join(JSON.stringify($("#titlezh").value.trim() || title))
     .split("__SUBTITLE_ZH_JSON__").join(JSON.stringify($("#subtitlezh").value.trim() || sub))
     .split("__DEMO_JSON__").join("false")
+    .split("__CODES_JSON__").join($("#codes").checked ? "true" : "false")
+    // Filled from the published defaults. Before this the token went through
+    // unreplaced, and every page built here stopped on a ReferenceError at load.
+    .split("__CODEHINT_JSON__").join(JSON.stringify(D.codehint || ""))
+    .split("__CODEHINT_ZH_JSON__").join(JSON.stringify(D.codehint_zh || D.codehint || ""))
     // The accent tokens must be filled here too. The Python builder and this one
     // share one template on purpose, so a token added there and forgotten here
     // ships a page with literal __ACCENT__ in its stylesheet.

@@ -572,14 +572,14 @@ try{
   <p class="sub" data-i18n="subtitle">__SUBTITLE__</p>
   <div class="card">
     <h2 data-i18n="before">Before you start</h2>
-    <p class="hint" style="margin:0 0 22px" data-i18n="codehint">Your instructor gave you a participant code.</p>
+    <p class="hint" style="margin:0 0 22px" data-i18n="codehint" id="codehint">Your instructor gave you a participant code.</p>
 
-    <div class="field">
+    <div class="field" id="pidwrap">
       <label for="pid" data-i18n="pid">Participant code</label>
       <input id="pid" autocomplete="off" spellcheck="false" data-i18n-ph="pidph" placeholder="Enter code here (e.g., P07)">
     </div>
-    <div class="row field">
-      <div><label for="grp" data-i18n="group">Group</label><input id="grp" autocomplete="off" spellcheck="false" data-i18n-ph="grpph" placeholder="Enter group here (e.g., G3)"></div>
+    <div class="row field" id="grprow">
+      <div id="grpwrap"><label for="grp" data-i18n="group">Group</label><input id="grp" autocomplete="off" spellcheck="false" data-i18n-ph="grpph" placeholder="Enter group here (e.g., G3)"></div>
       <div id="secwrap"><label for="sec" data-i18n="section">Section</label><input id="sec" autocomplete="off" spellcheck="false" data-i18n-ph="secph" placeholder="Enter section here (e.g., S4)"></div>
     </div>
     <div class="field">
@@ -741,6 +741,7 @@ const SUBMIT    = __SUBMIT_JSON__;
 const CHAT_URL  = __CHAT_JSON__;
 const AVATAR    = __AVATAR_JSON__;
 const SECTION   = __SECTION_JSON__;
+const CODES     = __CODES_JSON__;
 let   SURVEY    = __SURVEY_JSON__;
 const FOOTER    = __FOOTER_JSON__;
 const DEMO      = __DEMO_JSON__;
@@ -810,6 +811,19 @@ $("#promptview").textContent = PROMPT.text;
    S4/s4/Section 4 all appearing in the same corpus. It is still recorded. */
 if(SECTION){ $("#sec").value = SECTION; $("#secwrap").classList.add("hide"); }
 
+/* A demonstration has nobody to identify. The codes exist so a transcript can be
+   matched to a consenting participant without a name; where nobody is enrolled
+   there is nothing to match, and asking anyway invents a code that means nothing
+   and reads as though data is being collected when it is not. The fields go, and
+   the three fields record as empty -- the same shape a converted Alkimi export
+   has, so anything reading sessions already copes with it. */
+if(!CODES){
+  for(const id of ["#pidwrap", "#grpwrap", "#codehint"]) $(id).classList.add("hide");
+  if(!SECTION) $("#secwrap").classList.add("hide");
+  if($("#grprow").children.length && $("#secwrap").classList.contains("hide"))
+    $("#grprow").classList.add("hide");
+}
+
 /* Course branding in the masthead and footer, so a student can see at a glance
    that this page is their own instructor's activity and not something stray. */
 if(AVATAR){
@@ -876,6 +890,7 @@ const I18N = {
     pidph: "Enter code here (e.g., P07)",
     grpph: "Enter group here (e.g., G3)",
     secph: "Enter section here (e.g., S4)",
+    nocodes: "Demonstration — no codes",
     errfields: "Participant code, group and section are all required.",
     errcode: "The participant code should be letters and numbers only, e.g. P07. Please do not use your name.",
     errai: "Please set up your AI first.",
@@ -980,6 +995,7 @@ const I18N = {
     pidph: "在此输入编号（例如 P07）",
     grpph: "在此输入组别（例如 G3）",
     secph: "在此输入班级（例如 S4）",
+    nocodes: "演示 — 无编号",
     errfields: "参与者编号、组别和班级都是必填项。",
     errcode: "参与者编号只能包含字母和数字，例如 P07。请不要使用姓名。",
     errai: "请先设置你的 AI。",
@@ -1708,13 +1724,13 @@ refreshAiStatus();
 probeProviders();
 
 $("#go-setup").onclick = async () => {
-  const pid = $("#pid").value.trim().toUpperCase();
-  const grp = $("#grp").value.trim().toUpperCase();
-  const sec = $("#sec").value.trim().toUpperCase();
+  const pid = CODES ? $("#pid").value.trim().toUpperCase() : "";
+  const grp = CODES ? $("#grp").value.trim().toUpperCase() : "";
+  const sec = CODES ? $("#sec").value.trim().toUpperCase() : (SECTION || "");
   const cfg = aiConfig();
-  if(!pid || !grp || !sec){ $("#setup-err").textContent = tr("errfields"); return; }
+  if(CODES && (!pid || !grp || !sec)){ $("#setup-err").textContent = tr("errfields"); return; }
   if(!DEMO && !aiReady()){ $("#setup-err").textContent = tr("errai"); return; }
-  if(/[^A-Z0-9-]/.test(pid)){ $("#setup-err").textContent = tr("errcode"); return; }
+  if(pid && /[^A-Z0-9-]/.test(pid)){ $("#setup-err").textContent = tr("errcode"); return; }
   $("#setup-err").textContent = "";
   /* network_check is part of why a given student ended up on a given provider,
      so it travels with the session. Null when they never ran one. */
@@ -1749,7 +1765,8 @@ let aiDoneAt = null, composeStart = null;
    for both means neither language has to be special-cased at the call site. */
 const turnCount = n => n + " " + tr(n === 1 ? "turn1" : "turns");
 function header(){
-  $("#p-id").textContent    = S.participant + " · " + S.group + " · " + S.section;
+  $("#p-id").textContent    = [S.participant, S.group, S.section].filter(Boolean).join(" · ")
+    || tr("nocodes");
   $("#p-model").textContent = S.model;
   const gone = S.turns.filter(isGone).length;
   $("#p-turns").textContent = turnCount(S.turns.length)
@@ -2386,7 +2403,8 @@ function download(){
   const blob = new Blob([JSON.stringify(S, null, 2)], { type: "application/json;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "session_" + S.participant + "_" + S.group + "_" + S.section + ".json";
+  const stem = [S.participant, S.group, S.section].filter(Boolean).join("_") || S.session_id;
+  a.download = "session_" + stem + ".json";
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
@@ -2873,7 +2891,7 @@ def tint(hex_colour: str, s: float, l: float) -> str:
 def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
           avatar: str, footer: str, lang: str, section: str, title_zh: str,
           subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str, codehint: str, codehint_zh: str,
-          accent: str) -> str:
+          accent: str, no_codes: bool = False) -> str:
     # Deliberately NOT published to the page: url and key. The page names a
     # provider; the student supplies the credential.
     pub = pub_providers(providers)
@@ -2888,6 +2906,7 @@ def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
             .replace("__SUBTITLE_JSON__", json.dumps(subtitle, ensure_ascii=False))
             .replace("__LANG_JSON__", json.dumps(lang))
             .replace("__SECTION_JSON__", json.dumps(section))
+            .replace("__CODES_JSON__", "false" if no_codes else "true")
             .replace("__SURVEY_JSON__", json.dumps(survey, ensure_ascii=False))
             .replace("__TITLE_ZH_JSON__", json.dumps(title_zh, ensure_ascii=False))
             .replace("__SUBTITLE_ZH_JSON__", json.dumps(subtitle_zh, ensure_ascii=False))
@@ -2940,6 +2959,9 @@ def main() -> int:
     ap.add_argument("--survey", type=Path, default=HERE / "survey.json",
                     help="survey shown after the conversation and saved into the same file")
     ap.add_argument("--no-survey", action="store_true", help="skip the survey entirely")
+    ap.add_argument("--no-codes", action="store_true",
+                    help="no participant code, group or section: for a demonstration, "
+                         "where there is nobody to identify. The three fields record as empty.")
     ap.add_argument("--section", default="",
                     help="fixed section code recorded with every session, e.g. S4. "
                          "When set, students are not asked for it.")
@@ -3028,7 +3050,7 @@ def main() -> int:
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.lang, a.section.strip().upper(),
                            a.title_zh, a.subtitle_zh, survey, a.demo, a.title, subtitle,
-                           a.codehint, a.codehint_zh, a.accent), encoding="utf-8")
+                           a.codehint, a.codehint_zh, a.accent, a.no_codes), encoding="utf-8")
 
     # The builder ships with the activity so a teacher can make their own without
     # Python. It embeds this exact template, so the two stay in step by construction.
@@ -3039,6 +3061,7 @@ def main() -> int:
             "avatar": avatar, "footer": a.footer, "title": a.title, "title_zh": a.title_zh,
             "subtitle": subtitle, "subtitle_zh": a.subtitle_zh, "lang": a.lang,
             "section": a.section.strip().upper(), "prompt": prompt, "survey": survey,
+            "codes": not a.no_codes, "codehint": a.codehint, "codehint_zh": a.codehint_zh,
             "accent": a.accent,
             "built": prompt["sha256"][:12],
         }), encoding="utf-8")
@@ -3057,7 +3080,8 @@ def main() -> int:
     print(f"  prompt            : {prompt['id']}  sha256 {prompt['sha256'][:12]}…  "
           f"{len(prompt['text'])} chars")
     print(f"  survey            : {len(survey)} question(s)" if survey else "  survey            : (none)")
-    print(f"  section           : {a.section.strip().upper() or '(students are asked)'}")
+    _sec = "(none — --no-codes)" if a.no_codes else "(students are asked)"
+    print(f"  section           : {a.section.strip().upper() or _sec}")
     print("  reachability      : probed silently at load; the picker lists what answered")
     print(f"  branding          : {'inlined, %.0f KB' % (len(avatar)/1024) if avatar else '(none)'}")
     print(f"  footer            : {a.footer or '(none)'}")

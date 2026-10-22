@@ -14,6 +14,12 @@ plain-language walkthrough for anyone who has not made one before.
         --out activities/activity-1-pendulum.html \
         --title "How small is small enough?"
 
+To rebuild all of them at once, run `bash activities/build.sh` from the repository
+root. That builds demonstrations: no participant codes are asked for and nothing is
+handed in. `bash activities/build.sh class` builds them for a class instead, with the
+code fields and the hand-in and research wording back. A page made on the setup page
+has the same choice as a checkbox, "Ask each student for a participant code".
+
 Always pass `--out`. It defaults to `session_capture.html` in the repository
 root, which is a different thing.
 
