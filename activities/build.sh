@@ -57,7 +57,8 @@ CODEHINT="Your participant code is the last five digits of your student number �
 # survey.json, so the root page keeps all ten.
 EXIT_IDS="alone_or_with helped_learn attitude_after comments"
 SURVEYS="$(mktemp -d)"
-trap 'rm -rf "$SURVEYS"' EXIT
+PROMPTS="$(mktemp -d)"
+trap 'rm -rf "$SURVEYS" "$PROMPTS"' EXIT
 learn_survey() {  # name, en -> path of the exit questions, helped_learn reworded
   python3 -I - "$SURVEYS/$1.json" "$2" "$EXIT_IDS" <<'EOF'
 import json, sys
@@ -78,10 +79,40 @@ EOF
   echo "$SURVEYS/$1.json"
 }
 
+# Every activity's instructions to the AI carry the same child-safety paragraph
+# (decided 29 Oct 2026; Anthropic's guidelines for organizations serving minors).
+# It lives once, in activities/prompts/_safety-paragraph.txt, and goes in as the
+# second paragraph after the marker, so the 60-word reminder stays last. The copy
+# keeps the prompt's file name, which is the prompt id recorded in the session.
+SAFETY=activities/prompts/_safety-paragraph.txt
+safe_prompt() {  # prompt path -> path of the same prompt with the safety paragraph
+  python3 -I - "$1" "$SAFETY" "$PROMPTS/$(basename "$1")" <<'EOF'
+import sys
+src, safety, out = sys.argv[1:]
+marker = "------- BEGIN PROMPT HERE -------"
+raw = open(src, encoding="utf-8").read()
+para = open(safety, encoding="utf-8").read().strip()
+assert raw.count(marker) == 1, f"{src}: expected the prompt marker exactly once"
+head, body = raw.split(marker)
+first, sep, rest = body.lstrip("\n").partition("\n\n")
+assert sep and first.startswith("You are"), f"{src}: no opening paragraph after the marker"
+open(out, "w", encoding="utf-8").write(f"{head}{marker}\n{first}\n\n{para}\n\n{rest}")
+EOF
+  echo "$PROMPTS/$(basename "$1")"
+}
+capture() {  # make_session_capture.py, with any --prompt given the safety paragraph
+  local args=()
+  while [ $# -gt 0 ]; do
+    if [ "$1" = --prompt ]; then args+=(--prompt "$(safe_prompt "$2")"); shift 2
+    else args+=("$1"); shift; fi
+  done
+  python3 make_session_capture.py "${args[@]}"
+}
+
 # Activities 5-8 are alternatives for the same slot, so they share one wording.
 CHAIN_EN="This assignment helped me understand how one rate of change can be built from two others (the chain rule)."
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/1-pendulum-approximation.txt \
   --out activities/activity-1-pendulum.html \
   --survey "$(learn_survey pendulum "This assignment helped me understand how to decide when an approximation is good enough.")" \
@@ -91,7 +122,7 @@ python3 make_session_capture.py \
   --title    "How small is small enough?" \
   --subtitle "Welcome! Today you will work out how far a pendulum can be pulled aside before the usual formula stops being good enough — and find that the answer depends entirely on what the pendulum is for. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/2-scaling-square-cube.txt \
   --out activities/activity-2-scaling.html \
   --survey "$(learn_survey scaling "This assignment helped me understand how weight and strength change when something is made bigger.")" \
@@ -101,7 +132,7 @@ python3 make_session_capture.py \
   --title    "Why can't a spider be the size of a horse?" \
   --subtitle "Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/3-speedometer-limits.txt \
   --out activities/activity-3-speedometer.html \
   --survey "$(learn_survey speedometer "This assignment helped me understand what speed at a single instant means.")" \
@@ -111,7 +142,7 @@ python3 make_session_capture.py \
   --title    "What does the speedometer mean?" \
   --subtitle "Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/5-record-chain-rule.txt \
   --out activities/activity-5-record.html \
   --survey "$(learn_survey record "$CHAIN_EN")" \
@@ -126,7 +157,7 @@ python3 make_session_capture.py \
 # 4 is already the record. They are built so the choice can be made by trying
 # them, and they carry the same codehint because they would run in the same set.
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/6-gears-chain-rule.txt \
   --out activities/activity-6-gears.html \
   --survey "$(learn_survey gears "$CHAIN_EN")" \
@@ -136,7 +167,7 @@ python3 make_session_capture.py \
   --title    "Why does the same pedalling give you different speeds?" \
   --subtitle "Welcome! Today you will work out how far one turn of the pedals takes you, and how fast that makes you go. Then you will decide what to change when the hill gets too steep to pedal at all. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/7-uphill-chain-rule.txt \
   --out activities/activity-7-uphill.html \
   --survey "$(learn_survey uphill "$CHAIN_EN")" \
@@ -146,7 +177,7 @@ python3 make_session_capture.py \
   --title    "How much colder does it get when you walk uphill?" \
   --subtitle "Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/8-clock-chain-rule.txt \
   --out activities/activity-8-clock.html \
   --survey "$(learn_survey clock "$CHAIN_EN")" \
@@ -159,7 +190,7 @@ python3 make_session_capture.py \
 # Rates in context, and maxima, minima and shape: added 29 Oct 2026 (the launch
 # angle one was dropped the same day: it needed the projectile formula). Each survey's topic question names that activity's own topic.
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/9-growth-races-lhopital.txt \
   --out activities/activity-9-growth.html \
   --survey "$(learn_survey growth "This assignment helped me understand how to compare two quantities that both grow without bound (L'Hôpital's rule).")" \
@@ -169,7 +200,7 @@ python3 make_session_capture.py \
   --title    "Which grows faster in the end?" \
   --subtitle "Welcome! Today you will race two quantities that both grow without bound and work out which one wins in the end. Their sizes will not settle it, but how fast each one grows will. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/10-sprinter-splits.txt \
   --out activities/activity-10-sprinter.html \
   --survey "$(learn_survey sprinter "This assignment helped me understand what a derivative means in context, with its units.")" \
@@ -179,7 +210,7 @@ python3 make_session_capture.py \
   --title    "When was the sprinter fastest?" \
   --subtitle "Welcome! Today you will use the times a sprinter passed each 10-metre mark to work out when they were fastest, and what a table of times can and cannot tell you about speed. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/11-streetlight-shadow.txt \
   --out activities/activity-11-shadow.html \
   --survey "$(learn_survey shadow "This assignment helped me understand how the speed of one thing can follow from the speed of another (related rates).")" \
@@ -189,7 +220,7 @@ python3 make_session_capture.py \
   --title    "How fast does your shadow move?" \
   --subtitle "Welcome! Today you will walk away from a streetlight, on paper, and work out how fast the tip of your shadow moves. The answer may surprise you. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/12-cone-cup.txt \
   --out activities/activity-12-cup.html \
   --survey "$(learn_survey cup "This assignment helped me understand how a steady rate of filling can give a changing rate of rise (related rates).")" \
@@ -199,7 +230,7 @@ python3 make_session_capture.py \
   --title    "Why does the cup fill fast, then slowly?" \
   --subtitle "Welcome! Today you will pour water into a cone-shaped cup at a steady rate and work out why the level rises quickly at first and then slows down. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/13-speed-camera-mvt.txt \
   --out activities/activity-13-camera.html \
   --survey "$(learn_survey camera "This assignment helped me understand what the Mean Value Theorem guarantees, and what it does not.")" \
@@ -209,7 +240,7 @@ python3 make_session_capture.py \
   --title    "Can a camera prove you were speeding?" \
   --subtitle "Welcome! Today you will decide whether two cameras that only time a car can prove it broke the speed limit, and what has to be true for that proof to work. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/15-still-rising.txt \
   --out activities/activity-15-rising.html \
   --survey "$(learn_survey rising "This assignment helped me understand what the first and second derivatives say about how something is changing.")" \
@@ -219,7 +250,7 @@ python3 make_session_capture.py \
   --title    "Still rising, but more slowly" \
   --subtitle "Welcome! Today you will take a sentence from the news about prices and work out exactly what it says about a function and its derivatives. $TAIL"
 
-python3 make_session_capture.py \
+capture \
   --prompt activities/prompts/16-soup-can.txt \
   --out activities/activity-16-can.html \
   --survey "$(learn_survey can "This assignment helped me understand how to set up and solve an optimization problem, and what a model leaves out.")" \
@@ -233,7 +264,7 @@ python3 make_session_capture.py \
 # Built here so its wording is written down too; --section S4 is what it has
 # always carried. Run last only because it rewrites the root setup.html, not
 # activities/setup.html.
-python3 make_session_capture.py \
+capture \
   --out index.html \
   --section S4 $CODES \
   --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file."
