@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the fifteen draft activities and the root page. Run from the repository root:
+# Rebuild the fourteen draft activities and the root page. Run from the repository root:
 #     bash activities/build.sh          demonstrations: no codes asked, no hand-in
 #     bash activities/build.sh class    a class runs them: codes asked, hand-in and
 #                                       research wording back
@@ -144,8 +144,8 @@ python3 make_session_capture.py \
   --title    "How does one swing of a pendulum become an hour?" \
   --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL"
 
-# Rates in context, and maxima, minima and shape: eight activities added on
-# 29 Oct 2026. Each survey's topic question names that activity's own topic.
+# Rates in context, and maxima, minima and shape: added 29 Oct 2026 (the launch
+# angle one was dropped the same day: it needed the projectile formula). Each survey's topic question names that activity's own topic.
 
 python3 make_session_capture.py \
   --prompt activities/prompts/9-growth-races-lhopital.txt \
@@ -198,16 +198,6 @@ python3 make_session_capture.py \
   --subtitle "Welcome! Today you will decide whether two cameras that only time a car can prove it broke the speed limit, and what has to be true for that proof to work. $TAIL"
 
 python3 make_session_capture.py \
-  --prompt activities/prompts/14-launch-angle.txt \
-  --out activities/activity-14-launch.html \
-  --survey "$(learn_survey launch "This assignment helped me understand how to find and check the largest value of a function.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
-  --codehint "$CODEHINT" \
-  --accent '#9a4a3a' \
-  --title    "What is the best angle to throw?" \
-  --subtitle "Welcome! Today you will find the angle that throws a ball furthest, and then find out why a shot-putter should not use it. $TAIL"
-
-python3 make_session_capture.py \
   --prompt activities/prompts/15-still-rising.txt \
   --out activities/activity-15-rising.html \
   --survey "$(learn_survey rising "This assignment helped me understand what the first and second derivatives say about how something is changing.")" \
@@ -237,5 +227,5 @@ python3 make_session_capture.py \
   --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file."
 
 echo
-echo "Rebuilt fifteen activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
+echo "Rebuilt fourteen activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."
