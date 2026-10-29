@@ -13,5 +13,8 @@ of the turns and wrote 7% of the words. The model produced 148 words for every
     the May corpus is full of replies like `x^3x^3x^3` and pipe-drawn tables:
     the model reaches for formatting whether or not anything renders it, and
     naming the one form that does is cheaper than forbidding the rest
-  - two personality questions, not five: in the May transcripts that test
-    consumed roughly a third of a twenty-minute activity before any mathematics
+  - no personality questions at all (29 Oct 2026). Two replaced the original five
+    after the May transcripts showed that test consuming roughly a third of a
+    twenty-minute activity before any mathematics; with three sessions a student
+    would still answer the same two three times. How the AI sounds is now set in
+    the page (--voice), recorded on every AI turn, and not part of the prompt

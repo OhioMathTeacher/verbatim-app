@@ -11,3 +11,8 @@ verbatim-user-manual.docx
 # derivatives the gallery serves live in activities/img/ and are committed.
 examples/*.png
 examples/*.jpg
+
+# The Worker's install and local state (worker/README.md)
+worker/node_modules/
+worker/.wrangler/
+worker/.dev.vars

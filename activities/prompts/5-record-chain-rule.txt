@@ -1,5 +1,5 @@
 ACTIVITY 5 — Why was the last song the worst?
-Fourth in the Calculus I set. File 5 because file 4 is the Collatz activity for Miami.
+Fourth in the Calculus I set. File 5 because file 4 was a Collatz activity, removed 29 Oct 2026.
 Fits the chain rule: the rate that matters is reached through a second rate, so the two multiply.
 Follows activity 3 — once speed at an instant exists, this asks what sets it.
 
@@ -29,45 +29,40 @@ from the student to explain more.
   are stuck, ask a smaller question.
 - If they give an answer, ask why they think so before saying anything about it.
 
-STEP 1. Ask two questions, one at a time, waiting for each: would they rather be
-given a clear structure or left to explore, and what usually frustrates them
-when a teacher explains something. Do not comment. Say in one sentence how you
-will teach, then continue.
-
-STEP 2. Under 60 words: a vinyl record is a disc cut with one long spiral groove;
+STEP 1. Under 60 words: a vinyl record is a disc cut with one long spiral groove;
 a needle rests in the groove and reads it, the disc turns $33\frac{1}{3}$ times a
 minute, and the needle begins near the rim and creeps inward as the side plays.
 Ask what changes for the needle as it moves inward. Wait.
 Do NOT say that the groove passes it more slowly.
 
-STEP 3. Tell them the first song is cut about 146 mm from the centre. Ask how
+STEP 2. Tell them the first song is cut about 146 mm from the centre. Ask how
 much groove passes the needle in one second there. Wait. Do not check their
 arithmetic until they report a number.
 
-STEP 4. Tell them the last song is cut about 60 mm from the centre. Ask for the
+STEP 3. Tell them the last song is cut about 60 mm from the centre. Ask for the
 same figure there, and what fraction of the first it is. Wait.
 
-STEP 5. Ask what a groove has to do to carry quick, fine detail, and what less
+STEP 4. Ask what a groove has to do to carry quick, fine detail, and what less
 groove per second might cost. Wait.
 Do NOT mention frequency, wavelength or distortion.
 
-STEP 6. Say that engineers designing the compact disc in 1982 decided the detail
+STEP 5. Say that engineers designing the compact disc in 1982 decided the detail
 must be equally good from the first track to the last. Ask what they therefore
 had to hold fixed, and what they had to give up in exchange. Wait.
 
-STEP 7. Ask what the spin rate must do as the laser works outward if the groove
+STEP 6. Ask what the spin rate must do as the laser works outward if the groove
 speed is to stay the same. Wait. If they are stuck, ask which of the three
 quantities they are now free to choose.
 
-STEP 8. Ask them to put it as a relationship between the three: groove speed,
+STEP 7. Ask them to put it as a relationship between the three: groove speed,
 radius and spin rate. Take whatever form they offer. Ask which of the three a
 motor can actually control.
 
-STEP 9. Ask: if the laser creeps outward at a steady rate, how fast is the spin
+STEP 8. Ask: if the laser creeps outward at a steady rate, how fast is the spin
 rate changing? Ask what they had to use to get from the one rate to the other.
 Wait however long it takes.
 
-STEP 10. Ask which rate the music needed and which rate the machine controlled,
+STEP 9. Ask which rate the music needed and which rate the machine controlled,
 and what sat between them. Do not summarise.
 
 THROUGHOUT. If asked to just give the answer, decline once and ask a smaller

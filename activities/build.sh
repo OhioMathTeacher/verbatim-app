@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the eight draft activities and the root page. Run from the repository root:
+# Rebuild the seven draft activities and the root page. Run from the repository root:
 #     bash activities/build.sh          demonstrations: no codes asked, no hand-in
 #     bash activities/build.sh class    a class runs them: codes asked, hand-in and
 #                                       research wording back
@@ -19,14 +19,20 @@ cd "$(dirname "$0")/.."
 # is uploaded to the internet", which is false -- the page calls the provider's
 # API from the student's browser. What is true is that no copy comes to us until
 # the student hands the file in, and that it is posted to no website.
-TAIL_CLASS="Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade."
+TAIL_CLASS="Type the class passcode and your codes below to begin. Your conversation is saved on this device as you go, and the words you send go through the class's server to Claude, Anthropic's AI, to get replies, and nowhere else. The server keeps no copy of them. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade."
 # What the pages say while they are demonstrations: no codes to enter, nothing
 # handed in, no research use.
-TAIL="Set up an AI below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, you can download the conversation as a file."
+TAIL="Type the class passcode below to begin. Your conversation is saved on this device as you go, and the words you send go through the class's server to Claude, Anthropic's AI, to get replies, and nowhere else. The server keeps no copy of them. When you have finished, you can download the conversation as a file."
 
 # The one switch. Demo (the default) builds with --no-codes and the demo TAIL;
 # "class" asks for codes again and uses the TAIL_CLASS wording.
 MODE="${1:-demo}"
+
+# The eight activities call Claude through the class's Worker (worker/README.md):
+# students type the class passcode and never see a key, and AI Setup is in the
+# page but not shown (decided 29 Oct 2026). Each links back to the activities
+# page. Set VERBATIM_CLASS_AI to try a build against a Worker on 127.0.0.1.
+CLASS_AI="${VERBATIM_CLASS_AI:-https://verbatim-class.ohiomathteacher.workers.dev}"
 case "$MODE" in
   demo)  CODES="--no-codes" ;;
   class) CODES=""; TAIL="$TAIL_CLASS" ;;
@@ -35,13 +41,12 @@ esac
 
 # The seven calculus pages key everything to the last five digits of the student
 # number (decided 15 Sep 2026): pre-survey, the activities, post-survey all
-# carry the same digits, and only Zheng can resolve them. The Collatz page keeps
-# the generator's default hint.
+# carry the same digits, and only Zheng can resolve them.
 CODEHINT="Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page."
 
 # The one content item in survey.json, helped_learn, asks whether the activity
 # "helped me learn calculus concepts better" -- wrong for the spider (no
-# calculus) and for Collatz, and too vague for the rest. Each page gets
+# calculus), and too vague for the rest. Each page gets
 # survey.json with that item reworded to name what its activity is about;
 # every other question stays as written. The id is kept, so the answers still
 # line up across pages.
@@ -68,7 +73,7 @@ python3 make_session_capture.py \
   --prompt activities/prompts/1-pendulum-approximation.txt \
   --out activities/activity-1-pendulum.html \
   --survey "$(learn_survey pendulum "This assignment helped me understand how to decide when an approximation is good enough.")" \
-  $CODES \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#9a5734' \
   --title    "How small is small enough?" \
@@ -78,7 +83,7 @@ python3 make_session_capture.py \
   --prompt activities/prompts/2-scaling-square-cube.txt \
   --out activities/activity-2-scaling.html \
   --survey "$(learn_survey scaling "This assignment helped me understand how weight and strength change when something is made bigger.")" \
-  $CODES \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7a5c1f' \
   --title    "Why can't a spider be the size of a horse?" \
@@ -88,7 +93,7 @@ python3 make_session_capture.py \
   --prompt activities/prompts/3-speedometer-limits.txt \
   --out activities/activity-3-speedometer.html \
   --survey "$(learn_survey speedometer "This assignment helped me understand what speed at a single instant means.")" \
-  $CODES \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3f5f7a' \
   --title    "What does the speedometer mean?" \
@@ -98,7 +103,7 @@ python3 make_session_capture.py \
   --prompt activities/prompts/5-record-chain-rule.txt \
   --out activities/activity-5-record.html \
   --survey "$(learn_survey record "$CHAIN_EN")" \
-  $CODES \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6b4a6e' \
   --title    "Why was the last song the worst?" \
@@ -113,7 +118,7 @@ python3 make_session_capture.py \
   --prompt activities/prompts/6-gears-chain-rule.txt \
   --out activities/activity-6-gears.html \
   --survey "$(learn_survey gears "$CHAIN_EN")" \
-  $CODES \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6f6a' \
   --title    "Why does the same pedalling give you different speeds?" \
@@ -123,7 +128,7 @@ python3 make_session_capture.py \
   --prompt activities/prompts/7-uphill-chain-rule.txt \
   --out activities/activity-7-uphill.html \
   --survey "$(learn_survey uphill "$CHAIN_EN")" \
-  $CODES \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6a7a2f' \
   --title    "How much colder does it get when you walk uphill?" \
@@ -133,26 +138,11 @@ python3 make_session_capture.py \
   --prompt activities/prompts/8-clock-chain-rule.txt \
   --out activities/activity-8-clock.html \
   --survey "$(learn_survey clock "$CHAIN_EN")" \
-  $CODES \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a3f52' \
   --title    "How does one swing of a pendulum become an hour?" \
   --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL"
-
-# The Collatz activity keeps its own welcome text rather than $TAIL, and bakes
-# the section in: it was written for one class of Todd's rather than for
-# Mathematical Modeling 1, and its prompt runs the full five-question
-# personality test instead of the two-question, 60-word-capped version in
-# _RULES.txt -- see its entry in index.html.
-python3 make_session_capture.py \
-  --prompt activities/prompts/4-collatz-conjecture.txt \
-  --out activities/activity-4-collatz.html \
-  --survey "$(learn_survey collatz "This assignment helped me understand the difference between checking many cases and proving a conjecture.")" \
-  $CODES \
-  --accent '#4a7a55' \
-  --section S4 \
-  --title    "Does every number come home?" \
-  --subtitle "Welcome! In today's class, you'll have the opportunity to explore the Collatz Conjecture with genAI. I've set up this app to collect your work. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. You'll download your conversation as a JSON file and submit it to me for class credit."
 
 # The Taylor series page at the root of the site, the one linked as "Try it".
 # Built here so its wording is written down too; --section S4 is what it has
@@ -164,5 +154,5 @@ python3 make_session_capture.py \
   --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file."
 
 echo
-echo "Rebuilt eight activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
+echo "Rebuilt seven activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."

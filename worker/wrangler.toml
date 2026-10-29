@@ -1,0 +1,25 @@
+# Verbatim class AI — see README.md beside this file.
+# Secrets (set once with `npx wrangler secret put NAME`, never in this file):
+#   ANTHROPIC_API_KEY   a key made for Verbatim alone, with its own monthly limit in Console
+#   PASSCODE            the phrase the teacher gives the class
+name = "verbatim-class"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+
+# No request logs. The Worker never writes a message anywhere; this keeps Cloudflare
+# from doing it either.
+[observability]
+enabled = false
+
+[vars]
+# Must match CLASS_MODEL in make_session_capture.py: the page refuses a reply from any
+# other model, because the session file records which model answered.
+MODEL = "claude-opus-5-5"
+SESSION_CAP = "80"
+DAILY_CAP = "1500"
+ALLOWED_ORIGINS = "https://ohiomathteacher.github.io,http://localhost:8000,http://127.0.0.1:8000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "verbatim-class-counts"
+database_id = "c5b225e6-bdad-44ec-9a7c-0ecc3a5f130e"

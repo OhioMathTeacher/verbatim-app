@@ -445,6 +445,10 @@ async function compose(){
     .split("__SECTION_JSON__").join(JSON.stringify($("#section").value.trim().toUpperCase()))
     .split("__SURVEY_JSON__").join(JSON.stringify(survey))
     .split("__DEMO_JSON__").join("false")
+    // A page made here sets up its own AI and has no list to go back to.
+    .split("__CLASS_AI_JSON__").join("null")
+    .split("__HOME_JSON__").join("null")
+    .split("__VOICE_JSON__").join("false")
     .split("__CODES_JSON__").join($("#codes").checked ? "true" : "false")
     // Filled from the published defaults. Before this the token went through
     // unreplaced, and every page built here stopped on a ReferenceError at load.

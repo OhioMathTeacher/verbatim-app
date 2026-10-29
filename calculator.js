@@ -222,7 +222,9 @@ const Calc = (() => {
    so a key lands in the line just above the thumb that pressed it.
 
    Everything entered is recorded, including what did not work, and deleting a
-   line leaves a tombstone. The turns are the conversation; tool use sits beside
+   line leaves a tombstone in the session file. The panel shows nothing where it
+   was: the room on screen is worth more than the reminder, and the record keeps
+   the deletion either way. The turns are the conversation; tool use sits beside
    them so the turn counts and the words-per-speaker ratio stay true. */
 const Calculator = (() => {
   let host = null, tr = k => k, onUse = () => {}, onDrop = () => {};
@@ -487,9 +489,8 @@ const Calculator = (() => {
   const toBottom = sel => { const f = $(sel); f.scrollTop = f.scrollHeight; };
 
   function tape(){
-    $("#cal-cfeed").innerHTML = lists.calc.map(e => e.gone
-      ? `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`
-      : `<div class="cal-h${e.err ? " err" : ""}">${binFor(e.id)}`
+    $("#cal-cfeed").innerHTML = live("calc").map(e =>
+        `<div class="cal-h${e.err ? " err" : ""}">${binFor(e.id)}`
         + `<div class="cal-he">${esc(e.expr)}</div>`
         + `<div class="cal-hr">${esc(e.err ? e.err : show(e.result))}</div></div>`).join("");
     toBottom("#cal-cfeed");
@@ -497,13 +498,10 @@ const Calculator = (() => {
 
   const swatch = i => `<span class="cal-sw" style="background:var(${PENS[i % PENS.length]})"></span>`;
 
-  /* Each entry gets its own plot, one after another. A plot never stretches to
-     fill whatever height is going: it keeps a fixed shape, and the feed scrolls,
-     because a graph two thousand pixels tall and three hundred wide tells you
-     nothing about a function. */
+  /* Each entry gets its own plot, one after another. How tall depends on how many
+     there are: see sizePlots(). */
   function graphFeed(){
-    $("#cal-gfeed").innerHTML = lists.graph.map(e => {
-      if(e.gone) return `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`;
+    $("#cal-gfeed").innerHTML = live("graph").map(e => {
       const head = `<div class="cal-cardhead">`
         + e.parts.map((q, i) => `<span class="cal-lg">${swatch(i)}<code>${esc(q)}</code></span>`).join("")
         + binFor(e.id) + `</div>`;
@@ -514,8 +512,44 @@ const Calculator = (() => {
     toBottom("#cal-gfeed");
   }
 
+  /* How tall the plots are depends on how many there are (Todd, 29 Oct 2026).
+     One gets the room, up to square: never taller than it is wide, because a
+     graph two thousand pixels tall and three hundred wide tells you nothing about
+     a function. Two share the room, so both can be read against each other
+     without scrolling. Three or more keep the stylesheet's fixed strip, and the
+     feed scrolls. On a short screen one or two are shrunk to fit, since seeing
+     both is the point, but never below 90 pixels. */
+  function sizePlots(){
+    const feed = $("#cal-gfeed"), cvs = [...feed.querySelectorAll("canvas[data-plot]")];
+    for(const cv of cvs){ cv.style.height = ""; cv.style.maxHeight = ""; cv.style.aspectRatio = ""; }
+    if(!feed.clientHeight || !cvs.length || cvs.length > 2) return;
+    const cs = getComputedStyle(feed), kids = [...feed.children];
+    let other = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)
+              + (parseFloat(cs.rowGap) || 0) * Math.max(0, kids.length - 1);
+    for(const k of kids){
+      const c = k.querySelector("canvas[data-plot]");
+      other += k.getBoundingClientRect().height - (c ? c.getBoundingClientRect().height : 0);
+    }
+    const r = cvs[0].getBoundingClientRect();
+    const h = Math.max(90, Math.floor(Math.min((feed.clientHeight - other) / cvs.length, r.width)));
+    for(const cv of cvs){ cv.style.aspectRatio = "auto"; cv.style.maxHeight = "none"; cv.style.height = h + "px"; }
+  }
+
+  /* One unit up is one unit across. The x-range is the student's (zoom, drag,
+     Reset); the y-range is centred where it was and given the span the plot's own
+     shape calls for. Without this, a plot made taller stretches every slope, and
+     y = 2x looks steeper in a big graph than in a small one. Every plot in the
+     feed is the same size, so the first one speaks for all of them. */
+  function fitY(){
+    const c = $("#cal-gfeed canvas[data-plot]"); if(!c) return;
+    const r = c.getBoundingClientRect(); if(!r.width || !r.height) return;
+    const yc = (win.y0 + win.y1) / 2, half = (win.x1 - win.x0) * r.height / r.width / 2;
+    win.y0 = yc - half; win.y1 = yc + half;
+  }
+
   function plots(){
     if(!built) return;
+    sizePlots(); fitY();
     $("#cal-rng").textContent = `x [${show(win.x0)}, ${show(win.x1)}]`;
     host.querySelectorAll("#cal-gfeed canvas[data-plot]").forEach(cv => {
       const e = lists.graph.find(x => x.id === parseInt(cv.dataset.plot, 10));
@@ -585,8 +619,7 @@ const Calculator = (() => {
 
   function tableFeed(){
     const from = parseFloat($("#cal-from").value), by = parseFloat($("#cal-step").value);
-    $("#cal-tfeed").innerHTML = lists.table.map(e => {
-      if(e.gone) return `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`;
+    $("#cal-tfeed").innerHTML = live("table").map(e => {
       const head = `<div class="cal-cardhead">`
         + e.parts.map((q, i) => `<span class="cal-lg"><span class="cal-sw plain">f${i + 1}</span><code>${esc(q)}</code></span>`).join("")
         + binFor(e.id) + `</div>`;

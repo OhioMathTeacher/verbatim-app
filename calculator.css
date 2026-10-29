@@ -58,8 +58,6 @@
 .cal-card { position: relative; border: 1px solid var(--rule); border-radius: 11px;
   background: var(--paper); padding: 7px 8px 8px; }
 .cal-card.err { border-style: dashed; }
-.cal-card.gone { padding: 7px 10px; border-style: dashed; background: transparent;
-  color: var(--muted); font: italic 12px var(--sans); text-align: center; }
 .cal-cardhead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 0 22px 6px 2px; min-width: 0; }
 .cal-lg { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
@@ -69,9 +67,10 @@
 .cal-sw.plain { background: none; width: auto; font: 11px var(--mono); color: var(--muted); }
 .cal-err { color: var(--warn); font: 12.5px var(--sans); margin: 0; padding: 2px 2px 3px; }
 
-/* A plot keeps its shape. It does not stretch to fill whatever height is going:
-   a graph two thousand pixels tall and three hundred wide says nothing about a
-   function, and on a tall screen that is exactly what filling gives you. */
+/* The fixed strip every plot starts as, and keeps from the third one on. One or
+   two plots are made taller than this, up to square, by sizePlots() in
+   calculator.js; it never fills the room beyond that, because a graph two
+   thousand pixels tall and three hundred wide says nothing about a function. */
 .cal-card canvas { width: 100%; aspect-ratio: 2 / 1; max-height: 168px; display: block;
   border-radius: 7px; background: var(--card); touch-action: none; cursor: crosshair; }
 

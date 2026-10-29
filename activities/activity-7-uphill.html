@@ -53,6 +53,19 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   border:1px solid var(--rule)}
 h1{font-family:var(--serif);font-size:27px;font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.25}
 .mastbtns{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+/* Back to the page that lists the activities, when there is one (--home-url). */
+.homelink{display:inline-block;margin:0 0 14px;font-size:13.5px;color:var(--accent);text-decoration:none}
+.homelink:hover{text-decoration:underline}
+/* "How your AI teacher sounds": one row per setting, one card per choice. */
+.vrow{margin:0 0 16px}
+.vrow h3{font-size:14px;font-weight:700;margin:0 0 8px}
+.vopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.vopt{text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--rule);
+  border-radius:10px;padding:11px 14px;box-shadow:none;font-weight:400;line-height:1.35}
+.vopt:hover{transform:none;border-color:var(--accent)}
+.vopt b{display:block;font-size:15px}
+.vopt span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.vopt.on{border-color:var(--accent);background:var(--stu-bg);box-shadow:0 0 0 1px var(--accent)}
 .mast .tag{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
   margin-left:auto;white-space:nowrap;padding-bottom:3px}
 .sub{color:var(--muted);font-size:15px;margin:-18px 0 30px}
@@ -405,8 +418,6 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 .cal-card { position: relative; border: 1px solid var(--rule); border-radius: 11px;
   background: var(--paper); padding: 7px 8px 8px; }
 .cal-card.err { border-style: dashed; }
-.cal-card.gone { padding: 7px 10px; border-style: dashed; background: transparent;
-  color: var(--muted); font: italic 12px var(--sans); text-align: center; }
 .cal-cardhead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 0 22px 6px 2px; min-width: 0; }
 .cal-lg { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
@@ -416,9 +427,10 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 .cal-sw.plain { background: none; width: auto; font: 11px var(--mono); color: var(--muted); }
 .cal-err { color: var(--warn); font: 12.5px var(--sans); margin: 0; padding: 2px 2px 3px; }
 
-/* A plot keeps its shape. It does not stretch to fill whatever height is going:
-   a graph two thousand pixels tall and three hundred wide says nothing about a
-   function, and on a tall screen that is exactly what filling gives you. */
+/* The fixed strip every plot starts as, and keeps from the third one on. One or
+   two plots are made taller than this, up to square, by sizePlots() in
+   calculator.js; it never fills the room beyond that, because a graph two
+   thousand pixels tall and three hundred wide says nothing about a function. */
 .cal-card canvas { width: 100%; aspect-ratio: 2 / 1; max-height: 168px; display: block;
   border-radius: 7px; background: var(--card); touch-action: none; cursor: crosshair; }
 
@@ -846,6 +858,7 @@ try{
 <div id="demobar" class="demo hide">DEMO MODE — replies are canned. Nothing is sent anywhere.</div>
 <div class="wrap">
 
+<a class="homelink hide" id="homelink" href="#"></a>
 <div class="mast">
   <img class="avatar hide" id="avatar" alt="">
   <h1 data-i18n="title">How much colder does it get when you walk uphill?</h1>
@@ -857,7 +870,7 @@ try{
 
 <!-- 1 · who -->
 <section id="s-setup">
-  <p class="sub" data-i18n="subtitle">Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. Set up an AI below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, you can download the conversation as a file.</p>
+  <p class="sub" data-i18n="subtitle">Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. Type the class passcode below to begin. Your conversation is saved on this device as you go, and the words you send go through the class's server to Claude, Anthropic's AI, to get replies, and nowhere else. The server keeps no copy of them. When you have finished, you can download the conversation as a file.</p>
   <div class="card">
     <h2 data-i18n="before">Before you start</h2>
     <p class="hint" style="margin:0 0 22px" data-i18n="codehint" id="codehint">Your instructor gave you a participant code.</p>
@@ -870,7 +883,7 @@ try{
       <div id="grpwrap"><label for="grp" data-i18n="group">Group</label><input id="grp" autocomplete="off" spellcheck="false" data-i18n-ph="grpph" placeholder="Enter group here (e.g., G3)"></div>
       <div id="secwrap"><label for="sec" data-i18n="section">Section</label><input id="sec" autocomplete="off" spellcheck="false" data-i18n-ph="secph" placeholder="Enter section here (e.g., S4)"></div>
     </div>
-    <div class="field">
+    <div class="field" id="aiwrap">
       <label data-i18n="yourai">Your AI</label>
       <div class="ai-status" id="ai-status">
         <span class="dot"></span>
@@ -878,6 +891,14 @@ try{
         <button type="button" class="ghost" id="ai-open">Set up</button>
       </div>
       <p class="hint" style="margin-top:10px" data-i18n="aihint">Use your own API key, or the one your instructor gives you.</p>
+    </div>
+    <div class="field hide" id="passwrap">
+      <label for="pass" data-i18n="passlabel">Class passcode</label>
+      <input id="pass" autocomplete="off" spellcheck="false" data-i18n-ph="passph" placeholder="Your teacher will tell you">
+      <p class="hint" style="margin-top:10px" data-i18n="passhint">Your teacher will give you this.</p>
+    </div>
+    <div class="field hide" id="voicewrap">
+      <button type="button" class="ghost" id="voice-open" data-i18n="voiceopen">How your AI teacher sounds</button>
     </div>
 
     <p class="err" id="setup-err"></p>
@@ -897,6 +918,7 @@ try{
     <span class="pill" id="p-model"></span>
     <span class="pill" id="p-turns"></span>
     <span class="sp"></span>
+    <button id="voice-chat" class="ghost hide" style="padding:7px 16px;font-size:14px" data-i18n="voicebtn">How it sounds</button>
     <button id="back-start" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="backstart">Back to the start</button>
     <button id="restart" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="restart">Start over</button>
     <button id="finish" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="finish">Finish &amp; export</button>
@@ -937,7 +959,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
-<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · c59f1ec5</p>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · 15fb659a</p>
 
 </div>
 
@@ -978,6 +1000,20 @@ try{
       <button type="button" class="ghost danger" id="ai-forget" data-i18n="forgetkeys">Forget all keys</button>
       <button type="button" class="ghost" id="ai-test" data-i18n="testconn">Test connection</button>
       <button type="button" id="ai-done" data-i18n="done">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="ai-modal-overlay" id="voice-overlay">
+  <div class="ai-modal" style="width:680px">
+    <button type="button" class="ai-x" id="voice-x" aria-label="Close">&times;</button>
+    <h2 data-i18n="voiceh">How your AI teacher sounds</h2>
+    <p class="ai-modal-sub" data-i18n="voicesub">Change how your AI teacher talks to you.</p>
+    <div id="voice-rows"></div>
+    <p class="hint" style="margin:4px 0 0" data-i18n="voicenote">These change how it talks, not the activity.</p>
+    <div class="ai-modal-actions">
+      <button type="button" class="ghost" id="voice-usual" data-i18n="voiceusual">Back to the usual</button>
+      <button type="button" id="voice-done" data-i18n="voicedone">Done</button>
     </div>
   </div>
 </div>
@@ -1418,7 +1454,9 @@ const Calc = (() => {
    so a key lands in the line just above the thumb that pressed it.
 
    Everything entered is recorded, including what did not work, and deleting a
-   line leaves a tombstone. The turns are the conversation; tool use sits beside
+   line leaves a tombstone in the session file. The panel shows nothing where it
+   was: the room on screen is worth more than the reminder, and the record keeps
+   the deletion either way. The turns are the conversation; tool use sits beside
    them so the turn counts and the words-per-speaker ratio stay true. */
 const Calculator = (() => {
   let host = null, tr = k => k, onUse = () => {}, onDrop = () => {};
@@ -1683,9 +1721,8 @@ const Calculator = (() => {
   const toBottom = sel => { const f = $(sel); f.scrollTop = f.scrollHeight; };
 
   function tape(){
-    $("#cal-cfeed").innerHTML = lists.calc.map(e => e.gone
-      ? `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`
-      : `<div class="cal-h${e.err ? " err" : ""}">${binFor(e.id)}`
+    $("#cal-cfeed").innerHTML = live("calc").map(e =>
+        `<div class="cal-h${e.err ? " err" : ""}">${binFor(e.id)}`
         + `<div class="cal-he">${esc(e.expr)}</div>`
         + `<div class="cal-hr">${esc(e.err ? e.err : show(e.result))}</div></div>`).join("");
     toBottom("#cal-cfeed");
@@ -1693,13 +1730,10 @@ const Calculator = (() => {
 
   const swatch = i => `<span class="cal-sw" style="background:var(${PENS[i % PENS.length]})"></span>`;
 
-  /* Each entry gets its own plot, one after another. A plot never stretches to
-     fill whatever height is going: it keeps a fixed shape, and the feed scrolls,
-     because a graph two thousand pixels tall and three hundred wide tells you
-     nothing about a function. */
+  /* Each entry gets its own plot, one after another. How tall depends on how many
+     there are: see sizePlots(). */
   function graphFeed(){
-    $("#cal-gfeed").innerHTML = lists.graph.map(e => {
-      if(e.gone) return `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`;
+    $("#cal-gfeed").innerHTML = live("graph").map(e => {
       const head = `<div class="cal-cardhead">`
         + e.parts.map((q, i) => `<span class="cal-lg">${swatch(i)}<code>${esc(q)}</code></span>`).join("")
         + binFor(e.id) + `</div>`;
@@ -1710,8 +1744,44 @@ const Calculator = (() => {
     toBottom("#cal-gfeed");
   }
 
+  /* How tall the plots are depends on how many there are (Todd, 29 Oct 2026).
+     One gets the room, up to square: never taller than it is wide, because a
+     graph two thousand pixels tall and three hundred wide tells you nothing about
+     a function. Two share the room, so both can be read against each other
+     without scrolling. Three or more keep the stylesheet's fixed strip, and the
+     feed scrolls. On a short screen one or two are shrunk to fit, since seeing
+     both is the point, but never below 90 pixels. */
+  function sizePlots(){
+    const feed = $("#cal-gfeed"), cvs = [...feed.querySelectorAll("canvas[data-plot]")];
+    for(const cv of cvs){ cv.style.height = ""; cv.style.maxHeight = ""; cv.style.aspectRatio = ""; }
+    if(!feed.clientHeight || !cvs.length || cvs.length > 2) return;
+    const cs = getComputedStyle(feed), kids = [...feed.children];
+    let other = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)
+              + (parseFloat(cs.rowGap) || 0) * Math.max(0, kids.length - 1);
+    for(const k of kids){
+      const c = k.querySelector("canvas[data-plot]");
+      other += k.getBoundingClientRect().height - (c ? c.getBoundingClientRect().height : 0);
+    }
+    const r = cvs[0].getBoundingClientRect();
+    const h = Math.max(90, Math.floor(Math.min((feed.clientHeight - other) / cvs.length, r.width)));
+    for(const cv of cvs){ cv.style.aspectRatio = "auto"; cv.style.maxHeight = "none"; cv.style.height = h + "px"; }
+  }
+
+  /* One unit up is one unit across. The x-range is the student's (zoom, drag,
+     Reset); the y-range is centred where it was and given the span the plot's own
+     shape calls for. Without this, a plot made taller stretches every slope, and
+     y = 2x looks steeper in a big graph than in a small one. Every plot in the
+     feed is the same size, so the first one speaks for all of them. */
+  function fitY(){
+    const c = $("#cal-gfeed canvas[data-plot]"); if(!c) return;
+    const r = c.getBoundingClientRect(); if(!r.width || !r.height) return;
+    const yc = (win.y0 + win.y1) / 2, half = (win.x1 - win.x0) * r.height / r.width / 2;
+    win.y0 = yc - half; win.y1 = yc + half;
+  }
+
   function plots(){
     if(!built) return;
+    sizePlots(); fitY();
     $("#cal-rng").textContent = `x [${show(win.x0)}, ${show(win.x1)}]`;
     host.querySelectorAll("#cal-gfeed canvas[data-plot]").forEach(cv => {
       const e = lists.graph.find(x => x.id === parseInt(cv.dataset.plot, 10));
@@ -1781,8 +1851,7 @@ const Calculator = (() => {
 
   function tableFeed(){
     const from = parseFloat($("#cal-from").value), by = parseFloat($("#cal-step").value);
-    $("#cal-tfeed").innerHTML = lists.table.map(e => {
-      if(e.gone) return `<div class="cal-card gone">${esc(tr("calcgone"))}</div>`;
+    $("#cal-tfeed").innerHTML = live("table").map(e => {
       const head = `<div class="cal-cardhead">`
         + e.parts.map((q, i) => `<span class="cal-lg"><span class="cal-sw plain">f${i + 1}</span><code>${esc(q)}</code></span>`).join("")
         + binFor(e.id) + `</div>`;
@@ -1844,8 +1913,8 @@ const Calculator = (() => {
 })();</script>
 
 <script>
-const PROVIDERS = [{"id": "gemini", "label": "Gemini", "model": "gemini-2.5-flash", "blurb": "Free tier via Google — use a personal Gmail account.", "recommended": true, "tier": "free", "api": "gemini", "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", "key_url": "https://aistudio.google.com/apikey", "prefix": "AIza", "placeholder": "AIza…"}, {"id": "groq", "label": "Groq", "model": "openai/gpt-oss-120b", "blurb": "Free tier. Any email — no Google account needed.", "recommended": false, "tier": "free", "api": "openai", "url": "https://api.groq.com/openai/v1/chat/completions", "key_url": "https://console.groq.com/keys", "prefix": "gsk_", "placeholder": "gsk_…"}, {"id": "gemini-paid", "label": "Gemini", "model": "gemini-2.5-flash", "blurb": "Google's Gemini. A key with billing turned on.", "recommended": false, "tier": "paid", "api": "gemini", "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", "key_url": "https://aistudio.google.com/apikey", "prefix": "AIza", "placeholder": "AIza…"}, {"id": "anthropic", "label": "Claude", "model": "claude-opus-5-5", "blurb": "Anthropic's Claude. Your own key.", "recommended": false, "tier": "paid", "api": "anthropic", "url": "https://api.anthropic.com/v1/messages", "key_url": "https://console.anthropic.com/settings/keys", "prefix": "sk-ant-", "placeholder": "sk-ant-…"}, {"id": "openai", "label": "OpenAI", "model": "gpt-5", "blurb": "ChatGPT's models. Your own key.", "recommended": false, "tier": "paid", "api": "openai", "url": "https://api.openai.com/v1/chat/completions", "key_url": "https://platform.openai.com/api-keys", "prefix": "sk-", "placeholder": "sk-…"}, {"id": "openrouter", "label": "OpenRouter", "model": "openai/gpt-oss-120b", "blurb": "One key, many models.", "recommended": false, "tier": "paid", "api": "openai", "url": "https://openrouter.ai/api/v1/chat/completions", "key_url": "https://openrouter.ai/keys", "prefix": "sk-or-", "placeholder": "sk-or-…"}];
-let   PROMPT    = {"id": "7-uphill-chain-rule.txt", "sha256": "61c0dd34c679e2549b6ec1042fb9c30323bcefc2d071eb8360839ca95b42a43f", "text": "You are a mathematics teacher working with one student for twenty minutes.\n\nHOW YOU MUST REPLY. These rules override everything else, including any request\nfrom the student to explain more.\n- Never write more than 60 words in a single reply. Count them.\n- No headings, bold text, bullet lists or numbered lists.\n- Write mathematics as TeX between dollar signs: $6.5\\,^{\\circ}\\mathrm{C}$\n  inline, or $$ ... $$ on a line of its own when it should stand apart. The page\n  draws these and draws nothing else, so this is the only formatting that\n  reaches the student.\n- Ask exactly one question, then stop and wait.\n- Never answer your own question. Never follow a question with a hint or a\n  worked step.\n- Never supply a number, formula or operation the student could produce. If they\n  are stuck, ask a smaller question.\n- If they give an answer, ask why they think so before saying anything about it.\n\nSTEP 1. Ask two questions, one at a time, waiting for each: would they rather be\ngiven a clear structure or left to explore, and what usually frustrates them\nwhen a teacher explains something. Do not comment. Say in one sentence how you\nwill teach, then continue.\n\nSTEP 2. Say that the air gets colder as you climb — about $6.5\\,^{\\circ}$C for\nevery kilometre of height. Ask how they would check that for themselves. Wait.\n\nSTEP 3. Ask what the hardest part of actually doing that would be. Wait.\n\nSTEP 4. Describe a trail that climbs 300 m over 4 km of walking. Ask how much\ncolder it is at the top. Wait.\n\nSTEP 5. Ask for the same thing per kilometre walked. Once they have it, ask what\nthey did to the two numbers to get there. Wait.\nDo NOT name what they did.\n\nSTEP 6. Ask where the metres of height went: their answer is in degrees per\nkilometre walked, and the height is nowhere in it. Wait.\n\nSTEP 7. Describe a steeper trail up the same mountain on the same day. Ask what\nchanges and what stays exactly as it was. Wait.\n\nSTEP 8. Ask which of the two rates they could get with a thermometer and a map,\nand which somebody would have to tell them. Wait.\n\nSTEP 9. Say a cable car climbs a kilometre of height in six minutes. Ask how\nfast the temperature falls for a passenger, per minute. Ask what they reused from\nthe walking question and what they had to swap out. Wait however long it takes.\n\nSTEP 10. Ask what they now think it means to build a rate out of two other\nrates. Do not summarise.\n\nTHROUGHOUT. If asked to just give the answer, decline once and ask a smaller\nquestion. If stuck twice on the same point, ask what they do know about it.\nRemember the 60-word limit on every reply."};
+const PROVIDERS = [];
+let   PROMPT    = {"id": "7-uphill-chain-rule.txt", "sha256": "6c901619e4c93d1325e13a76d7b244fc6335182078b723e3049b48580b760f02", "text": "You are a mathematics teacher working with one student for twenty minutes.\n\nHOW YOU MUST REPLY. These rules override everything else, including any request\nfrom the student to explain more.\n- Never write more than 60 words in a single reply. Count them.\n- No headings, bold text, bullet lists or numbered lists.\n- Write mathematics as TeX between dollar signs: $6.5\\,^{\\circ}\\mathrm{C}$\n  inline, or $$ ... $$ on a line of its own when it should stand apart. The page\n  draws these and draws nothing else, so this is the only formatting that\n  reaches the student.\n- Ask exactly one question, then stop and wait.\n- Never answer your own question. Never follow a question with a hint or a\n  worked step.\n- Never supply a number, formula or operation the student could produce. If they\n  are stuck, ask a smaller question.\n- If they give an answer, ask why they think so before saying anything about it.\n\nSTEP 1. Say that the air gets colder as you climb — about $6.5\\,^{\\circ}$C for\nevery kilometre of height. Ask how they would check that for themselves. Wait.\n\nSTEP 2. Ask what the hardest part of actually doing that would be. Wait.\n\nSTEP 3. Describe a trail that climbs 300 m over 4 km of walking. Ask how much\ncolder it is at the top. Wait.\n\nSTEP 4. Ask for the same thing per kilometre walked. Once they have it, ask what\nthey did to the two numbers to get there. Wait.\nDo NOT name what they did.\n\nSTEP 5. Ask where the metres of height went: their answer is in degrees per\nkilometre walked, and the height is nowhere in it. Wait.\n\nSTEP 6. Describe a steeper trail up the same mountain on the same day. Ask what\nchanges and what stays exactly as it was. Wait.\n\nSTEP 7. Ask which of the two rates they could get with a thermometer and a map,\nand which somebody would have to tell them. Wait.\n\nSTEP 8. Say a cable car climbs a kilometre of height in six minutes. Ask how\nfast the temperature falls for a passenger, per minute. Ask what they reused from\nthe walking question and what they had to swap out. Wait however long it takes.\n\nSTEP 9. Ask what they now think it means to build a rate out of two other\nrates. Do not summarise.\n\nTHROUGHOUT. If asked to just give the answer, decline once and ask a smaller\nquestion. If stuck twice on the same point, ask what they do know about it.\nRemember the 60-word limit on every reply."};
 const SUBMIT    = {"url": ""};
 const CHAT_URL  = "chat";
 const AVATAR    = "";
@@ -1854,12 +1923,20 @@ const CODES     = false;
 let   SURVEY    = [{"id": "llms_used", "type": "multi", "en": "Which large language models (LLMs) have you used before?", "options": [{"v": "chatgpt", "en": "ChatGPT (OpenAI)"}, {"v": "deepseek", "en": "DeepSeek"}, {"v": "claude", "en": "Claude.ai"}, {"v": "other", "en": "Other (please specify)", "specify": true}, {"v": "none", "en": "I have not used any LLMs before this course"}]}, {"id": "how_long", "type": "single", "en": "How long have you been using LLMs?", "options": [{"v": "lt1m", "en": "Less than 1 month"}, {"v": "1_6m", "en": "1–6 months"}, {"v": "7_12m", "en": "7–12 months"}, {"v": "gt1y", "en": "Over 1 year"}, {"v": "none", "en": "I have not used LLMs before this course"}]}, {"id": "how_often", "type": "single", "en": "How often do you use LLMs?", "options": [{"v": "never", "en": "Never"}, {"v": "lt_weekly", "en": "Less than once a week"}, {"v": "weekly", "en": "Once a week"}, {"v": "several", "en": "Several times per week"}, {"v": "daily", "en": "Daily"}]}, {"id": "purposes", "type": "multi", "en": "For what purposes do you typically use LLMs?", "options": [{"v": "faster", "en": "To complete homework or assignments more quickly"}, {"v": "check", "en": "To check or correct my own work"}, {"v": "learn", "en": "To help me learn or understand new topics"}, {"v": "search", "en": "To search for information"}, {"v": "fun", "en": "For entertainment or curiosity"}, {"v": "other", "en": "Other (please specify)", "specify": true}]}, {"id": "other_courses", "type": "single", "en": "Have you used LLMs (like ChatGPT or DeepSeek) in other courses at your school?", "options": [{"v": "yes_freq", "en": "Yes, frequently"}, {"v": "yes_some", "en": "Yes, sometimes"}, {"v": "only_this", "en": "No, only for this course"}, {"v": "never", "en": "No, never"}]}, {"id": "professor_views", "type": "single", "en": "How do your other teachers view the use of AI tools like ChatGPT?", "options": [{"v": "encourage", "en": "They encourage it"}, {"v": "allow", "en": "They allow it, but do not encourage"}, {"v": "discourage", "en": "They discourage it"}, {"v": "unknown", "en": "I don't know"}, {"v": "na", "en": "Not applicable"}]}, {"id": "alone_or_with", "type": "single", "en": "Did you work alone or with others for this assignment?", "options": [{"v": "alone", "en": "Alone"}, {"v": "classmates", "en": "With classmates (group discussion)"}, {"v": "other", "en": "Other (please specify)", "specify": true}]}, {"id": "helped_learn", "type": "likert", "en": "This assignment helped me understand how one rate of change can be built from two others (the chain rule).", "options": [{"v": "1", "en": "Strongly disagree"}, {"v": "2", "en": "Disagree"}, {"v": "3", "en": "Neutral"}, {"v": "4", "en": "Agree"}, {"v": "5", "en": "Strongly agree"}]}, {"id": "attitude_after", "type": "single", "en": "After this assignment, my attitude toward using AI for learning is:", "options": [{"v": "much_pos", "en": "Much more positive"}, {"v": "some_pos", "en": "Somewhat more positive"}, {"v": "same", "en": "No change"}, {"v": "some_neg", "en": "Somewhat more negative"}, {"v": "much_neg", "en": "Much more negative"}]}, {"id": "comments", "type": "text", "en": "Please share any other comments about your experience using AI or LLMs for this assignment:"}];
 const FOOTER    = "";
 const DEMO      = false;
+/* Set when the page was built with --class-ai: the class's Worker and the model it
+   answers with. Null otherwise. See askClass(). */
+const CLASS_AI  = {"url": "https://verbatim-class.ohiomathteacher.workers.dev", "model": "claude-opus-5-5"};
+/* The page that lists this activity among others (--home-url), or null. */
+const HOME      = {"url": "index.html", "label": "All activities"};
+/* Built with --voice: the student sets how the AI sounds in a panel, instead of the
+   AI asking about it at the start. See VOICE_DIRECTIVES. */
+const VOICE_ON  = true;
 const SCHEMA    = "tea-taylor-session/2";
 /* Recorded in the session as well as shown on the page. A file outlives the
    page that made it, and by the time a transcript raises a question the page is
    usually gone. Additive: nothing in /2 changed shape, so a reader written for
    /2 goes on working and simply has one more thing it may report. */
-const APP       = { name: "verbatim", version: "1.2.1", build: "c59f1ec5" };   // /2: a turn may be a tombstone (no text)
+const APP       = { name: "verbatim", version: "1.2.1", build: "15fb659a" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --
@@ -1927,7 +2004,9 @@ if(SECTION){ $("#sec").value = SECTION; $("#secwrap").classList.add("hide"); }
    the three fields record as empty -- the same shape a converted Alkimi export
    has, so anything reading sessions already copes with it. */
 if(!CODES){
-  for(const id of ["#pidwrap", "#grpwrap", "#codehint", "#back-start"]) $(id).classList.add("hide");
+  for(const id of ["#pidwrap", "#grpwrap", "#codehint"]) $(id).classList.add("hide");
+  /* Kept on a class page: it is where a student retypes a passcode. */
+  if(!CLASS_AI) $("#back-start").classList.add("hide");
   if(!SECTION) $("#secwrap").classList.add("hide");
   if($("#grprow").children.length && $("#secwrap").classList.contains("hide"))
     $("#grprow").classList.add("hide");
@@ -1948,7 +2027,7 @@ if(FOOTER){ $("#foottext").textContent = FOOTER; $("#foot").classList.remove("hi
    until October 2026; it is English only now. */
 const I18N = {
   en: {
-    title: "How much colder does it get when you walk uphill?", subtitle: "Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. Set up an AI below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, you can download the conversation as a file.",
+    title: "How much colder does it get when you walk uphill?", subtitle: "Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. Type the class passcode below to begin. Your conversation is saved on this device as you go, and the words you send go through the class's server to Claude, Anthropic's AI, to get replies, and nowhere else. The server keeps no copy of them. When you have finished, you can download the conversation as a file.",
     before: "Before you start",
     codehint: "Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page.",
     pid: "Participant code", group: "Group", section: "Section",
@@ -2004,6 +2083,30 @@ const I18N = {
     errfields: "Participant code, group and section are all required.",
     errcode: "The participant code should be letters and numbers only, e.g. P07. Please do not use your name.",
     errai: "Please set up your AI first.",
+    passlabel: "Class passcode",
+    passph: "Your teacher will tell you",
+    passhint: "Your teacher will give you this. It lets this page use the class's AI, so you do not need an API key. Your messages go through the class's server to Claude, Anthropic's AI, to get replies. The server keeps no copy of them.",
+    errpassneed: "Please type the class passcode your teacher gave you.",
+    voiceopen: "How your AI teacher sounds",
+    voicebtn: "How it sounds",
+    voiceh: "How your AI teacher sounds",
+    voicesub: "Change how your AI teacher talks to you. Your choice is kept on this browser.",
+    voicenote: "These change how it talks, not the activity. Your choice is saved with your conversation, so your teacher will see it.",
+    voiceusual: "Back to the usual",
+    voicedone: "Done",
+    vtone: "Tone",
+    vgentle: "Gentle", vgentled: "Starts with what's working",
+    vbalanced: "Balanced", vusual: "The usual",
+    vdirect: "Direct", vdirectd: "Gets to the problem first",
+    vstructure: "Structure",
+    vsteps: "Clear steps", vstepsd: "Tell me the plan as we go",
+    vmixed: "Some of each",
+    vexplore: "Let me explore", vexplored: "Leave room to find my own way",
+    errpass: "the class passcode was not accepted. Press Back to the start and type it again.",
+    errcap: "this conversation has used all of today's turns with the class AI.",
+    errcapclass: "the class AI has reached its limit for today.",
+    errclassup: "the class AI's server could not get a reply.",
+    errclassmodel: "the class AI answered with a different model from the one this page records. Please tell your teacher.",
     errsay: "Please say something to your AI teacher first.",
     errreach: "Could not reach the AI: ",
     errsaved: "\nYour conversation is saved. Try Send again, or tell your instructor.",
@@ -2146,6 +2249,7 @@ const SS = {
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
 const K_PROV = "tea.ai.provider", K_ENDS = "tea.ai.endpoints";
+const K_PASS = "tea.ai.passcode";   // a class build only; kept like a key, for the same reason
 const K_KEY  = id => "tea.ai.key." + id;
 
 /* Which services this network can reach.
@@ -2166,6 +2270,10 @@ const endpoints    = () => { try{ return JSON.parse(SS.get(K_ENDS) || "[]"); }ca
 const setEndpoints = a  => SS.set(K_ENDS, JSON.stringify(a));
 
 function aiConfig(){
+  /* A class build has one AI and nothing to choose. The passcode stands where a
+     key would, so everything that asks "is the AI ready" works unchanged. */
+  if(CLASS_AI) return { id: "class", api: "class", url: CLASS_AI.url, model: CLASS_AI.model,
+                        label: "Claude", key: SS.get(K_PASS) || "" };
   const id = SS.get(K_PROV);
   if(!id) return null;
   if(id.startsWith("webgpu:")){
@@ -2188,6 +2296,26 @@ function aiConfig(){
 const aiLive  = () => { const c = aiConfig(); return !!c && (c.local || !!c.key); };
 const aiReady = () => DEMO || aiLive();
 const demoActive = () => DEMO && !aiLive();
+
+/* A class build keeps all of AI Setup in the page but shows none of it: the gear
+   and the provider line go, and the passcode field takes their place. */
+if(CLASS_AI){
+  for(const id of ["#gear", "#aiwrap"]) $(id).classList.add("hide");
+  $("#passwrap").classList.remove("hide");
+  $("#pass").value = SS.get(K_PASS) || "";
+}
+if(VOICE_ON){
+  for(const id of ["#voicewrap", "#voice-chat"]) $(id).classList.remove("hide");
+  $("#voice-open").onclick = $("#voice-chat").onclick = openVoice;
+  $("#voice-x").onclick = closeVoice;
+  $("#voice-usual").onclick = () => { voiceDraft = Object.assign({}, VOICE_USUAL); renderVoice(); };
+  $("#voice-done").onclick = () => { setVoice(voiceDraft); closeVoice(); };
+}
+if(HOME){
+  $("#homelink").href = HOME.url;
+  $("#homelink").textContent = "\u2190 " + HOME.label;
+  $("#homelink").classList.remove("hide");
+}
 
 function refreshAiStatus(){
   const c = aiConfig(), el = $("#ai-status");
@@ -2714,6 +2842,11 @@ $("#go-setup").onclick = async () => {
   const sec = CODES ? $("#sec").value.trim().toUpperCase() : (SECTION || "");
   const cfg = aiConfig();
   if(CODES && (!pid || !grp || !sec)){ $("#setup-err").textContent = tr("errfields"); return; }
+  if(CLASS_AI){
+    const pass = $("#pass").value.trim();
+    if(!pass){ $("#setup-err").textContent = tr("errpassneed"); return; }
+    SS.set(K_PASS, pass);
+  }
   if(!DEMO && !aiReady()){ $("#setup-err").textContent = tr("errai"); return; }
   if(pid && /[^A-Z0-9-]/.test(pid)){ $("#setup-err").textContent = tr("errcode"); return; }
   $("#setup-err").textContent = "";
@@ -2736,6 +2869,7 @@ $("#go-setup").onclick = async () => {
         session_id: rndHex(8), provider: (cfg ? cfg.id : "demo"), model: (cfg ? cfg.model : "demo"),
         started_utc: nowUTC(), exported_utc: null,
         reply_directives: REPLY_DIRECTIVE,
+        ...(VOICE_ON ? { voice_directives: VOICE_DIRECTIVES, voice: voiceNow(), voice_changes: [] } : {}),
         // `source` says whether this is the prompt the page was built with or one
         // an instructor replaced at run time, so no file is ever ambiguous about
         // which prompt produced it.
@@ -2884,9 +3018,91 @@ const REPLY_DIRECTIVE = {
   en: "Reply in English throughout, whatever language the student writes in.",
 };
 const replyLang = () => "en";
+
+/* "How your AI teacher sounds" (Todd, 29 Oct 2026). The activities used to open
+   with the AI asking two questions about how the student likes to be taught. In
+   three sessions a student would answer the same two questions three times, so the
+   choice moved to this panel. The prompt itself is unchanged by it: the settings
+   are appended to the copy SENT to the model, the way the reply directive is.
+
+   Recorded four ways, so the instrument can be rebuilt from the file:
+     voice_directives   the exact wording below, once
+     voice              the settings the session began with; never overwritten
+     turn.voice         on every AI turn, the settings that request was sent with
+     voice_changes      each change made during the conversation, with when, and
+                        after which turn, and from what to what
+   "balanced" and "mixed" send nothing: the usual is the prompt as written. */
+const VOICE_USUAL = { tone: "balanced", structure: "mixed" };
+const VOICE_ROWS = [
+  ["tone",      "vtone",      [["gentle", "vgentle", "vgentled"], ["balanced", "vbalanced", "vusual"], ["direct", "vdirect", "vdirectd"]]],
+  ["structure", "vstructure", [["steps", "vsteps", "vstepsd"], ["mixed", "vmixed", "vusual"], ["explore", "vexplore", "vexplored"]]],
+];
+const VOICE_DIRECTIVES = {
+  header: "THE STUDENT'S SETTINGS FOR HOW YOU SOUND. They change how you talk, never the rules above, and never the 60-word limit.",
+  tone: {
+    gentle: "TONE: gentle. Warm, patient and encouraging in how you word things. Treat a wrong answer as a good place to look next, not a failure. Gentle changes how you say things, never whether you say them.",
+    direct: "TONE: direct. No warm-up and no reassurance. Plain, brisk sentences that get straight to your question.",
+  },
+  structure: {
+    steps: "STRUCTURE: clear steps. When you move to a new step, first say in one short sentence what this step is for.",
+    explore: "STRUCTURE: room to explore. Do not announce what comes next. If the student heads somewhere else first, follow their idea for a turn before steering back to the next step.",
+  },
+};
+const K_VOICE = "tea.ai.voice";
+function voiceNow(){
+  let v = null;
+  try{ v = JSON.parse(SS.get(K_VOICE) || "null"); }catch(e){}
+  const out = {};
+  for(const [k, , opts] of VOICE_ROWS)
+    out[k] = v && opts.some(o => o[0] === v[k]) ? v[k] : VOICE_USUAL[k];
+  return out;
+}
+function voiceText(v){
+  const lines = VOICE_ROWS.map(([k]) => VOICE_DIRECTIVES[k][v[k]]).filter(Boolean);
+  return lines.length ? VOICE_DIRECTIVES.header + "\n" + lines.join("\n") : "";
+}
+/* A change is recorded only once there is a session to record it in. Before the
+   first Start, the choice is simply where the session begins: S.voice. */
+function setVoice(v){
+  const was = voiceNow();
+  if(JSON.stringify(was) === JSON.stringify(v)) return;
+  SS.set(K_VOICE, JSON.stringify(v));
+  if(!S) return;
+  (S.voice_changes = S.voice_changes || []).push({ changed_utc: nowUTC(),
+    after_turn: S.turns.length - 1, from: was, to: v });
+  save();
+}
+let voiceDraft = null;
+function renderVoice(){
+  const wrap = $("#voice-rows"); wrap.innerHTML = "";
+  for(const [k, label, opts] of VOICE_ROWS){
+    const row = document.createElement("div"); row.className = "vrow";
+    const h = document.createElement("h3"); h.textContent = tr(label); row.appendChild(h);
+    const grid = document.createElement("div"); grid.className = "vopts";
+    for(const [id, name, note] of opts){
+      const b = document.createElement("button"); b.type = "button";
+      b.className = "vopt" + (voiceDraft[k] === id ? " on" : "");
+      b.setAttribute("aria-pressed", String(voiceDraft[k] === id));
+      const bb = document.createElement("b"); bb.textContent = tr(name);
+      const sp = document.createElement("span"); sp.textContent = tr(note);
+      b.append(bb, sp);
+      b.onclick = () => { voiceDraft[k] = id; renderVoice(); };
+      grid.appendChild(b);
+    }
+    row.appendChild(grid); wrap.appendChild(row);
+  }
+}
+function openVoice(){
+  voiceDraft = voiceNow(); renderVoice();
+  $("#voice-overlay").classList.add("open");
+}
+function closeVoice(){ $("#voice-overlay").classList.remove("open"); }
+
 function apiMessages(){
+  const vt = VOICE_ON ? voiceText(voiceNow()) : "";
   const m = [{ role: "user",
-               content: S.activity_prompt.text + "\n\n" + REPLY_DIRECTIVE[replyLang()] }];
+               content: S.activity_prompt.text + "\n\n" + REPLY_DIRECTIVE[replyLang()]
+                        + (vt ? "\n\n" + vt : "") }];
   for(const t of S.turns) m.push({ role: t.role === "ai" ? "assistant" : "user", content: t.text });
   return m;
 }
@@ -2901,11 +3117,12 @@ async function turnFromAI(){
   $("#log").appendChild(wait);
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   const askedAt = Date.now(), askedTs = nowUTC(), askedLang = replyLang();
+  const askedVoice = VOICE_ON ? voiceNow() : null;
   try{
     const text = demoActive() ? await demoReply() : await callAPI();
     wait.remove();
-    push("ai", text, { request_ts: askedTs, elapsed_ms: Date.now() - askedAt,
-                       reply_lang: askedLang });
+    push("ai", text, Object.assign({ request_ts: askedTs, elapsed_ms: Date.now() - askedAt,
+                                     reply_lang: askedLang }, askedVoice ? { voice: askedVoice } : {}));
     aiDoneAt = Date.now(); composeStart = null;
   }catch(e){
     wait.remove();
@@ -2930,6 +3147,7 @@ async function askModel(messages){
   if(!c) throw new Error(tr("errai"));
   if(c.api === "webgpu") return askWebGPU(c, messages);
   if(c.api === "anthropic") return askAnthropic(c, messages);
+  if(c.api === "class") return askClass(c, messages);
   return c.api === "gemini" ? askGemini(c, messages) : askOpenAI(c, messages);
 }
 /* No fetch and no key: the weights are already in this browser and the reply is
@@ -3007,6 +3225,26 @@ async function askAnthropic(c, messages){
   const out = (d.content || []).filter(b => b.type === "text").map(b => b.text).join("");
   if(!out) throw new Error("empty reply");
   return out;
+}
+/* The class's Worker (worker/ in this repository) holds the key and makes the
+   same request askAnthropic makes. The student only ever typed the passcode.
+   `sid` is this session's random id, which is all the Worker counts turns by.
+   The reply names the model that answered, and any other model than the one this
+   page was built for is refused: the session file records `model`, and a Worker
+   reconfigured mid-collection must not change it silently. */
+async function askClass(c, messages){
+  const r = await fetch(c.url + "/chat", { method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ passcode: c.key, sid: S.session_id, messages }) });
+  let d = {};
+  try{ d = await r.json(); }catch(e){}
+  if(r.status === 401){ SS.del(K_PASS); $("#pass").value = ""; throw new Error(tr("errpass")); }
+  if(d.error === "cap") throw new Error(tr("errcap"));
+  if(d.error === "cap-class") throw new Error(tr("errcapclass"));
+  if(d.error === "refusal") throw new Error("Claude declined to answer that message.");
+  if(!r.ok || !d.text) throw new Error(d.error ? tr("errclassup") : "HTTP " + r.status);
+  if(!String(d.model || "").startsWith(c.model)) throw new Error(tr("errclassmodel"));
+  return d.text;
 }
 const callAPI = () => askModel(apiMessages());
 async function demoReply(){
@@ -3602,8 +3840,10 @@ $("#restart").onclick = async () => {
   if(busy) return;
   if(!S.turns.some(t => t.role === "student")){ $("#chat-err").textContent = tr("errsay"); return; }
   if(!confirm(tr("restartconfirm"))) return;
-  (S.set_aside = S.set_aside || []).push({ set_aside_utc: nowUTC(), turns: S.turns, tool_uses: S.tool_uses || [] });
+  (S.set_aside = S.set_aside || []).push(Object.assign({ set_aside_utc: nowUTC(), turns: S.turns,
+    tool_uses: S.tool_uses || [] }, S.voice_changes ? { voice_changes: S.voice_changes } : {}));
   S.turns = []; S.tool_uses = []; Calculator.restore([]);
+  if(S.voice_changes) S.voice_changes = [];
   aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
   save(); render(); header(); window.scrollTo(0, 0);
   await turnFromAI();
@@ -3627,8 +3867,10 @@ $("#back-start").onclick = () => {
   if(S.turns.length || (S.tool_uses || []).length)
     (S.set_aside = S.set_aside || []).push({ set_aside_utc: nowUTC(), reason: "back_to_start",
       participant: S.participant, group: S.group, section: S.section,
-      provider: S.provider, model: S.model, turns: S.turns, tool_uses: S.tool_uses || [] });
+      provider: S.provider, model: S.model, turns: S.turns, tool_uses: S.tool_uses || [],
+      ...(S.voice_changes ? { voice_changes: S.voice_changes } : {}) });
   S.turns = []; S.tool_uses = []; Calculator.restore([]);
+  if(S.voice_changes) S.voice_changes = [];
   aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
   S.at_start = true;
   save(); toStart();

@@ -287,6 +287,19 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   border:1px solid var(--rule)}
 h1{font-family:var(--serif);font-size:27px;font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.25}
 .mastbtns{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+/* Back to the page that lists the activities, when there is one (--home-url). */
+.homelink{display:inline-block;margin:0 0 14px;font-size:13.5px;color:var(--accent);text-decoration:none}
+.homelink:hover{text-decoration:underline}
+/* "How your AI teacher sounds": one row per setting, one card per choice. */
+.vrow{margin:0 0 16px}
+.vrow h3{font-size:14px;font-weight:700;margin:0 0 8px}
+.vopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.vopt{text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--rule);
+  border-radius:10px;padding:11px 14px;box-shadow:none;font-weight:400;line-height:1.35}
+.vopt:hover{transform:none;border-color:var(--accent)}
+.vopt b{display:block;font-size:15px}
+.vopt span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.vopt.on{border-color:var(--accent);background:var(--stu-bg);box-shadow:0 0 0 1px var(--accent)}
 .mast .tag{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
   margin-left:auto;white-space:nowrap;padding-bottom:3px}
 .sub{color:var(--muted);font-size:15px;margin:-18px 0 30px}
@@ -569,6 +582,7 @@ try{
 <div id="demobar" class="demo hide">DEMO MODE — replies are canned. Nothing is sent anywhere.</div>
 <div class="wrap">
 
+<a class="homelink hide" id="homelink" href="#"></a>
 <div class="mast">
   <img class="avatar hide" id="avatar" alt="">
   <h1 data-i18n="title">__TITLE__</h1>
@@ -593,7 +607,7 @@ try{
       <div id="grpwrap"><label for="grp" data-i18n="group">Group</label><input id="grp" autocomplete="off" spellcheck="false" data-i18n-ph="grpph" placeholder="Enter group here (e.g., G3)"></div>
       <div id="secwrap"><label for="sec" data-i18n="section">Section</label><input id="sec" autocomplete="off" spellcheck="false" data-i18n-ph="secph" placeholder="Enter section here (e.g., S4)"></div>
     </div>
-    <div class="field">
+    <div class="field" id="aiwrap">
       <label data-i18n="yourai">Your AI</label>
       <div class="ai-status" id="ai-status">
         <span class="dot"></span>
@@ -601,6 +615,14 @@ try{
         <button type="button" class="ghost" id="ai-open">Set up</button>
       </div>
       <p class="hint" style="margin-top:10px" data-i18n="aihint">Use your own API key, or the one your instructor gives you.</p>
+    </div>
+    <div class="field hide" id="passwrap">
+      <label for="pass" data-i18n="passlabel">Class passcode</label>
+      <input id="pass" autocomplete="off" spellcheck="false" data-i18n-ph="passph" placeholder="Your teacher will tell you">
+      <p class="hint" style="margin-top:10px" data-i18n="passhint">Your teacher will give you this.</p>
+    </div>
+    <div class="field hide" id="voicewrap">
+      <button type="button" class="ghost" id="voice-open" data-i18n="voiceopen">How your AI teacher sounds</button>
     </div>
 
     <p class="err" id="setup-err"></p>
@@ -620,6 +642,7 @@ try{
     <span class="pill" id="p-model"></span>
     <span class="pill" id="p-turns"></span>
     <span class="sp"></span>
+    <button id="voice-chat" class="ghost hide" style="padding:7px 16px;font-size:14px" data-i18n="voicebtn">How it sounds</button>
     <button id="back-start" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="backstart">Back to the start</button>
     <button id="restart" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="restart">Start over</button>
     <button id="finish" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="finish">Finish &amp; export</button>
@@ -705,6 +728,20 @@ try{
   </div>
 </div>
 
+<div class="ai-modal-overlay" id="voice-overlay">
+  <div class="ai-modal" style="width:680px">
+    <button type="button" class="ai-x" id="voice-x" aria-label="Close">&times;</button>
+    <h2 data-i18n="voiceh">How your AI teacher sounds</h2>
+    <p class="ai-modal-sub" data-i18n="voicesub">Change how your AI teacher talks to you.</p>
+    <div id="voice-rows"></div>
+    <p class="hint" style="margin:4px 0 0" data-i18n="voicenote">These change how it talks, not the activity.</p>
+    <div class="ai-modal-actions">
+      <button type="button" class="ghost" id="voice-usual" data-i18n="voiceusual">Back to the usual</button>
+      <button type="button" id="voice-done" data-i18n="voicedone">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="ai-modal-overlay" id="tool-overlay" style="z-index:10001">
   <div class="ai-modal" style="width:760px">
     <button type="button" class="ai-x" id="tool-x" aria-label="Close">&times;</button>
@@ -757,6 +794,14 @@ const CODES     = __CODES_JSON__;
 let   SURVEY    = __SURVEY_JSON__;
 const FOOTER    = __FOOTER_JSON__;
 const DEMO      = __DEMO_JSON__;
+/* Set when the page was built with --class-ai: the class's Worker and the model it
+   answers with. Null otherwise. See askClass(). */
+const CLASS_AI  = __CLASS_AI_JSON__;
+/* The page that lists this activity among others (--home-url), or null. */
+const HOME      = __HOME_JSON__;
+/* Built with --voice: the student sets how the AI sounds in a panel, instead of the
+   AI asking about it at the start. See VOICE_DIRECTIVES. */
+const VOICE_ON  = __VOICE_JSON__;
 const SCHEMA    = "tea-taylor-session/2";
 /* Recorded in the session as well as shown on the page. A file outlives the
    page that made it, and by the time a transcript raises a question the page is
@@ -830,7 +875,9 @@ if(SECTION){ $("#sec").value = SECTION; $("#secwrap").classList.add("hide"); }
    the three fields record as empty -- the same shape a converted Alkimi export
    has, so anything reading sessions already copes with it. */
 if(!CODES){
-  for(const id of ["#pidwrap", "#grpwrap", "#codehint", "#back-start"]) $(id).classList.add("hide");
+  for(const id of ["#pidwrap", "#grpwrap", "#codehint"]) $(id).classList.add("hide");
+  /* Kept on a class page: it is where a student retypes a passcode. */
+  if(!CLASS_AI) $("#back-start").classList.add("hide");
   if(!SECTION) $("#secwrap").classList.add("hide");
   if($("#grprow").children.length && $("#secwrap").classList.contains("hide"))
     $("#grprow").classList.add("hide");
@@ -907,6 +954,30 @@ const I18N = {
     errfields: "Participant code, group and section are all required.",
     errcode: "The participant code should be letters and numbers only, e.g. P07. Please do not use your name.",
     errai: "Please set up your AI first.",
+    passlabel: "Class passcode",
+    passph: "Your teacher will tell you",
+    passhint: "Your teacher will give you this. It lets this page use the class's AI, so you do not need an API key. Your messages go through the class's server to Claude, Anthropic's AI, to get replies. The server keeps no copy of them.",
+    errpassneed: "Please type the class passcode your teacher gave you.",
+    voiceopen: "How your AI teacher sounds",
+    voicebtn: "How it sounds",
+    voiceh: "How your AI teacher sounds",
+    voicesub: "Change how your AI teacher talks to you. Your choice is kept on this browser.",
+    voicenote: "These change how it talks, not the activity. Your choice is saved with your conversation, so your teacher will see it.",
+    voiceusual: "Back to the usual",
+    voicedone: "Done",
+    vtone: "Tone",
+    vgentle: "Gentle", vgentled: "Starts with what's working",
+    vbalanced: "Balanced", vusual: "The usual",
+    vdirect: "Direct", vdirectd: "Gets to the problem first",
+    vstructure: "Structure",
+    vsteps: "Clear steps", vstepsd: "Tell me the plan as we go",
+    vmixed: "Some of each",
+    vexplore: "Let me explore", vexplored: "Leave room to find my own way",
+    errpass: "the class passcode was not accepted. Press Back to the start and type it again.",
+    errcap: "this conversation has used all of today's turns with the class AI.",
+    errcapclass: "the class AI has reached its limit for today.",
+    errclassup: "the class AI's server could not get a reply.",
+    errclassmodel: "the class AI answered with a different model from the one this page records. Please tell your teacher.",
     errsay: "Please say something to your AI teacher first.",
     errreach: "Could not reach the AI: ",
     errsaved: "\nYour conversation is saved. Try Send again, or tell your instructor.",
@@ -1049,6 +1120,7 @@ const SS = {
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
 const K_PROV = "tea.ai.provider", K_ENDS = "tea.ai.endpoints";
+const K_PASS = "tea.ai.passcode";   // a class build only; kept like a key, for the same reason
 const K_KEY  = id => "tea.ai.key." + id;
 
 /* Which services this network can reach.
@@ -1069,6 +1141,10 @@ const endpoints    = () => { try{ return JSON.parse(SS.get(K_ENDS) || "[]"); }ca
 const setEndpoints = a  => SS.set(K_ENDS, JSON.stringify(a));
 
 function aiConfig(){
+  /* A class build has one AI and nothing to choose. The passcode stands where a
+     key would, so everything that asks "is the AI ready" works unchanged. */
+  if(CLASS_AI) return { id: "class", api: "class", url: CLASS_AI.url, model: CLASS_AI.model,
+                        label: "Claude", key: SS.get(K_PASS) || "" };
   const id = SS.get(K_PROV);
   if(!id) return null;
   if(id.startsWith("webgpu:")){
@@ -1091,6 +1167,26 @@ function aiConfig(){
 const aiLive  = () => { const c = aiConfig(); return !!c && (c.local || !!c.key); };
 const aiReady = () => DEMO || aiLive();
 const demoActive = () => DEMO && !aiLive();
+
+/* A class build keeps all of AI Setup in the page but shows none of it: the gear
+   and the provider line go, and the passcode field takes their place. */
+if(CLASS_AI){
+  for(const id of ["#gear", "#aiwrap"]) $(id).classList.add("hide");
+  $("#passwrap").classList.remove("hide");
+  $("#pass").value = SS.get(K_PASS) || "";
+}
+if(VOICE_ON){
+  for(const id of ["#voicewrap", "#voice-chat"]) $(id).classList.remove("hide");
+  $("#voice-open").onclick = $("#voice-chat").onclick = openVoice;
+  $("#voice-x").onclick = closeVoice;
+  $("#voice-usual").onclick = () => { voiceDraft = Object.assign({}, VOICE_USUAL); renderVoice(); };
+  $("#voice-done").onclick = () => { setVoice(voiceDraft); closeVoice(); };
+}
+if(HOME){
+  $("#homelink").href = HOME.url;
+  $("#homelink").textContent = "\u2190 " + HOME.label;
+  $("#homelink").classList.remove("hide");
+}
 
 function refreshAiStatus(){
   const c = aiConfig(), el = $("#ai-status");
@@ -1617,6 +1713,11 @@ $("#go-setup").onclick = async () => {
   const sec = CODES ? $("#sec").value.trim().toUpperCase() : (SECTION || "");
   const cfg = aiConfig();
   if(CODES && (!pid || !grp || !sec)){ $("#setup-err").textContent = tr("errfields"); return; }
+  if(CLASS_AI){
+    const pass = $("#pass").value.trim();
+    if(!pass){ $("#setup-err").textContent = tr("errpassneed"); return; }
+    SS.set(K_PASS, pass);
+  }
   if(!DEMO && !aiReady()){ $("#setup-err").textContent = tr("errai"); return; }
   if(pid && /[^A-Z0-9-]/.test(pid)){ $("#setup-err").textContent = tr("errcode"); return; }
   $("#setup-err").textContent = "";
@@ -1639,6 +1740,7 @@ $("#go-setup").onclick = async () => {
         session_id: rndHex(8), provider: (cfg ? cfg.id : "demo"), model: (cfg ? cfg.model : "demo"),
         started_utc: nowUTC(), exported_utc: null,
         reply_directives: REPLY_DIRECTIVE,
+        ...(VOICE_ON ? { voice_directives: VOICE_DIRECTIVES, voice: voiceNow(), voice_changes: [] } : {}),
         // `source` says whether this is the prompt the page was built with or one
         // an instructor replaced at run time, so no file is ever ambiguous about
         // which prompt produced it.
@@ -1787,9 +1889,91 @@ const REPLY_DIRECTIVE = {
   en: "Reply in English throughout, whatever language the student writes in.",
 };
 const replyLang = () => "en";
+
+/* "How your AI teacher sounds" (Todd, 29 Oct 2026). The activities used to open
+   with the AI asking two questions about how the student likes to be taught. In
+   three sessions a student would answer the same two questions three times, so the
+   choice moved to this panel. The prompt itself is unchanged by it: the settings
+   are appended to the copy SENT to the model, the way the reply directive is.
+
+   Recorded four ways, so the instrument can be rebuilt from the file:
+     voice_directives   the exact wording below, once
+     voice              the settings the session began with; never overwritten
+     turn.voice         on every AI turn, the settings that request was sent with
+     voice_changes      each change made during the conversation, with when, and
+                        after which turn, and from what to what
+   "balanced" and "mixed" send nothing: the usual is the prompt as written. */
+const VOICE_USUAL = { tone: "balanced", structure: "mixed" };
+const VOICE_ROWS = [
+  ["tone",      "vtone",      [["gentle", "vgentle", "vgentled"], ["balanced", "vbalanced", "vusual"], ["direct", "vdirect", "vdirectd"]]],
+  ["structure", "vstructure", [["steps", "vsteps", "vstepsd"], ["mixed", "vmixed", "vusual"], ["explore", "vexplore", "vexplored"]]],
+];
+const VOICE_DIRECTIVES = {
+  header: "THE STUDENT'S SETTINGS FOR HOW YOU SOUND. They change how you talk, never the rules above, and never the 60-word limit.",
+  tone: {
+    gentle: "TONE: gentle. Warm, patient and encouraging in how you word things. Treat a wrong answer as a good place to look next, not a failure. Gentle changes how you say things, never whether you say them.",
+    direct: "TONE: direct. No warm-up and no reassurance. Plain, brisk sentences that get straight to your question.",
+  },
+  structure: {
+    steps: "STRUCTURE: clear steps. When you move to a new step, first say in one short sentence what this step is for.",
+    explore: "STRUCTURE: room to explore. Do not announce what comes next. If the student heads somewhere else first, follow their idea for a turn before steering back to the next step.",
+  },
+};
+const K_VOICE = "tea.ai.voice";
+function voiceNow(){
+  let v = null;
+  try{ v = JSON.parse(SS.get(K_VOICE) || "null"); }catch(e){}
+  const out = {};
+  for(const [k, , opts] of VOICE_ROWS)
+    out[k] = v && opts.some(o => o[0] === v[k]) ? v[k] : VOICE_USUAL[k];
+  return out;
+}
+function voiceText(v){
+  const lines = VOICE_ROWS.map(([k]) => VOICE_DIRECTIVES[k][v[k]]).filter(Boolean);
+  return lines.length ? VOICE_DIRECTIVES.header + "\n" + lines.join("\n") : "";
+}
+/* A change is recorded only once there is a session to record it in. Before the
+   first Start, the choice is simply where the session begins: S.voice. */
+function setVoice(v){
+  const was = voiceNow();
+  if(JSON.stringify(was) === JSON.stringify(v)) return;
+  SS.set(K_VOICE, JSON.stringify(v));
+  if(!S) return;
+  (S.voice_changes = S.voice_changes || []).push({ changed_utc: nowUTC(),
+    after_turn: S.turns.length - 1, from: was, to: v });
+  save();
+}
+let voiceDraft = null;
+function renderVoice(){
+  const wrap = $("#voice-rows"); wrap.innerHTML = "";
+  for(const [k, label, opts] of VOICE_ROWS){
+    const row = document.createElement("div"); row.className = "vrow";
+    const h = document.createElement("h3"); h.textContent = tr(label); row.appendChild(h);
+    const grid = document.createElement("div"); grid.className = "vopts";
+    for(const [id, name, note] of opts){
+      const b = document.createElement("button"); b.type = "button";
+      b.className = "vopt" + (voiceDraft[k] === id ? " on" : "");
+      b.setAttribute("aria-pressed", String(voiceDraft[k] === id));
+      const bb = document.createElement("b"); bb.textContent = tr(name);
+      const sp = document.createElement("span"); sp.textContent = tr(note);
+      b.append(bb, sp);
+      b.onclick = () => { voiceDraft[k] = id; renderVoice(); };
+      grid.appendChild(b);
+    }
+    row.appendChild(grid); wrap.appendChild(row);
+  }
+}
+function openVoice(){
+  voiceDraft = voiceNow(); renderVoice();
+  $("#voice-overlay").classList.add("open");
+}
+function closeVoice(){ $("#voice-overlay").classList.remove("open"); }
+
 function apiMessages(){
+  const vt = VOICE_ON ? voiceText(voiceNow()) : "";
   const m = [{ role: "user",
-               content: S.activity_prompt.text + "\n\n" + REPLY_DIRECTIVE[replyLang()] }];
+               content: S.activity_prompt.text + "\n\n" + REPLY_DIRECTIVE[replyLang()]
+                        + (vt ? "\n\n" + vt : "") }];
   for(const t of S.turns) m.push({ role: t.role === "ai" ? "assistant" : "user", content: t.text });
   return m;
 }
@@ -1804,11 +1988,12 @@ async function turnFromAI(){
   $("#log").appendChild(wait);
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   const askedAt = Date.now(), askedTs = nowUTC(), askedLang = replyLang();
+  const askedVoice = VOICE_ON ? voiceNow() : null;
   try{
     const text = demoActive() ? await demoReply() : await callAPI();
     wait.remove();
-    push("ai", text, { request_ts: askedTs, elapsed_ms: Date.now() - askedAt,
-                       reply_lang: askedLang });
+    push("ai", text, Object.assign({ request_ts: askedTs, elapsed_ms: Date.now() - askedAt,
+                                     reply_lang: askedLang }, askedVoice ? { voice: askedVoice } : {}));
     aiDoneAt = Date.now(); composeStart = null;
   }catch(e){
     wait.remove();
@@ -1833,6 +2018,7 @@ async function askModel(messages){
   if(!c) throw new Error(tr("errai"));
   if(c.api === "webgpu") return askWebGPU(c, messages);
   if(c.api === "anthropic") return askAnthropic(c, messages);
+  if(c.api === "class") return askClass(c, messages);
   return c.api === "gemini" ? askGemini(c, messages) : askOpenAI(c, messages);
 }
 /* No fetch and no key: the weights are already in this browser and the reply is
@@ -1910,6 +2096,26 @@ async function askAnthropic(c, messages){
   const out = (d.content || []).filter(b => b.type === "text").map(b => b.text).join("");
   if(!out) throw new Error("empty reply");
   return out;
+}
+/* The class's Worker (worker/ in this repository) holds the key and makes the
+   same request askAnthropic makes. The student only ever typed the passcode.
+   `sid` is this session's random id, which is all the Worker counts turns by.
+   The reply names the model that answered, and any other model than the one this
+   page was built for is refused: the session file records `model`, and a Worker
+   reconfigured mid-collection must not change it silently. */
+async function askClass(c, messages){
+  const r = await fetch(c.url + "/chat", { method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ passcode: c.key, sid: S.session_id, messages }) });
+  let d = {};
+  try{ d = await r.json(); }catch(e){}
+  if(r.status === 401){ SS.del(K_PASS); $("#pass").value = ""; throw new Error(tr("errpass")); }
+  if(d.error === "cap") throw new Error(tr("errcap"));
+  if(d.error === "cap-class") throw new Error(tr("errcapclass"));
+  if(d.error === "refusal") throw new Error("Claude declined to answer that message.");
+  if(!r.ok || !d.text) throw new Error(d.error ? tr("errclassup") : "HTTP " + r.status);
+  if(!String(d.model || "").startsWith(c.model)) throw new Error(tr("errclassmodel"));
+  return d.text;
 }
 const callAPI = () => askModel(apiMessages());
 async function demoReply(){
@@ -2505,8 +2711,10 @@ $("#restart").onclick = async () => {
   if(busy) return;
   if(!S.turns.some(t => t.role === "student")){ $("#chat-err").textContent = tr("errsay"); return; }
   if(!confirm(tr("restartconfirm"))) return;
-  (S.set_aside = S.set_aside || []).push({ set_aside_utc: nowUTC(), turns: S.turns, tool_uses: S.tool_uses || [] });
+  (S.set_aside = S.set_aside || []).push(Object.assign({ set_aside_utc: nowUTC(), turns: S.turns,
+    tool_uses: S.tool_uses || [] }, S.voice_changes ? { voice_changes: S.voice_changes } : {}));
   S.turns = []; S.tool_uses = []; Calculator.restore([]);
+  if(S.voice_changes) S.voice_changes = [];
   aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
   save(); render(); header(); window.scrollTo(0, 0);
   await turnFromAI();
@@ -2530,8 +2738,10 @@ $("#back-start").onclick = () => {
   if(S.turns.length || (S.tool_uses || []).length)
     (S.set_aside = S.set_aside || []).push({ set_aside_utc: nowUTC(), reason: "back_to_start",
       participant: S.participant, group: S.group, section: S.section,
-      provider: S.provider, model: S.model, turns: S.turns, tool_uses: S.tool_uses || [] });
+      provider: S.provider, model: S.model, turns: S.turns, tool_uses: S.tool_uses || [],
+      ...(S.voice_changes ? { voice_changes: S.voice_changes } : {}) });
   S.turns = []; S.tool_uses = []; Calculator.restore([]);
+  if(S.voice_changes) S.voice_changes = [];
   aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
   S.at_start = true;
   save(); toStart();
@@ -2808,10 +3018,13 @@ def tint(hex_colour: str, s: float, l: float) -> str:
 def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
           avatar: str, footer: str, section: str, survey: list, demo: bool,
           title: str, subtitle: str, codehint: str,
-          accent: str, no_codes: bool = False) -> str:
+          accent: str, no_codes: bool = False,
+          class_ai: dict | None = None, home: dict | None = None,
+          voice: bool = False) -> str:
     # Deliberately NOT published to the page: url and key. The page names a
-    # provider; the student supplies the credential.
-    pub = pub_providers(providers)
+    # provider; the student supplies the credential. A class build offers no
+    # provider at all: the Worker is the only AI it calls.
+    pub = [] if class_ai else pub_providers(providers)
     return (TEMPLATE
             .replace("__PROVIDERS_JSON__", json.dumps(pub, ensure_ascii=False))
             .replace("__PROMPT_JSON__", json.dumps(prompt, ensure_ascii=False))
@@ -2826,6 +3039,9 @@ def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
             .replace("__SURVEY_JSON__", json.dumps(survey, ensure_ascii=False))
             .replace("__CODEHINT_JSON__", json.dumps(codehint, ensure_ascii=False))
             .replace("__DEMO_JSON__", "true" if demo else "false")
+            .replace("__CLASS_AI_JSON__", json.dumps(class_ai))
+            .replace("__HOME_JSON__", json.dumps(home, ensure_ascii=False))
+            .replace("__VOICE_JSON__", "true" if voice else "false")
             .replace("__ACCENT_BG__", tint(accent, 0.71, 0.945))
             .replace("__ACCENT_EDGE__", tint(accent, 0.56, 0.849))
             .replace("__ACCENT__", accent)
@@ -2869,6 +3085,18 @@ def main() -> int:
     ap.add_argument("--demo", action="store_true",
                     help="canned replies, no keys, no network — for looking at the interface")
     ap.add_argument("--out", type=Path, default=HERE / "session_capture.html")
+    ap.add_argument("--class-ai", default="", metavar="URL",
+                    help="the class's Worker (worker/README.md), e.g. "
+                         "https://verbatim-class.<account>.workers.dev. Students type the "
+                         "class passcode instead of setting up an AI, and never see or hold "
+                         "a key. AI Setup stays in the page but is not shown.")
+    ap.add_argument("--home-url", default="",
+                    help="a link back to the page that lists this activity, e.g. index.html")
+    ap.add_argument("--home-label", default="All activities")
+    ap.add_argument("--voice", action="store_true",
+                    help="offer 'How your AI teacher sounds': the student sets the tone and "
+                         "structure in a panel, recorded in the session, instead of the "
+                         "prompt asking about it")
     ap.add_argument("--survey", type=Path, default=HERE / "survey.json",
                     help="survey shown after the conversation and saved into the same file")
     ap.add_argument("--no-survey", action="store_true", help="skip the survey entirely")
@@ -2952,10 +3180,22 @@ def main() -> int:
 
     prompt = load_prompt(a.prompt)
     submit = {"url": a.submit_url}
+
+    # The model is read from the Worker's own configuration rather than written
+    # here a second time, so the page and the Worker cannot disagree about it.
+    class_ai = None
+    if a.class_ai:
+        import tomllib
+        url = a.class_ai.rstrip("/")
+        if not re.match(r"https://|http://(127\.0\.0\.1|localhost)[:/]", url + "/"):
+            ap.error("--class-ai must be an https:// URL (or http://127.0.0.1 for testing)")
+        conf = tomllib.loads((HERE / "worker" / "wrangler.toml").read_text(encoding="utf-8"))
+        class_ai = {"url": url, "model": conf["vars"]["MODEL"]}
+    home = {"url": a.home_url, "label": a.home_label} if a.home_url else None
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.section.strip().upper(),
                            survey, a.demo, a.title, subtitle,
-                           a.codehint, a.accent, a.no_codes), encoding="utf-8")
+                           a.codehint, a.accent, a.no_codes, class_ai, home, a.voice), encoding="utf-8")
 
     # The builder ships with the activity so a teacher can make their own without
     # Python. It embeds this exact template, so the two stay in step by construction.
@@ -2996,8 +3236,12 @@ def main() -> int:
         print(f"  xdg-open {a.out}")
         return 0
 
-    print(f"  providers offered : {', '.join(p['id'] for p in provs)}")
-    print("  keys              : entered by the student in AI Setup; none in this file")
+    if class_ai:
+        print(f"  class AI          : {class_ai['url']}  ({class_ai['model']}); AI Setup hidden")
+        print("  keys              : none in this file or the student's hands; they type the passcode")
+    else:
+        print(f"  providers offered : {', '.join(p['id'] for p in provs)}")
+        print("  keys              : entered by the student in AI Setup; none in this file")
     if any(p.get("test_only") for p in provs):
         print("\n  NOTE: a testing-only provider is in this build. Groq is not reachable\n"
               "  from mainland China — do not send this build to the classroom.")

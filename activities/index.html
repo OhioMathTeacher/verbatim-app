@@ -237,15 +237,14 @@
       .cr1, .cr2, .rolling, .walkLong, .walkShort,
       .pend, .g1, .g2, .g3, .hmin, .hhour { animation: none; }
     }
-    /* The Collatz banner: one hailstone sequence, drawn to the same 6.5:1 shape.
-       The line is the whole point -- it climbs, falls, climbs again, and lands
-       on 1 -- so nothing here is animated; the shape is what the reader should
-       look at. */
-    .banner .hail  { fill: none; stroke: #333; stroke-width: 2; stroke-linejoin: round; }
-    .banner .dot   { fill: #333; }
-    .banner .peak  { fill: #2563eb; }
-    .banner .base  { fill: none; stroke: #b9b1a3; stroke-width: 1.2; stroke-dasharray: 3 3; }
-    .banner text.lbl { text-anchor: middle; }
+    /* Topic tabs. Plain buttons; the chosen one is remembered in the address
+       (#limits, #chain) so a link can open on either. */
+    .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 2px solid #eee; margin: 1.6em 0 1em; }
+    .tabs button { font: inherit; font-weight: 600; color: #555; background: none; border: 0;
+                   border-bottom: 3px solid transparent; margin-bottom: -2px; padding: 10px 14px; cursor: pointer; }
+    .tabs button:hover { color: #222; }
+    .tabs button[aria-selected="true"] { color: #222; border-bottom-color: #2563eb; }
+    .tabnote { color: #555; }
     hr {
       border: none;
       border-top: 2px solid #eee;
@@ -260,22 +259,20 @@
 <body>
   <div class="container">
     <h1><span role="img" aria-label="conversation">💬</span> Verbatim — Draft Activities</h1>
-    <p>Short conversations between a student and a generative AI. Four of them are a
-    set for a first-semester calculus course, meant to run about a month apart. Three
-    more are other ways into the chain rule, any of which could stand in for the
-    fourth. The last, on the Collatz conjecture, is a separate activity for a class of
-    preservice teachers at Miami University.</p>
-    <p>Open any of them,
-    press <strong>AI Setup</strong>, choose a provider and paste in your own key —
-    Gemini is free with a Google account, and four others are offered — then talk to it. The key stays in your
-    browser: it is not stored in the page and goes nowhere but the provider you chose.
-    Each activity takes about twenty minutes, needs nothing installed, and saves the
-    conversation as you go.</p>
-    <p>🔑 <strong>Never set up a key before?</strong>
-    <a href="getting-a-key.html">Start here</a> — it takes about three minutes and
-    needs no programming.</p>
-    <hr>
-    <h2>Calculus I, fall 2026 — four activities</h2>
+    <p>Short conversations between a student and a generative AI, written for a
+    first-semester calculus course. They are sorted by topic in the tabs below. Each
+    takes about twenty minutes, needs nothing installed, and saves the conversation as
+    you go.</p>
+    <p>Open any of them, type the class passcode, and press <strong>Start the
+    activity</strong>. The AI is Claude, from Anthropic. Messages go through the class's
+    server to Claude to get replies, and nowhere else. The server keeps no copy of them.</p>
+    <div class="tabs" role="tablist" aria-label="Activities by topic">
+      <button type="button" role="tab" id="tab-limits" aria-controls="limits" aria-selected="true">Small, large and limits</button>
+      <button type="button" role="tab" id="tab-chain" aria-controls="chain" aria-selected="false">The chain rule</button>
+    </div>
+    <section id="limits" role="tabpanel" aria-labelledby="tab-limits">
+    <p class="tabnote">The first three of a set of four for Calculus I, fall 2026, meant to
+    run about a month apart. The fourth is in the chain rule tab.</p>
     <ul class="applet-list">
 
       <li>
@@ -383,6 +380,16 @@
         </div>
       </li>
 
+    </ul>
+    </section>
+
+    <section id="chain" role="tabpanel" aria-labelledby="tab-chain" hidden>
+    <p class="tabnote">Activity 4 of the Calculus I set, and three other ways into the
+    chain rule. Each of the three teaches the same idea through a different object, and
+    any of them could take activity 4's place, so the choice can be made by trying them
+    rather than on paper.</p>
+    <ul class="applet-list">
+
       <li>
         <span class="applet-title">💿 <a href="activity-5-record.html">Why was the last song the worst?</a></span>
         <div class="applet-desc">
@@ -456,15 +463,6 @@
           reached through a second rate, which is what the rule is for.</p>
         </div>
       </li>
-    </ul>
-
-
-    <h2>More ways into the chain rule — three drafts</h2>
-    <p>Activity 4 is the one built for the term. These three teach the same idea
-    through a different object and any of them could take its place, so the choice
-    can be made by trying them rather than on paper. They share activity 4's reply
-    rules and its participant code.</p>
-    <ul class="applet-list">
 
       <li>
         <span class="applet-title">🚲 <a href="activity-6-gears.html">Why does the same pedalling give you different speeds?</a></span>
@@ -630,58 +628,7 @@
         </div>
       </li>
     </ul>
-
-    <h2>Separate — preservice teachers, Miami University</h2>
-    <ul class="applet-list">
-      <li>
-        <span class="applet-title">🔢 <a href="activity-4-collatz.html">Does every number come home?</a></span>
-        <div class="applet-desc">
-          <p class="week">Preservice teachers · conjecture, evidence and proof</p>
-          <figure class="fig">
-            <!-- The sequence from 7: 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1.
-                 x is the step, y is the value on a scale where 52 sits near the top. -->
-            <svg class="banner" viewBox="0 0 650 100" role="img"
-                 aria-label="The Collatz sequence starting from 7, drawn as a jagged line:
-                             it rises to 52 at the sixth step, falls, rises to 40, then
-                             drops to 1 after sixteen steps">
-              <path class="base" d="M60 84 H590"/>
-              <polyline class="hail" points="60,76 93,55 126,71 159,38 192,62 225,13 258,49 291,67 324,30 357,58 390,72 423,79 456,64 489,75 522,81 555,83 588,85"/>
-              <g class="dot">
-                <circle cx="60" cy="76" r="3.2"/><circle cx="93" cy="55" r="3.2"/><circle cx="126" cy="71" r="3.2"/>
-                <circle cx="159" cy="38" r="3.2"/><circle cx="192" cy="62" r="3.2"/>
-                <circle cx="258" cy="49" r="3.2"/><circle cx="291" cy="67" r="3.2"/><circle cx="324" cy="30" r="3.2"/>
-                <circle cx="357" cy="58" r="3.2"/><circle cx="390" cy="72" r="3.2"/><circle cx="423" cy="79" r="3.2"/>
-                <circle cx="456" cy="64" r="3.2"/><circle cx="489" cy="75" r="3.2"/><circle cx="522" cy="81" r="3.2"/>
-                <circle cx="555" cy="83" r="3.2"/><circle cx="588" cy="85" r="3.2"/>
-              </g>
-              <circle class="peak" cx="225" cy="13" r="4.2"/>
-              <text class="lbl" x="60" y="95">7</text>
-              <text class="deg" x="236" y="16" style="font-size:10px;text-anchor:start">52</text>
-              <text class="lbl" x="324" y="24">40</text>
-              <text class="lbl" x="588" y="97">1</text>
-              <text class="lbl" x="325" y="97">16 steps</text>
-            </svg>
-            <figcaption>Start at 7. Halve it if even, triple it and add one if odd. The
-              sequence climbs to 52, falls, climbs again, and reaches 1 after sixteen
-              steps. Does every start come home?</figcaption>
-          </figure>
-          <p>The rule takes one line. Even: halve it. Odd: triple it and add one. Repeat.
-          The conjecture is that every positive whole number eventually reaches 1, and
-          nobody has proved it — though it has been checked far past anything a class could
-          compute by hand.</p>
-          <p>Students do the computing. They pick a start, write out the full sequence, and
-          record how many steps it took and how high it climbed; then they collect five more,
-          look for patterns in the table, and state a conjecture of their own as a sentence
-          that could be false. The AI is told never to write out a sequence for them, and to
-          point at an arithmetic slip rather than fix it.</p>
-          <p>Then they break the rule — 3<em>n</em> − 1 instead of 3<em>n</em> + 1 — and
-          watch what happens. It closes on the question the activity is really about:
-          what is the difference between <em>checked a lot</em> and <em>proven</em>, and why
-          might something this simple be so hard to prove?</p>
-        </div>
-      </li>
-
-    </ul>
+    </section>
     <hr>
     <h2>About these</h2>
     <p>All were built with <strong>Verbatim</strong>, which records a student's
@@ -692,10 +639,29 @@
     than sixty words at a time, one question per turn, and never answering its own question.
     Those came out of reading an earlier round of transcripts, where the AI was writing
     roughly eleven words for every one the student wrote. Students were holding up their
-    half of the conversation and being buried in it. The Collatz activity is an earlier
-    prompt with a longer personality test at the start and no word cap; it is included
-    partly so the two can be compared.</p>
+    half of the conversation and being buried in it.</p>
+    <p>None of them asks the student how they like to be taught. That is set in the page,
+    under <strong>How your AI teacher sounds</strong>, and saved with the conversation.</p>
     <p><em>The calculus set runs in class from late September 2026.</em></p>
   </div>
+<script>
+  (function () {
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    function pick(id) {
+      for (const t of tabs) {
+        const on = t.getAttribute("aria-controls") === id;
+        t.setAttribute("aria-selected", String(on));
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+      }
+    }
+    for (const t of tabs) t.onclick = () => {
+      const id = t.getAttribute("aria-controls");
+      pick(id);
+      history.replaceState(null, "", "#" + id);
+    };
+    const start = location.hash.slice(1);
+    if (tabs.some(t => t.getAttribute("aria-controls") === start)) pick(start);
+  })();
+</script>
 </body>
 </html>

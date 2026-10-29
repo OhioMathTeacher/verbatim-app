@@ -163,6 +163,7 @@ const T = {
     restarts:"Started over", restartn:"time(s); the set-aside conversation is at the end",
     setaside:"Set aside by the student", setasideat:"set aside",
     codeschanged:"Codes changed", wentback:"went back to the start", hadunder:"under",
+    voice:"How the AI sounded at the start", voicechanged:"Voice changed",
     deletedat:"deleted",
     swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
     reach:"Services that answered", noreach:"not recorded", schema:"Schema",
@@ -232,7 +233,16 @@ function render(d){
   const codes = o => [o && o.participant, o && o.group, o && o.section].filter(Boolean).join(" · ") || "—";
   for (const c of (Array.isArray(d.codes_changed) ? d.codes_changed : []))
     h += fact(tr("codeschanged"), `${codes(c.from)} → ${codes(c.to)}`, c.changed_utc || "");
+  /* "How your AI teacher sounds": where the session began, and each change shown
+     at the point in the conversation where it was made. */
+  const vfmt = v => v && typeof v === "object" ? Object.entries(v).map(([k, x]) => `${k} ${x}`).join(" · ") : "—";
+  if (d.voice) h += fact(tr("voice"), vfmt(d.voice));
   h += `</div><h2 class="conv">${esc(tr("conversation"))}</h2>`;
+  const voiceAt = (list, i) => (Array.isArray(list) ? list : [])
+    .filter(c => (c.after_turn == null ? -1 : c.after_turn) === i)
+    .map(c => `<div class="calcuse"><span class="cw">${esc(tr("voicechanged"))}</span>`
+            + `<code>${esc(vfmt(c.from))} → ${esc(vfmt(c.to))}</code>`
+            + `<span class="cm" title="${esc(c.changed_utc || "")}">${esc(when(c.changed_utc))}</span></div>`).join("");
 
   const KIND = { evaluate: "calceval", graph: "calcgraph", table: "calctable" };
   const calcAt = i => uses.filter(u => (u.after_turn == null ? -1 : u.after_turn) === i).map(u => {
@@ -256,7 +266,7 @@ function render(d){
          + `<span class="cm">${u.deg ? "deg" : "rad"}</span></div>`;
   }).join("");
 
-  h += calcAt(-1);
+  h += calcAt(-1) + voiceAt(d.voice_changes, -1);
   for (const [ti, t] of turns.entries()){
     const role = t.role === "student" ? "student" : "ai";
     const bits = [];
@@ -266,6 +276,7 @@ function render(d){
     if (t.word_count != null) bits.push(`${t.word_count} words`);
     if (t.math_inserts) bits.push(`${tr("inserts")} ×${t.math_inserts}`);
     if (t.reply_lang) bits.push(t.reply_lang);
+    if (t.voice) bits.push(vfmt(t.voice));
     // A turn the student deleted keeps its place. Closing the gap would let the
     // transcript read as though nothing had ever been there.
     if (t.deleted_utc){
@@ -282,7 +293,7 @@ function render(d){
         <div class="text rt">${renderRich(t.text)}</div>
         ${bits.length ? `<p class="meta">${esc(bits.join("  ·  "))}</p>` : ""}
       </div></div>`;
-    h += calcAt(ti);
+    h += calcAt(ti) + voiceAt(d.voice_changes, ti);
   }
 
   /* Conversations the student set aside with "Start over". Shown plainly, after
@@ -292,11 +303,13 @@ function render(d){
       ? ` · ${esc(tr("wentback"))} · ${esc(tr("hadunder"))} ${esc(codes(a))}${a.model ? " · " + esc(a.model) : ""}` : "";
     h += `<h2>${esc(tr("setaside"))} (${ai_ + 1})</h2><p class="sub">${esc(tr("setasideat"))} <span title="${
       esc(a.set_aside_utc || "")}">${esc(when(a.set_aside_utc))}</span>${back}</p>`;
-    for (const t of (Array.isArray(a.turns) ? a.turns : [])){
+    h += voiceAt(a.voice_changes, -1);
+    for (const [si, t] of (Array.isArray(a.turns) ? a.turns : []).entries()){
       const role = t.role === "student" ? "student" : "ai";
       h += t.deleted_utc
         ? `<div class="turn ${role}"><div class="bubble bubble-gone"><p class="who">${esc(tr(role))}</p><p class="gonetext">${esc(tr("deleted"))}</p></div></div>`
         : `<div class="turn ${role}"><div class="bubble"><p class="who">${esc(tr(role))}</p><div class="text rt">${renderRich(t.text)}</div></div></div>`;
+      h += voiceAt(a.voice_changes, si);
     }
   }
 

@@ -29,36 +29,31 @@ from the student to explain more.
   are stuck, ask a smaller question.
 - If they give an answer, ask why they think so before saying anything about it.
 
-STEP 1. Ask two questions, one at a time, waiting for each: would they rather be
-given a clear structure or left to explore, and what usually frustrates them
-when a teacher explains something. Do not comment. Say in one sentence how you
-will teach, then continue.
-
-STEP 2. Under 60 words: a pendulum clock has a pendulum that swings about once a
+STEP 1. Under 60 words: a pendulum clock has a pendulum that swings about once a
 second, and a hand that must go round once in twelve hours. Ask how they would
 get from the one to the other. Wait.
 
-STEP 3. Tell them about one pair of toothed wheels, 8 teeth driving 64. Ask what
+STEP 2. Tell them about one pair of toothed wheels, 8 teeth driving 64. Ask what
 that pair does to a turning rate. Wait.
 
-STEP 4. Ask what factor they need altogether, between one swing and twelve
+STEP 3. Ask what factor they need altogether, between one swing and twelve
 hours. Wait. Do NOT give them the number of seconds in twelve hours.
 
-STEP 5. Ask how many pairs like that one it would take. Let them try. Wait.
+STEP 4. Ask how many pairs like that one it would take. Let them try. Wait.
 
-STEP 6. Ask whether the pairs all have to be the same, and what else they could
+STEP 5. Ask whether the pairs all have to be the same, and what else they could
 have chosen. Wait.
 
-STEP 7. Say the pendulum is running 0.1% fast. Ask what the hand is doing after a
+STEP 6. Say the pendulum is running 0.1% fast. Ask what the hand is doing after a
 day. Wait.
 
-STEP 8. Ask whether a longer gear train — more pairs — would make that error
+STEP 7. Ask whether a longer gear train — more pairs — would make that error
 worse. Wait. Do NOT tell them it does not.
 
-STEP 9. Ask where the accuracy has to be bought, then: in the pendulum or in the
+STEP 8. Ask where the accuracy has to be bought, then: in the pendulum or in the
 wheels. Ask why. Wait however long it takes.
 
-STEP 10. Ask what they now think a chain of multiplications does to a small
+STEP 9. Ask what they now think a chain of multiplications does to a small
 error made at one end of it. Do not summarise.
 
 THROUGHOUT. If asked to just give the answer, decline once and ask a smaller
