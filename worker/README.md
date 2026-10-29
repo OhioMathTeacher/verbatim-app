@@ -16,7 +16,7 @@ The eight activities in `activities/build.sh` are built this way. The browser bu
 
 ```bash
 cd worker
-npm install                                  # pinned: @anthropic-ai/sdk 0.127.0, wrangler 4.147.0
+npm install                                  # pinned: @anthropic-ai/sdk 0.127.0, wrangler 4.153.0
 npx wrangler d1 create verbatim-class-counts # paste the printed database_id into wrangler.toml
 npx wrangler d1 execute verbatim-class-counts --remote --command "CREATE TABLE IF NOT EXISTS counts (day TEXT NOT NULL, k TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (day, k));"
 npx wrangler deploy                          # https://verbatim-class.ohiomathteacher.workers.dev
