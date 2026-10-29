@@ -50,17 +50,29 @@ CODEHINT="Your participant code is the last five digits of your student number â
 # survey.json with that item reworded to name what its activity is about;
 # every other question stays as written. The id is kept, so the answers still
 # line up across pages.
+#
+# The activities ask only the four exit questions about the activity itself
+# (decided 29 Oct 2026): routine feedback to improve the activity. The six
+# background items on AI use outside the class are dropped here, not in
+# survey.json, so the root page keeps all ten.
+EXIT_IDS="alone_or_with helped_learn attitude_after comments"
 SURVEYS="$(mktemp -d)"
 trap 'rm -rf "$SURVEYS"' EXIT
-learn_survey() {  # name, en -> path of a survey.json with helped_learn reworded
-  python3 -I - "$SURVEYS/$1.json" "$2" <<'EOF'
+learn_survey() {  # name, en -> path of the exit questions, helped_learn reworded
+  python3 -I - "$SURVEYS/$1.json" "$2" "$EXIT_IDS" <<'EOF'
 import json, sys
-out, en = sys.argv[1:]
+out, en, keep = sys.argv[1], sys.argv[2], sys.argv[3].split()
 spec = json.load(open("survey.json", encoding="utf-8"))
 qs = spec["questions"] if isinstance(spec, dict) else spec
 hit = [q for q in qs if q["id"] == "helped_learn"]
 assert len(hit) == 1, "survey.json no longer has exactly one helped_learn item"
 hit[0]["en"] = en
+kept = [q for q in qs if q["id"] in keep]
+assert [q["id"] for q in kept] == keep, "survey.json no longer has the four exit questions in order"
+if isinstance(spec, dict):
+    spec["questions"] = kept
+else:
+    spec = kept
 json.dump(spec, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 EOF
   echo "$SURVEYS/$1.json"
