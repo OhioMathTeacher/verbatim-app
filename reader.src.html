@@ -162,6 +162,7 @@ const T = {
     deleted:"Deleted by the student", deletedn:"deleted by the student",
     restarts:"Started over", restartn:"time(s); the set-aside conversation is at the end",
     setaside:"Set aside by the student", setasideat:"set aside",
+    codeschanged:"Codes changed", wentback:"went back to the start", hadunder:"under",
     deletedat:"deleted",
     swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
     reach:"Services that answered", noreach:"not recorded", schema:"Schema",
@@ -228,6 +229,9 @@ function render(d){
   if (uses.length) h += fact(tr("calcs"), `${uses.length} ${tr("calcn")}`);
   const aside = Array.isArray(d.set_aside) ? d.set_aside : [];
   if (aside.length) h += fact(tr("restarts"), `${aside.length} ${tr("restartn")}`);
+  const codes = o => [o && o.participant, o && o.group, o && o.section].filter(Boolean).join(" · ") || "—";
+  for (const c of (Array.isArray(d.codes_changed) ? d.codes_changed : []))
+    h += fact(tr("codeschanged"), `${codes(c.from)} → ${codes(c.to)}`, c.changed_utc || "");
   h += `</div><h2 class="conv">${esc(tr("conversation"))}</h2>`;
 
   const KIND = { evaluate: "calceval", graph: "calcgraph", table: "calctable" };
@@ -284,8 +288,10 @@ function render(d){
   /* Conversations the student set aside with "Start over". Shown plainly, after
      the one handed in, so a restart is visible rather than silently absent. */
   for (const [ai_, a] of aside.entries()){
+    const back = a.reason === "back_to_start"
+      ? ` · ${esc(tr("wentback"))} · ${esc(tr("hadunder"))} ${esc(codes(a))}${a.model ? " · " + esc(a.model) : ""}` : "";
     h += `<h2>${esc(tr("setaside"))} (${ai_ + 1})</h2><p class="sub">${esc(tr("setasideat"))} <span title="${
-      esc(a.set_aside_utc || "")}">${esc(when(a.set_aside_utc))}</span></p>`;
+      esc(a.set_aside_utc || "")}">${esc(when(a.set_aside_utc))}</span>${back}</p>`;
     for (const t of (Array.isArray(a.turns) ? a.turns : [])){
       const role = t.role === "student" ? "student" : "ai";
       h += t.deleted_utc

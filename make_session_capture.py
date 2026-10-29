@@ -620,6 +620,7 @@ try{
     <span class="pill" id="p-model"></span>
     <span class="pill" id="p-turns"></span>
     <span class="sp"></span>
+    <button id="back-start" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="backstart">Back to the start</button>
     <button id="restart" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="restart">Start over</button>
     <button id="finish" class="ghost" style="padding:7px 16px;font-size:14px" data-i18n="finish">Finish &amp; export</button>
   </div>
@@ -829,7 +830,7 @@ if(SECTION){ $("#sec").value = SECTION; $("#secwrap").classList.add("hide"); }
    the three fields record as empty -- the same shape a converted Alkimi export
    has, so anything reading sessions already copes with it. */
 if(!CODES){
-  for(const id of ["#pidwrap", "#grpwrap", "#codehint"]) $(id).classList.add("hide");
+  for(const id of ["#pidwrap", "#grpwrap", "#codehint", "#back-start"]) $(id).classList.add("hide");
   if(!SECTION) $("#secwrap").classList.add("hide");
   if($("#grprow").children.length && $("#secwrap").classList.contains("hide"))
     $("#grprow").classList.add("hide");
@@ -861,6 +862,8 @@ const I18N = {
     finish: "Finish & export", send: "Send",
     finishconfirm: "Finish the activity and export your work?\n\nYou can come back to the conversation afterwards.",
     restart: "Start over",
+    backstart: "Back to the start",
+    backconfirm: "Go back to the start, to fix your codes or change your AI?\n\nThe conversation you have now is not deleted. It stays in your file, marked as set aside, and your teacher will see it.",
     restartconfirm: "Start a new conversation from the beginning?\n\nThe one you have now is not deleted. It stays in your file, marked as set aside, and your teacher will see it.",
     sayph: "Type your reply…    (Enter to send · Shift+Enter for a new line)",
     aisetup: "AI Setup",
@@ -1617,6 +1620,18 @@ $("#go-setup").onclick = async () => {
   if(!DEMO && !aiReady()){ $("#setup-err").textContent = tr("errai"); return; }
   if(pid && /[^A-Z0-9-]/.test(pid)){ $("#setup-err").textContent = tr("errcode"); return; }
   $("#setup-err").textContent = "";
+  /* Back from "Back to the start": the same session, not a new one. */
+  if(S && S.at_start){
+    const was = { participant: S.participant, group: S.group, section: S.section },
+          now = { participant: pid, group: grp, section: sec };
+    if(JSON.stringify(was) !== JSON.stringify(now))
+      (S.codes_changed = S.codes_changed || []).push({ changed_utc: nowUTC(), from: was, to: now });
+    Object.assign(S, now, { provider: (cfg ? cfg.id : "demo"), model: (cfg ? cfg.model : "demo") });
+    delete S.at_start;
+    save(); header(); show("s-chat");
+    await turnFromAI();
+    return;
+  }
   /* network_check is part of why a given student ended up on a given provider,
      so it travels with the session. Null when they never ran one. */
   S = { schema: SCHEMA, app: APP, tool_uses: [], participant: pid, group: grp, section: sec,
@@ -2496,6 +2511,31 @@ $("#restart").onclick = async () => {
   save(); render(); header(); window.scrollTo(0, 0);
   await turnFromAI();
 };
+/* "Back to the start" is for a student who typed the wrong code, or wants a
+   different AI (Todd, 2026-10-29). Like Start over, it sets the conversation
+   aside rather than discarding it. The set-aside entry also carries the codes and
+   the AI it was had under, since both may change before the next one. The start
+   screen comes back with the codes filled in; pressing Start again records any
+   change in S.codes_changed, and the AI opens a fresh conversation in the same
+   session. A reload in between comes back to the start screen. */
+function toStart(){
+  $("#pid").value = S.participant || ""; $("#grp").value = S.group || "";
+  if(!SECTION) $("#sec").value = S.section || "";
+  $("#setup-err").textContent = "";
+  show("s-setup"); window.scrollTo(0, 0);
+}
+$("#back-start").onclick = () => {
+  if(busy) return;
+  if(!confirm(tr("backconfirm"))) return;
+  if(S.turns.length || (S.tool_uses || []).length)
+    (S.set_aside = S.set_aside || []).push({ set_aside_utc: nowUTC(), reason: "back_to_start",
+      participant: S.participant, group: S.group, section: S.section,
+      provider: S.provider, model: S.model, turns: S.turns, tool_uses: S.tool_uses || [] });
+  S.turns = []; S.tool_uses = []; Calculator.restore([]);
+  aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
+  S.at_start = true;
+  save(); toStart();
+};
 $("#survey-back").onclick = () => {
   surveyDraft = collectSurvey();
   (S.back_to_chat_utc = S.back_to_chat_utc || []).push(nowUTC());
@@ -2567,7 +2607,9 @@ applyText();
        find their working where they left it, not an empty tape beside a
        conversation that survived. */
     Calculator.restore(S.tool_uses);
-    if(prev.exported_utc && SURVEY.length && !surveyDone()){
+    if(prev.at_start){
+      toStart();
+    }else if(prev.exported_utc && SURVEY.length && !surveyDone()){
       renderSurvey(); show("s-survey");
     }else if(prev.exported_utc){
       fillDone(); show("s-done");

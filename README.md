@@ -78,7 +78,13 @@ discarding it: the turns and the calculator tape move into `set_aside`, stamped 
 time, and the AI opens a fresh conversation in the same session. The file still shows every
 restart, and the reader counts them among the session facts and shows each set-aside
 conversation after the one handed in. Discarding would leave nothing behind; both of these
-leave a trace. The reader draws deleted exchanges in place, as an outline rather than a gap,
+leave a trace.
+
+"Back to the start" is for a wrong code, or a change of AI. It sets the conversation aside the
+same way, with the codes and the AI it was had under, and returns to the start screen with the
+codes filled in. Starting again keeps the same session file and records any change in
+`codes_changed`: the old codes, the new ones and the time. The reader lists each change among
+the session facts. The reader draws deleted exchanges in place, as an outline rather than a gap,
 for the same reason.
 
 
