@@ -245,6 +245,10 @@
     .tabs button:hover { color: #222; }
     .tabs button[aria-selected="true"] { color: #222; border-bottom-color: #2563eb; }
     .tabnote { color: #555; }
+    /* What each task is well suited for (Todd, 29 Oct 2026): a tag only where it fits. */
+    .tags { margin: -0.2em 0 0.8em; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { font-size: 0.8em; font-weight: 600; color: #3a4a5a; background: #eef2f6;
+           border: 1px solid #d5dde6; border-radius: 99px; padding: 2px 10px; }
     hr {
       border: none;
       border-top: 2px solid #eee;
@@ -266,6 +270,9 @@
     <p>Open any of them, type the class passcode, and press <strong>Start the
     activity</strong>. The AI is Claude, from Anthropic. Messages go through the class's
     server to Claude to get replies, and nowhere else. The server keeps no copy of them.</p>
+    <p>The tags on each one say what it is well suited for: <strong>Graphing</strong>,
+    <strong>Tables</strong>, <strong>Calculating</strong>, or <strong>Discussion</strong> when it
+    is mostly reasoning in words. Choose the ones you want to explore.</p>
     <div class="tabs" role="tablist" aria-label="Activities by topic">
       <button type="button" role="tab" id="tab-limits" aria-controls="limits" aria-selected="true">Small, large and limits</button>
       <button type="button" role="tab" id="tab-chain" aria-controls="chain" aria-selected="false">The chain rule</button>
@@ -280,6 +287,7 @@
         <span class="applet-title">🕰️ <a href="activity-1-pendulum.html">How small is small enough?</a></span>
         <div class="applet-desc">
           <p class="week">Approximation for large and small values</p>
+          <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Three pendulums swinging through 30, 15 and 5 degrees — a
@@ -337,6 +345,7 @@
         <span class="applet-title">🕷️ <a href="activity-2-scaling.html">Why can't a spider be the size of a horse?</a></span>
         <div class="applet-desc">
           <p class="week">Dimensional analysis and proportionality</p>
+          <p class="tags"><span class="tag">Discussion</span></p>
           <figure class="fig">
             <img class="photo" src="img/spiders.jpg" width="1950" height="300" loading="lazy"
                  alt="Two garden spiders of the same species photographed side by side, the
@@ -361,6 +370,7 @@
         <span class="applet-title">🚗 <a href="activity-3-speedometer.html">What does the speedometer mean?</a></span>
         <div class="applet-desc">
           <p class="week">Limits, and what a derivative is before it is computed</p>
+          <p class="tags"><span class="tag">Discussion</span></p>
           <figure class="fig">
             <img class="photo" src="img/car.jpg" width="1950" height="300" loading="lazy"
                  alt="A saloon car in profile, standing on a road ruled with evenly spaced
@@ -393,6 +403,7 @@
         <span class="applet-title">💿 <a href="activity-5-record.html">Why was the last song the worst?</a></span>
         <div class="applet-desc">
           <p class="week">A rate reached through a second rate</p>
+          <p class="tags"><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A vinyl record turning evenly while its stylus creeps inward,
@@ -467,6 +478,7 @@
         <span class="applet-title">🚲 <a href="activity-6-gears.html">Why does the same pedalling give you different speeds?</a></span>
         <div class="applet-desc">
           <p class="week">The chain rule as a literal chain</p>
+          <p class="tags"><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A bicycle drivetrain: a fifty-tooth chainring turning once
@@ -517,6 +529,7 @@
         <span class="applet-title">🥾 <a href="activity-7-uphill.html">How much colder does it get when you walk uphill?</a></span>
         <div class="applet-desc">
           <p class="week">Two measured rates, one nobody can measure</p>
+          <p class="tags"><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Two trails climbing the same 300 metres, one long and gentle
@@ -564,6 +577,7 @@
         <span class="applet-title">⏳ <a href="activity-8-clock.html">How does one swing of a pendulum become an hour?</a></span>
         <div class="applet-desc">
           <p class="week">A companion to the pendulum activity</p>
+          <p class="tags"><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A pendulum swinging once a second drives a train of three
@@ -637,6 +651,7 @@
         <span class="applet-title">📈 <a href="activity-9-growth.html">Which grows faster in the end?</a></span>
         <div class="applet-desc">
           <p class="week">L'Hôpital's rule and indeterminate forms</p>
+          <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <p>At <em>x</em> = 10, <em>x</em><sup>3</sup> and 2<sup><em>x</em></sup> are nearly tied. At <em>x</em> = 100, <em>x</em><sup>100</sup> is so far ahead of <em>e</em><sup><em>x</em></sup> that it looks like a rout. Students are asked which wins in the long run, and why their sizes cannot tell them.</p>
           <p>They meet ∞/∞ as a question rather than an answer, compare how fast each side grows, and find that each step takes one off the power while <em>e</em><sup><em>x</em></sup> stays the same. It closes by asking them to find where <em>e</em><sup><em>x</em></sup> finally pulls ahead.</p>
         </div>
@@ -645,6 +660,7 @@
         <span class="applet-title">🏃 <a href="activity-10-sprinter.html">When was the sprinter fastest?</a></span>
         <div class="applet-desc">
           <p class="week">The derivative in context, with its units</p>
+          <p class="tags"><span class="tag">Calculating</span></p>
           <p>A sprinter's times at each 10-metre mark, and nothing else. Students work out the average speed, find the fastest stretch, and decide whether that is the runner's top speed or only a lower bound for it.</p>
           <p>Along the way they say what 12.3 means in a sentence, with units, notice that the runner slows over the last 30 metres, and say what the table would need to give the speed at exactly 65 metres.</p>
         </div>
@@ -653,6 +669,7 @@
         <span class="applet-title">🔦 <a href="activity-11-shadow.html">How fast does your shadow move?</a></span>
         <div class="applet-desc">
           <p class="week">Related rates</p>
+          <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <p>Someone walks away from a streetlight at a steady pace. The shadow gets longer, so it seems its tip should speed up as they go.</p>
           <p>Students use similar triangles to tie the tip of the shadow to the walker, then the rates to each other, and find that the tip moves at the same speed however far away the walker is.</p>
         </div>
@@ -661,6 +678,7 @@
         <span class="applet-title">🥤 <a href="activity-12-cup.html">Why does the cup fill fast, then slowly?</a></span>
         <div class="applet-desc">
           <p class="week">Related rates</p>
+          <p class="tags"><span class="tag">Graphing</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <p>Water goes into a cone-shaped cup at a steady rate, but the level races up at first and then crawls. Students write the volume in terms of the depth alone and work out how long the whole cup takes.</p>
           <p>Then they predict how long it takes to reach half the depth. It is about an eighth of the time. It closes by asking what shape a cup would need for the level to rise steadily.</p>
         </div>
@@ -676,6 +694,7 @@
         <span class="applet-title">📷 <a href="activity-13-camera.html">Can a camera prove you were speeding?</a></span>
         <div class="applet-desc">
           <p class="week">The Mean Value Theorem</p>
+          <p class="tags"><span class="tag">Discussion</span></p>
           <p>Two cameras 10 km apart time a car, and it averages 120 km/h on a 100 km/h road. The driver says they were never over the limit. Students decide whether that could be true.</p>
           <p>They work out what has to be true about a journey for the cameras' case to hold, state the theorem about the car in their own words, and say what it promises and what it does not.</p>
         </div>
@@ -684,6 +703,7 @@
         <span class="applet-title">⚾ <a href="activity-14-launch.html">What is the best angle to throw?</a></span>
         <div class="applet-desc">
           <p class="week">Extrema and checking the ends</p>
+          <p class="tags"><span class="tag">Graphing</span><span class="tag">Calculating</span></p>
           <p>On flat ground, ignoring the air, 45 degrees throws furthest. Students find that from the range formula, and check it against the angles at the ends, where the ball goes nowhere.</p>
           <p>Then a shot-putter lets go two metres up, and the best angle drops to about 42 degrees. They graph the range to find it, and say why it moved.</p>
         </div>
@@ -692,6 +712,7 @@
         <span class="applet-title">📰 <a href="activity-15-rising.html">Still rising, but more slowly</a></span>
         <div class="applet-desc">
           <p class="week">Connecting <em>f</em>, <em>f</em>′ and <em>f</em>″</p>
+          <p class="tags"><span class="tag">Discussion</span></p>
           <p>A sentence from the news: prices are still rising, but more slowly than last month. Students say which function it is about, what each half says about its derivatives, and what the graph looks like.</p>
           <p>They separate "inflation is falling" from "prices are falling", read a second headline about unemployment, and write a sentence of their own where the second derivative is the news.</p>
         </div>
@@ -700,6 +721,7 @@
         <span class="applet-title">🥫 <a href="activity-16-can.html">Why are soup cans that shape?</a></span>
         <div class="applet-desc">
           <p class="week">Optimization</p>
+          <p class="tags"><span class="tag">Graphing</span><span class="tag">Calculating</span></p>
           <p>A can must hold 400 cm³ with as little metal as possible. Students write the area of metal in terms of the radius alone and find that the best can is exactly as tall as it is wide.</p>
           <p>Real cans are not. It closes on what the model left out, and on what happens to the best shape if the metal for the ends costs more than the metal for the side.</p>
         </div>
