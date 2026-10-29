@@ -141,6 +141,18 @@ PROVIDERS = [
      "key_url": "https://console.groq.com/keys", "blurb_zh": "免费、快速的开源模型。",
      "prefix": "gsk_",
      "placeholder": "gsk_\u2026"},
+    # The same Gemini as the $0 tile, on the tab that matches who pays: Google
+    # decides the tier from whether billing is on for the key's project, and a
+    # billed key read out in class belongs here, not under $0. The page cannot
+    # see which tier a key is on, so a session naming "gemini-paid" records the
+    # tile the student chose, not a checked fact about billing.
+    {"id": "gemini-paid", "label": "Gemini", "tier": "paid", "api": "gemini",
+     "model": "gemini-2.5-flash",
+     "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+     "blurb": "Google's Gemini. A key with billing turned on.",
+     "key_url": "https://aistudio.google.com/apikey", "blurb_zh": "谷歌的 Gemini。需开通计费的密钥。",
+     "prefix": "AIza",
+     "placeholder": "AIza…"},
     # Pinned like Groq, and for the same reason. Effort is pinned in askAnthropic().
     {"id": "anthropic", "label": "Claude", "tier": "paid", "api": "anthropic",
      "model": "claude-opus-5-5",
