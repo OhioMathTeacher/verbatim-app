@@ -39,10 +39,11 @@ case "$MODE" in
   *)     echo "usage: bash activities/build.sh [demo|class]" >&2; exit 2 ;;
 esac
 
-# The seven calculus pages key everything to the last five digits of the student
-# number (decided 15 Sep 2026): pre-survey, the activities, post-survey all
-# carry the same digits, and only Zheng can resolve them.
-CODEHINT="Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page."
+# Codes are arbitrary, assigned by the teacher (decided 29 Oct 2026 for
+# Mariemont): not student numbers, so a code carries nothing about the student.
+# This replaces the Chengdu rule of 15 Sep, the last five digits of the student
+# number, which ended when Chengdu moved to Alkimi.
+CODEHINT="Type the code your teacher gave you. Do not type your name anywhere on this page."
 
 # The one content item in survey.json, helped_learn, asks whether the activity
 # "helped me learn calculus concepts better" -- wrong for the spider (no
