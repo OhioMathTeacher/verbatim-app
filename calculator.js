@@ -616,19 +616,6 @@ const Calculator = (() => {
        could disagree with itself -- and reading it back is what keeps a
        student's work in front of them for the whole activity rather than only
        until the page is refreshed. */
-    /* The drawer is built once, with its words baked in, so switching language
-       has to build it again -- otherwise the conversation turns Chinese and the
-       calculator stays English. State lives outside the DOM, so only what was
-       typed needs carrying across. */
-    relabel(){
-      if(!built) return;
-      const p = pane, typed = {};
-      host.querySelectorAll(".cal-line input, .cal-wrow input").forEach(i => typed[i.id] = i.value);
-      build();
-      for(const [id, v] of Object.entries(typed)){ const el = host.querySelector("#" + id); if(el) el.value = v; }
-      setPane(p);
-    },
-
     restore(uses){
       if(!Array.isArray(uses)) return;
       lists.calc.length = 0; lists.graph.length = 0; lists.table.length = 0;

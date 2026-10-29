@@ -12,9 +12,8 @@ in a second by a machine.
 The checks
 ----------
 1. The page's JavaScript parses.            (needs node; skipped with a warning if absent)
-2. The two i18n dictionaries have the same keys, and no entry is byte-identical
-   across them — an identical pair almost always means a replacement that did not
-   happen, which is exactly how the self-reference got in.
+2. The interface strings are one English table, I18N.en; the Chinese table
+   that once sat beside it was removed in October 2026.
 3. Every data-i18n / data-i18n-ph attribute and every tr("…") call names a key
    that exists.
 4. The word counter agrees with hand-derived expectations on mixed script.
@@ -142,30 +141,19 @@ def check_parses(js: str) -> None:
 
 
 def check_i18n(html: str, js: str) -> None:
-    # The dictionaries are JS literals with unquoted keys, so node reads them, not
+    # The table is a JS literal with unquoted keys, so node reads it, not
     # json.loads. Falling back to a regex here would defeat the point of the check.
     i18n = run_node("const I18N = " + js_object(js, "I18N") + ";", "I18N")
     if i18n is None:
-        warns.append("node not found — the i18n dictionaries were not compared")
-        print("  skip  i18n dictionaries (node not installed)")
+        warns.append("node not found — the interface strings were not checked")
+        print("  skip  interface strings (node not installed)")
         return
-    en, zh = set(i18n["en"]), set(i18n["zh"])
-    if en - zh:
-        fail(f"keys in en but not zh: {sorted(en - zh)}")
-    if zh - en:
-        fail(f"keys in zh but not en: {sorted(zh - en)}")
-    if en == zh:
-        ok(f"i18n dictionaries agree on all {len(en)} keys")
-
-    same = [k for k in en & zh
-            if isinstance(i18n["en"][k], str) and i18n["en"][k] == i18n["zh"][k]]
-    if same:
-        fail("identical in both dictionaries — a replacement that did not happen? "
-             + str(sorted(same)))
+    if set(i18n) != {"en"}:
+        fail(f"I18N should hold only en, found {sorted(i18n)}")
     else:
-        ok("no entry is byte-identical across the two dictionaries")
+        ok(f"one interface table, {len(i18n['en'])} strings")
 
-    known = en | zh
+    known = set(i18n["en"])
     used = set(re.findall(r'data-i18n(?:-ph)?="([^"]+)"', html))
     used |= set(re.findall(r'\btr\("([^"]+)"\)', js))
     missing = sorted(used - known)

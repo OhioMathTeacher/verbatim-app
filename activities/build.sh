@@ -20,18 +20,16 @@ cd "$(dirname "$0")/.."
 # API from the student's browser. What is true is that no copy comes to us until
 # the student hands the file in, and that it is posted to no website.
 TAIL_CLASS="Set up an AI and enter your codes below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, download the file and submit it to me for class credit. This conversation is your coursework. With your permission it may also be used for research: a small number of records, with names removed, may be studied by a collaborating researcher at Miami University in the United States. You may say no to research use, on the survey or by telling me, and it will make no difference to your grade."
-TAIL_CLASS_ZH="开始前请先设置 AI，并在下方填写你的编号。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后请下载文件并提交给我，作为本次课的成绩。这段对话是你的课堂作业。经你同意，它也可能用于研究：少数去除姓名的记录可能由美国迈阿密大学的合作研究者进行分析。你可以在问卷上或直接告诉我拒绝用于研究，这对你的成绩没有任何影响。"
 # What the pages say while they are demonstrations: no codes to enter, nothing
 # handed in, no research use.
 TAIL="Set up an AI below to begin. Your conversation is saved on this device as you go, and the words you send go to the AI provider you chose and nowhere else — this page posts to no website. When you have finished, you can download the conversation as a file."
-TAIL_ZH="开始前请先在下方设置 AI。你的对话会随时保存在本机；你发送的内容只会发给你所选择的 AI 服务商，不会发往任何其他网站。结束后，你可以把对话下载为文件。"
 
 # The one switch. Demo (the default) builds with --no-codes and the demo TAIL;
 # "class" asks for codes again and uses the TAIL_CLASS wording.
 MODE="${1:-demo}"
 case "$MODE" in
   demo)  CODES="--no-codes" ;;
-  class) CODES=""; TAIL="$TAIL_CLASS"; TAIL_ZH="$TAIL_CLASS_ZH" ;;
+  class) CODES=""; TAIL="$TAIL_CLASS" ;;
   *)     echo "usage: bash activities/build.sh [demo|class]" >&2; exit 2 ;;
 esac
 
@@ -40,7 +38,6 @@ esac
 # carry the same digits, and only Zheng can resolve them. The Collatz page keeps
 # the generator's default hint.
 CODEHINT="Your participant code is the last five digits of your student number — the same digits you gave on the survey. Do not type your name anywhere on this page."
-CODEHINT_ZH="你的参与者编号是你学号的后五位——与你在问卷上填写的数字相同。请不要在本页面任何地方填写你的姓名。"
 
 # The one content item in survey.json, helped_learn, asks whether the activity
 # "helped me learn calculus concepts better" -- wrong for the spider (no
@@ -50,15 +47,15 @@ CODEHINT_ZH="你的参与者编号是你学号的后五位——与你在问卷�
 # line up across pages.
 SURVEYS="$(mktemp -d)"
 trap 'rm -rf "$SURVEYS"' EXIT
-learn_survey() {  # name, en, zh -> path of a survey.json with helped_learn reworded
-  python3 -I - "$SURVEYS/$1.json" "$2" "$3" <<'EOF'
+learn_survey() {  # name, en -> path of a survey.json with helped_learn reworded
+  python3 -I - "$SURVEYS/$1.json" "$2" <<'EOF'
 import json, sys
-out, en, zh = sys.argv[1:]
+out, en = sys.argv[1:]
 spec = json.load(open("survey.json", encoding="utf-8"))
 qs = spec["questions"] if isinstance(spec, dict) else spec
 hit = [q for q in qs if q["id"] == "helped_learn"]
 assert len(hit) == 1, "survey.json no longer has exactly one helped_learn item"
-hit[0]["en"], hit[0]["zh"] = en, zh
+hit[0]["en"] = en
 json.dump(spec, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 EOF
   echo "$SURVEYS/$1.json"
@@ -66,55 +63,46 @@ EOF
 
 # Activities 5-8 are alternatives for the same slot, so they share one wording.
 CHAIN_EN="This assignment helped me understand how one rate of change can be built from two others (the chain rule)."
-CHAIN_ZH="这次作业帮助我更好地理解了一个变化率如何由另外两个变化率得到（链式法则）。"
 
 python3 make_session_capture.py \
   --prompt activities/prompts/1-pendulum-approximation.txt \
   --out activities/activity-1-pendulum.html \
-  --survey "$(learn_survey pendulum "This assignment helped me understand how to decide when an approximation is good enough." "这次作业帮助我更好地理解了怎样判断一个近似是否足够好。")" \
+  --survey "$(learn_survey pendulum "This assignment helped me understand how to decide when an approximation is good enough.")" \
   $CODES \
-  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --codehint "$CODEHINT" \
   --accent '#9a5734' \
   --title    "How small is small enough?" \
-  --title-zh "多小才算足够小？" \
-  --subtitle "Welcome! Today you will work out how far a pendulum can be pulled aside before the usual formula stops being good enough — and find that the answer depends entirely on what the pendulum is for. $TAIL" \
-  --subtitle-zh "欢迎！今天你将探究：把摆锤拉开多大的角度，常用的公式才会开始失准——你会发现答案完全取决于这个摆是用来做什么的。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out how far a pendulum can be pulled aside before the usual formula stops being good enough — and find that the answer depends entirely on what the pendulum is for. $TAIL"
 
 python3 make_session_capture.py \
   --prompt activities/prompts/2-scaling-square-cube.txt \
   --out activities/activity-2-scaling.html \
-  --survey "$(learn_survey scaling "This assignment helped me understand how weight and strength change when something is made bigger." "这次作业帮助我更好地理解了物体放大时，重量和强度各自会怎样变化。")" \
+  --survey "$(learn_survey scaling "This assignment helped me understand how weight and strength change when something is made bigger.")" \
   $CODES \
-  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --codehint "$CODEHINT" \
   --accent '#7a5c1f' \
   --title    "Why can't a spider be the size of a horse?" \
-  --title-zh "蜘蛛为什么不能长到马那么大？" \
-  --subtitle "Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. $TAIL" \
-  --subtitle-zh "欢迎！今天你将弄清楚：为什么一只马那么大的蜘蛛会被自己的体重压垮。不需要微积分，只要想清楚把一个物体放大时，体重和腿的粗细各自会怎样变化。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. $TAIL"
 
 python3 make_session_capture.py \
   --prompt activities/prompts/3-speedometer-limits.txt \
   --out activities/activity-3-speedometer.html \
-  --survey "$(learn_survey speedometer "This assignment helped me understand what speed at a single instant means." "这次作业帮助我更好地理解了“某一瞬间的速度”是什么意思。")" \
+  --survey "$(learn_survey speedometer "This assignment helped me understand what speed at a single instant means.")" \
   $CODES \
-  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --codehint "$CODEHINT" \
   --accent '#3f5f7a' \
   --title    "What does the speedometer mean?" \
-  --title-zh "速度表到底表示什么？" \
-  --subtitle "Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. $TAIL" \
-  --subtitle-zh "欢迎！今天你将思考：只用一只秒表和路边的距离标记，你要怎样验证速度表上的 60 km/h 是真的——以及当你测量的时间间隔越来越短时，会发生什么。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. $TAIL"
 
 python3 make_session_capture.py \
   --prompt activities/prompts/5-record-chain-rule.txt \
   --out activities/activity-5-record.html \
-  --survey "$(learn_survey record "$CHAIN_EN" "$CHAIN_ZH")" \
+  --survey "$(learn_survey record "$CHAIN_EN")" \
   $CODES \
-  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --codehint "$CODEHINT" \
   --accent '#6b4a6e' \
   --title    "Why was the last song the worst?" \
-  --title-zh "为什么唱片上最后一首歌最不好听？" \
-  --subtitle "Welcome! Today you will work out why the last song on a vinyl record sounded worse than the first one. Then you will find out why the engineers who designed the compact disc made it change speed as it plays. $TAIL" \
-  --subtitle-zh "欢迎！今天你将弄清楚：为什么黑胶唱片上最后一首歌听起来不如第一首。然后你会知道，设计光盘（CD）的工程师为什么要让碟片在播放过程中改变转速。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out why the last song on a vinyl record sounded worse than the first one. Then you will find out why the engineers who designed the compact disc made it change speed as it plays. $TAIL"
 
 # The three below are chain-rule alternatives to the record activity rather than
 # three more slots in the term: Zheng's set runs about a month apart and activity
@@ -124,38 +112,32 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/6-gears-chain-rule.txt \
   --out activities/activity-6-gears.html \
-  --survey "$(learn_survey gears "$CHAIN_EN" "$CHAIN_ZH")" \
+  --survey "$(learn_survey gears "$CHAIN_EN")" \
   $CODES \
-  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --codehint "$CODEHINT" \
   --accent '#2f6f6a' \
   --title    "Why does the same pedalling give you different speeds?" \
-  --title-zh "为什么同样的踩踏，速度却不一样？" \
-  --subtitle "Welcome! Today you will work out how far one turn of the pedals takes you, and how fast that makes you go. Then you will decide what to change when the hill gets too steep to pedal at all. $TAIL" \
-  --subtitle-zh "欢迎！今天你将算出：踩一整圈脚踏板能让你前进多远，以及这样的速度有多快。然后，当坡陡到几乎踩不动时，你要决定改变什么。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out how far one turn of the pedals takes you, and how fast that makes you go. Then you will decide what to change when the hill gets too steep to pedal at all. $TAIL"
 
 python3 make_session_capture.py \
   --prompt activities/prompts/7-uphill-chain-rule.txt \
   --out activities/activity-7-uphill.html \
-  --survey "$(learn_survey uphill "$CHAIN_EN" "$CHAIN_ZH")" \
+  --survey "$(learn_survey uphill "$CHAIN_EN")" \
   $CODES \
-  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --codehint "$CODEHINT" \
   --accent '#6a7a2f' \
   --title    "How much colder does it get when you walk uphill?" \
-  --title-zh "往山上走，会冷多少？" \
-  --subtitle "Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. $TAIL" \
-  --subtitle-zh "欢迎！今天你将算出：步道顶端的气温低了多少，以及你每走一公里气温降低多少。这是两个不同的数；弄清楚为什么不同，就是今天的任务。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. $TAIL"
 
 python3 make_session_capture.py \
   --prompt activities/prompts/8-clock-chain-rule.txt \
   --out activities/activity-8-clock.html \
-  --survey "$(learn_survey clock "$CHAIN_EN" "$CHAIN_ZH")" \
+  --survey "$(learn_survey clock "$CHAIN_EN")" \
   $CODES \
-  --codehint "$CODEHINT" --codehint-zh "$CODEHINT_ZH" \
+  --codehint "$CODEHINT" \
   --accent '#8a3f52' \
   --title    "How does one swing of a pendulum become an hour?" \
-  --title-zh "钟摆的一次摆动，怎么变成一个小时？" \
-  --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL" \
-  --subtitle-zh "欢迎！今天你将弄清楚：钟表是怎样把大约每秒一次的钟摆摆动，变成十二小时转一圈的指针。然后你会知道，如果钟摆稍微快了一点，这座钟会怎样。$TAIL_ZH"
+  --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL"
 
 # The Collatz activity keeps its own welcome text rather than $TAIL, and bakes
 # the section in: it was written for one class of Todd's rather than for
@@ -165,14 +147,12 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --prompt activities/prompts/4-collatz-conjecture.txt \
   --out activities/activity-4-collatz.html \
-  --survey "$(learn_survey collatz "This assignment helped me understand the difference between checking many cases and proving a conjecture." "这次作业帮助我更好地理解了验证大量例子与证明一个猜想之间的区别。")" \
+  --survey "$(learn_survey collatz "This assignment helped me understand the difference between checking many cases and proving a conjecture.")" \
   $CODES \
   --accent '#4a7a55' \
   --section S4 \
   --title    "Does every number come home?" \
-  --title-zh "每个数都会回到 1 吗？" \
-  --subtitle "Welcome! In today's class, you'll have the opportunity to explore the Collatz Conjecture with genAI. I've set up this app to collect your work. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. You'll download your conversation as a JSON file and submit it to me for class credit." \
-  --subtitle-zh "欢迎！在今天的课堂上，你将有机会借助生成式AI来探索考拉兹猜想（Collatz Conjecture）。我搭建了这个应用来收集你们的作业。开始之前，你需要先在下方设置一个AI。你的对话会在过程中自动保存。你的消息只会发送给AI提供方以获取回复，不会发送到其他任何地方。最后，请将你的对话下载为JSON文件并提交给我，以获得课堂学分。"
+  --subtitle "Welcome! In today's class, you'll have the opportunity to explore the Collatz Conjecture with genAI. I've set up this app to collect your work. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. You'll download your conversation as a JSON file and submit it to me for class credit."
 
 # The Taylor series page at the root of the site, the one linked as "Try it".
 # Built here so its wording is written down too; --section S4 is what it has
@@ -181,8 +161,7 @@ python3 make_session_capture.py \
 python3 make_session_capture.py \
   --out index.html \
   --section S4 $CODES \
-  --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file." \
-  --subtitle-zh "欢迎！在这个活动中，你将借助生成式 AI 探索泰勒级数。开始之前，请先在下方设置 AI。你的对话会随时保存。你发送的消息会传给 AI 服务商以获取回复，除此之外不会上传到任何其他地方。结束后，你可以把对话下载为文件。"
+  --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file."
 
 echo
 echo "Rebuilt eight activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"

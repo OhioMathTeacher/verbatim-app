@@ -121,7 +121,7 @@ PROVIDERS = [
      "model": "gemini-2.5-flash",
      "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
      "blurb": "Free tier via Google \u2014 use a personal Gmail account.",
-     "key_url": "https://aistudio.google.com/apikey", "blurb_zh": "谷歌免费额度。请使用个人 Gmail 账号。",
+     "key_url": "https://aistudio.google.com/apikey",
      "prefix": "AIza",
      "placeholder": "AIza\u2026"},
     # llama-3.3-70b-versatile stopped being served on 16 August 2026. It stayed
@@ -138,7 +138,7 @@ PROVIDERS = [
      "model": "openai/gpt-oss-120b",
      "url": "https://api.groq.com/openai/v1/chat/completions",
      "blurb": "Free tier. Any email \u2014 no Google account needed.",
-     "key_url": "https://console.groq.com/keys", "blurb_zh": "免费、快速的开源模型。",
+     "key_url": "https://console.groq.com/keys",
      "prefix": "gsk_",
      "placeholder": "gsk_\u2026"},
     # The same Gemini as the $0 tile, on the tab that matches who pays: Google
@@ -150,7 +150,7 @@ PROVIDERS = [
      "model": "gemini-2.5-flash",
      "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
      "blurb": "Google's Gemini. A key with billing turned on.",
-     "key_url": "https://aistudio.google.com/apikey", "blurb_zh": "谷歌的 Gemini。需开通计费的密钥。",
+     "key_url": "https://aistudio.google.com/apikey",
      "prefix": "AIza",
      "placeholder": "AIza…"},
     # Pinned like Groq, and for the same reason. Effort is pinned in askAnthropic().
@@ -158,21 +158,21 @@ PROVIDERS = [
      "model": "claude-opus-5-5",
      "url": "https://api.anthropic.com/v1/messages",
      "blurb": "Anthropic's Claude. Your own key.",
-     "key_url": "https://console.anthropic.com/settings/keys", "blurb_zh": "Anthropic 的 Claude。需自备密钥。",
+     "key_url": "https://console.anthropic.com/settings/keys",
      "prefix": "sk-ant-",
      "placeholder": "sk-ant-\u2026"},
     {"id": "openai", "label": "OpenAI", "tier": "paid", "api": "openai",
      "model": "gpt-5",
      "url": "https://api.openai.com/v1/chat/completions",
      "blurb": "ChatGPT's models. Your own key.",
-     "key_url": "https://platform.openai.com/api-keys", "blurb_zh": "ChatGPT 的模型。需自备密钥。",
+     "key_url": "https://platform.openai.com/api-keys",
      "prefix": "sk-",
      "placeholder": "sk-\u2026"},
     {"id": "openrouter", "label": "OpenRouter", "tier": "paid", "api": "openai",
      "model": "openai/gpt-oss-120b",
      "url": "https://openrouter.ai/api/v1/chat/completions",
      "blurb": "One key, many models.",
-     "key_url": "https://openrouter.ai/keys", "blurb_zh": "一个密钥，多种模型。",
+     "key_url": "https://openrouter.ai/keys",
      "prefix": "sk-or-",
      "placeholder": "sk-or-\u2026"},
 ]
@@ -573,8 +573,7 @@ try{
   <img class="avatar hide" id="avatar" alt="">
   <h1 data-i18n="title">__TITLE__</h1>
   <span class="mastbtns">
-    <button class="gear" id="theme" title="Light or dark / 浅色或深色"><span id="theme-icon" aria-hidden="true">☾</span></button>
-    <button class="gear" id="lang" title="Language / 语言">中文</button>
+    <button class="gear" id="theme" title="Light or dark"><span id="theme-icon" aria-hidden="true">☾</span></button>
     <button class="gear" id="gear"><span aria-hidden="true">⚙</span> <span id="gear-txt" data-i18n="aisetup">AI Setup</span></button>
   </span>
 </div>
@@ -846,10 +845,9 @@ if(AVATAR){
 if(FOOTER){ $("#foottext").textContent = FOOTER; $("#foot").classList.remove("hide"); }
 
 
-/* ---------- language ----------
-   A course may be taught in one language while students write in another, so the
-   whole interface switches and the choice persists for the tab. It also sets the
-   language the AI teacher is asked to work in; see apiMessages(). */
+/* ---------- interface text ----------
+   Every string the page shows, in one table. The page had a Chinese interface
+   until October 2026; it is English only now. */
 const I18N = {
   en: {
     title: __TITLE_JSON__, subtitle: __SUBTITLE_JSON__,
@@ -945,142 +943,28 @@ const I18N = {
     toolpromptt: "What the AI is told",
     toolprompts: "This replaces the prompt every student's AI teacher receives. It applies in this browser only \u2014 to change it for a class, rebuild the page with the new prompt and hand that copy out. Whichever prompt is used is recorded in every student's file.",
     toolsurveyt: "The questions at the end",
-    toolsurveys: "A list of questions in JSON. Each needs id, type (single, multi or text), en and zh; the first two types also need options. Applies in this browser only.",
+    toolsurveys: "A list of questions in JSON. Each needs id, type (single, multi or text) and en; the first two types also need options. Applies in this browser only.",
     toolrestore: "Restore the default", toolcancel: "Cancel", toolsave: "Save",
     toolreset: "Default restored. Reloading\u2026",
     toolerrshort: "That looks too short to be the activity prompt.",
     toolerrjson: "That is not valid JSON: ",
     toolerrlist: "Expected a list of questions.",
-    toolerrfields: "Every question needs id, type, en and zh.",
+    toolerrfields: "Every question needs id, type and en.",
     toolerrtype: "Unknown question type: ",
     toolerropts: "This question needs options: ",
   },
-  zh: {
-    title: __TITLE_ZH_JSON__,
-    subtitle: __SUBTITLE_ZH_JSON__,
-    before: "开始之前",
-    codehint: __CODEHINT_ZH_JSON__,
-    pid: "参与者编号", group: "组别", section: "班级",
-    yourai: "你的 AI", setup: "设置", change: "更改",
-    aihint: "可以使用你自己的 API 密钥，或老师提供的密钥。密钥与你的对话一起保存在本浏览器中，方便你稍后在同一台电脑上继续，不会发送到任何地方。如果使用公用电脑，结束后请点击“清除所有密钥”。你使用的 AI 会随会话一起记录。",
-    start: "开始活动",
-    whatai: "AI 收到的指令（所有人相同）",
-    finish: "完成并导出", send: "发送",
-    finishconfirm: "完成活动并导出你的作业吗？\n\n之后仍可以返回对话。",
-    restart: "重新开始",
-    restartconfirm: "要从头开始一段新的对话吗？\n\n当前的对话不会被删除：它会保留在你的文件中，标记为“已搁置”，老师也会看到。",
-    sayph: "输入你的回复……（Enter 发送 · Shift+Enter 换行）",
-    aisetup: "AI 设置",
-    modalsub: "选择你的 AI 老师在哪里运行，如需密钥请填写。",
-    tabwebgpu: "本机", tabfree: "免费", tabpaid: "付费（自备密钥）",
-    selected: "已选择：", selnone: "无", getkey: "获取密钥 \u2197",
-    footlocal: "在这台电脑上运行，或在你指定的服务器上运行。无需密钥。",
-    footfree: "免费额度。密钥保存在本浏览器中，只会发送给该服务商。",
-    footpaid: "付费服务，费用记入你自己的账户。密钥保存在本浏览器中。",
-    notefree: "\u5728\u5f53\u524d\u7f51\u7edc\u4e0b\uff0c\u8fd9\u91cc\u6ca1\u6709\u53ef\u7528\u7684\u670d\u52a1\u3002\u4ecd\u6709\u4e24\u4e2a\u53ef\u884c\u7684\u529e\u6cd5\uff1a\u5728\u672c\u9875\u9762\u5185\u8fd0\u884c\u6a21\u578b\uff08WebGPU\uff09\uff0c\u6216\u4f7f\u7528\u8001\u5e08\u63d0\u4f9b\u7684\u5bc6\u94a5\u8bbf\u95ee\u201c\u4ed8\u8d39\u201d\u4e2d\u7684\u670d\u52a1\u3002",
-    testconn: "测试连接", done: "完成",
-    surveyh: "结束前的几个问题",
-    surveyhint: "这些回答会与你的对话保存在同一个文件中。所有问题均为选填。",
-    surveydone: "完成并下载",
-    answerq: "回答问题",
-    surveypending: "你还没有回答这些问题。你的作业已保存在这台电脑上 —— 可以稍后用同一个浏览器打开本页面继续完成。",
-    surveylater: "你的作业会保存在这台电脑上，可以关闭页面，稍后用同一个浏览器继续完成。",
-    forgetkeys: "清除所有密钥",
-    forgetconfirm: "确定要清除本浏览器中保存的所有 API 密钥吗？",
-    resetconfirm: "\u6e05\u9664\u672c\u6b21\u4f1a\u8bdd\u5e76\u4ece\u7a7a\u767d\u9875\u9762\u91cd\u65b0\u5f00\u59cb\uff1f\n\n\u8fd9\u662f\u8bbe\u7f6e\u5de5\u5177\uff0c\u4e0d\u5c5e\u4e8e\u6d3b\u52a8\u5185\u5bb9\u3002",
-    forgotten: "密钥已清除。浏览器中不再保存任何密钥。",
-    forgotnone: "没有已保存的密钥。",
-    dlcopy: "重新下载文件", backconv: "返回对话",
-    aiteacher: "AI 老师", you: "你",
-    rcalced: "你计算了", rcalcgraph: "你作了图", rcalctable: "你列了表",
-    rcalctried: "你尝试了", rcalcgone: "你删除的一次计算",
-    calc: "计算器", calctab: "计算", calcgraph: "作图", calctable: "数值表",
-    calcfrom: "起点", calcstep: "步长", calcreset: "复位", calcclose: "关闭计算器",
-    calcdel: "删除这一行", calcgone: "已删除", calcmarks: "刻度",
-    calcph: "在此输入算式",
-    calcworked: "算过",
-    del: "删除这段对话",
-    delask: "要删除这段对话吗？\n\n你的发言和这条回复都会从你提交的文件中移除。文件仍会记录此处曾有一段对话及其长度——这样你提交的内容依然是本次会话的如实记录。\n\n此操作无法撤销。",
-    delgone: "已删除的对话",
-    delcount: "已删除",
-    notset: "尚未设置", keyneeded: "需要密钥", demomode: "演示模式 —— 无需 AI",
-    pidph: "在此输入编号（例如 P07）",
-    grpph: "在此输入组别（例如 G3）",
-    secph: "在此输入班级（例如 S4）",
-    nocodes: "演示 — 无编号",
-    errfields: "参与者编号、组别和班级都是必填项。",
-    errcode: "参与者编号只能包含字母和数字，例如 P07。请不要使用姓名。",
-    errai: "请先设置你的 AI。",
-    errsay: "请先对 AI 老师说些什么。",
-    errreach: "无法连接 AI：",
-    errsaved: "\n你的对话已保存。请重试发送，或告知老师。",
-    saved: "已下载", received: "已收到",
-    recvmsg: "老师已收到你的会话。无需其他操作。",
-    savedmsg: "\u4f60\u7684\u5bf9\u8bdd\u5df2\u4e0b\u8f7d\u4e3a JSON \u6587\u4ef6\u3002\u8bf7\u6309\u8001\u5e08\u8981\u6c42\u7684\u65b9\u5f0f\u63d0\u4ea4 \u2014\u2014 \u90ae\u4ef6\u3001\u6559\u5b66\u5e73\u53f0\u6216\u5176\u4ed6\u65b9\u5f0f \u2014\u2014 \u4f5c\u4e3a\u672c\u6b21\u8bfe\u7684\u6210\u7ee9\u3002",
-    turns: "轮对话", turn1: "轮对话", wordsfrom: "个词来自你", wordsai: "来自 AI",
-    seereport: "查看你提交的内容", hidereport: "收起提交的内容",
-    youranswers: "你的回答", noanswers: "你没有回答这些问题。",
-    rreplied: "回复用时", rtyped: "输入用时", word1: "个词", wordn: "个词",
-    cardlocaldesc: "在你自己的电脑上运行。",
-    cardfound: "个模型可用。点击使用。",
-    addserver: "添加服务器", addserverdesc: "输入你正在运行的 OpenAI 兼容模型的地址。",
-    badgelocal: "本地", badgefound: "已发现", badgefree: "免费", badgepaid: "自备密钥",
-    badgerec: "推荐",
-    wgpuh: "在本页面内运行的模型",
-    wgpudesc: "在浏览器中运行。无需密钥，无需账号。",
-    badgewgpu: "浏览器内",
-    wgpuno: "本浏览器无法在页面内运行模型。这需要 WebGPU，而本浏览器不支持。请使用其他选项卡，或用较新版本的 Chrome、Edge 或 Safari 打开本页。",
-    wgpulib: "正在加载模型运行器…",
-    wgpuliberr: "无法加载模型运行器。首次使用需要联网下载。",
-    wgpuget: "正在下载模型 —— 只需一次，之后会保存在本浏览器中。",
-    wgpuready: "已就绪。你输入的内容不会离开这台电脑。",
-    wgpupick: "在上方选一个模型开始下载。",
-    wgpufirst: "首次使用需下载",
-    keyph: "粘贴你的密钥", keysaved: "密钥已保存 —— 输入新密钥可替换",
-    keyhint1: "老师可能会给你一个密钥填在这里。也可以到这里自行获取：",
-    keyhint2: "。密钥会保存在本浏览器中，直到你点击“清除所有密钥”。",
-    endpointhint: "连接你自己运行的 OpenAI 兼容模型。按 Enter 添加。",
-    endpointph: "http://localhost:11434 （地址，不是密钥）",
-    errurl: "地址应以 http:// 或 https:// 开头",
-    looking: "正在查找模型……", nothinganswered: "该地址无响应：",
-    keychecking: "\u6b63\u5728\u68c0\u67e5\u4f60\u7684\u5bc6\u94a5\u2026\u2026",
-    keyok: "\u5bc6\u94a5\u53ef\u7528\uff0c\u53ef\u4ee5\u5f00\u59cb\u4e86\u3002",
-    keyshape: "\u8fd9\u770b\u8d77\u6765\u4e0d\u50cf {p} \u7684\u5bc6\u94a5 \u2014\u2014 \u5b83\u4eec\u901a\u5e38\u4ee5 {x} \u5f00\u5934\u3002\u5df2\u4fdd\u5b58\uff1b\u82e5\u6d4b\u8bd5\u5931\u8d25\u8bf7\u68c0\u67e5\u3002",
-    errkey: "\u8be5 API \u5bc6\u94a5\u672a\u88ab\u63a5\u53d7 \u2014\u2014 \u8bf7\u5728 AI \u8bbe\u7f6e\u4e2d\u68c0\u67e5\uff0c\u6216\u5411\u8001\u5e08\u7d22\u53d6\u3002",
-    toolpromptt: "\u7ed9 AI \u7684\u6307\u4ee4",
-    toolprompts: "\u8fd9\u5c06\u66ff\u6362\u6bcf\u4f4d\u5b66\u751f\u7684 AI \u8001\u5e08\u6536\u5230\u7684\u6307\u4ee4\u3002\u4ec5\u5bf9\u672c\u6d4f\u89c8\u5668\u751f\u6548 \u2014\u2014 \u82e5\u8981\u5bf9\u5168\u73ed\u751f\u6548\uff0c\u8bf7\u7528\u65b0\u6307\u4ee4\u91cd\u65b0\u751f\u6210\u9875\u9762\u5e76\u5206\u53d1\u3002\u5b9e\u9645\u4f7f\u7528\u7684\u6307\u4ee4\u4f1a\u8bb0\u5f55\u5728\u6bcf\u4efd\u4f5c\u4e1a\u6587\u4ef6\u4e2d\u3002",
-    toolsurveyt: "\u7ed3\u675f\u65f6\u7684\u95ee\u9898",
-    toolsurveys: "JSON \u683c\u5f0f\u7684\u95ee\u9898\u5217\u8868\u3002\u6bcf\u9898\u9700\u8981 id\u3001type\uff08single\u3001multi \u6216 text\uff09\u3001en \u548c zh\uff1b\u524d\u4e24\u79cd\u7c7b\u578b\u8fd8\u9700\u8981 options\u3002\u4ec5\u5bf9\u672c\u6d4f\u89c8\u5668\u751f\u6548\u3002",
-    toolrestore: "\u6062\u590d\u9ed8\u8ba4", toolcancel: "\u53d6\u6d88", toolsave: "\u4fdd\u5b58",
-    toolreset: "\u5df2\u6062\u590d\u9ed8\u8ba4\u3002\u6b63\u5728\u91cd\u65b0\u52a0\u8f7d\u2026\u2026",
-    toolerrshort: "\u8fd9\u6bb5\u5185\u5bb9\u592a\u77ed\uff0c\u4e0d\u50cf\u662f\u6d3b\u52a8\u6307\u4ee4\u3002",
-    toolerrjson: "JSON \u683c\u5f0f\u9519\u8bef\uff1a",
-    toolerrlist: "\u9700\u8981\u4e00\u4e2a\u95ee\u9898\u5217\u8868\u3002",
-    toolerrfields: "\u6bcf\u9053\u95ee\u9898\u90fd\u9700\u8981 id\u3001type\u3001en \u548c zh\u3002",
-    toolerrtype: "\u672a\u77e5\u7684\u95ee\u9898\u7c7b\u578b\uff1a",
-    toolerropts: "\u8be5\u95ee\u9898\u9700\u8981 options\uff1a",
-  }
 };
-let lang = (() => { try{ return localStorage.getItem("tea.lang") || __LANG_JSON__; }catch(e){ return __LANG_JSON__; } })();
-const tr = k => (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
-function applyLang(){
-  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+const tr = k => I18N.en[k] || k;
+/* Fills the static markup from I18N, then repaints whatever screen is on show.
+   Called once, at the end of loading. */
+function applyText(){
   for(const el of document.querySelectorAll("[data-i18n]"))    el.textContent = tr(el.dataset.i18n);
   for(const el of document.querySelectorAll("[data-i18n-ph]")) el.placeholder = tr(el.dataset.i18nPh);
   document.title = tr("title");
-  $("#lang").textContent = lang === "zh" ? "EN" : "中文";
   if(S) render();
-  // The done screen is written once when it is reached, so switching language
-  // while standing on it would otherwise leave the last thing a student reads in
-  // the language they just switched away from.
   if(S && !$("#s-done").classList.contains("hide")) fillDone();
-  // The report's button says what it will do next, so its label depends on state
-  // rather than on a single key -- the loop above cannot know which one is right.
   if($("#report")) $("#see-report").textContent =
     tr($("#report").classList.contains("hide") ? "seereport" : "hidereport");
-  // Same for the survey, whose questions come from survey.json and so are built
-  // rather than translated in place. Answers already given are carried across --
-  // re-rendering must not cost a student what they have filled in.
   if(!$("#s-survey").classList.contains("hide")) renderSurvey(collectSurvey());
   if(!$("#mathpal").classList.contains("hide")) renderMath();
   refreshAiStatus();
@@ -1090,13 +974,6 @@ function applyLang(){
     if(c && !c.local){ const pp = PROVIDERS.find(x => x.id === c.id); if(pp) showKeyEntry(pp); }
   }
 }
-$("#lang").onclick = () => {
-  lang = lang === "zh" ? "en" : "zh";
-  try{ localStorage.setItem("tea.lang", lang); }catch(e){}
-  applyLang();
-  /* The calculator builds its own markup once, so applyLang cannot reach it. */
-  Calculator.relabel();
-};
 
 /* ---------- the calculator ----------
    Opened from the bar, beside the symbol palette, because it is wanted while a
@@ -1138,8 +1015,8 @@ $("#calcbtn").onclick = () => {
 addEventListener("resize", () => Calculator.redraw());
 
 /* ---------- light or dark ----------
-   A preference about reading, not about the activity: stored in this browser
-   beside the language, and deliberately never written into the session file.
+   A preference about reading, not about the activity: stored in this browser,
+   and deliberately never written into the session file.
    What a student found comfortable to look at is not data about what they did.
 
    The glyph shows what pressing it gives you, not what you are looking at. */
@@ -1381,14 +1258,10 @@ async function webgpuEngineFor(id){
 /* Three things a student needs to know before waiting on a download, in the same
    numbered cards the Ollama steps used. */
 const WEBGPU_STEPS = [
-  { en: ["What this is", "The model runs on your own graphics hardware, inside this page. There is no key, no account, and nothing you type is sent anywhere."],
-    zh: ["这是什么", "模型在你自己的显卡上运行，就在本页面内。无需密钥，无需账号，你输入的内容不会发送到任何地方。"] },
-  { en: ["What it needs", "A browser with WebGPU — an up-to-date Chrome, Edge or Safari — and enough graphics memory for the model you pick. The sizes are on the cards above."],
-    zh: ["需要什么", "支持 WebGPU 的浏览器 —— 较新版本的 Chrome、Edge 或 Safari —— 以及足够的显存。上方每张卡片都标有大小。"] },
+  { en: ["What this is", "The model runs on your own graphics hardware, inside this page. There is no key, no account, and nothing you type is sent anywhere."] },
+  { en: ["What it needs", "A browser with WebGPU — an up-to-date Chrome, Edge or Safari — and enough graphics memory for the model you pick. The sizes are on the cards above."] },
   { en: ["The first run downloads it", "The model is fetched once and then kept in this browser, so later sessions start straight away. That first download is large and needs a network."],
-    zh: ["首次运行需下载", "模型只下载一次，之后保存在本浏览器中，以后可直接开始。首次下载较大，需要联网。"],
-    note: { en: "The weights come from the HuggingFace CDN, which may not load from mainland China. If it does not, use the key your instructor gives you under Paid instead.",
-            zh: "模型权重来自 HuggingFace CDN，在中国大陆可能无法访问。若无法下载，请改用老师提供的密钥（“付费”选项卡）。" } }
+    note: { en: "The weights come from the HuggingFace CDN, which may not load from mainland China. If it does not, use the key your instructor gives you under Paid instead." } }
 ];
 
 function renderWebgpuPanel(){
@@ -1418,7 +1291,7 @@ function renderWebgpuPanel(){
 
   const grid = document.createElement("div"); grid.className = "steps"; el.appendChild(grid);
   WEBGPU_STEPS.forEach((st, i) => {
-    const [title] = lang === "zh" ? st.zh : st.en;
+    const [title] = st.en;
     const c = document.createElement("button");
     c.type = "button"; c.className = "step";
     const nn = document.createElement("span"); nn.className = "sn"; nn.textContent = i + 1;
@@ -1445,7 +1318,7 @@ function renderWebgpuPanel(){
 }
 function openStep(i){
   const st = WEBGPU_STEPS[i];
-  const [title, body] = lang === "zh" ? st.zh : st.en;
+  const [title, body] = st.en;
   $("#step-title").textContent = (i + 1) + ". " + title;
   const el = $("#step-body"); el.textContent = "";
   const b = document.createElement("p"); b.className = "ai-modal-sub"; b.textContent = body;
@@ -1454,7 +1327,7 @@ function openStep(i){
     const pre = document.createElement("code"); pre.className = "sc"; pre.textContent = st.code;
     el.appendChild(pre);
   }
-  const links = (lang === "zh" ? st.links_zh : st.links_en) || st.links;
+  const links = st.links_en || st.links;
   if(links){
     const ln = document.createElement("div"); ln.className = "sl";
     links.forEach(([nm, url], j) => {
@@ -1467,7 +1340,7 @@ function openStep(i){
   }
   if(st.note){
     const nt = document.createElement("div"); nt.className = "snote";
-    nt.textContent = lang === "zh" ? st.note.zh : st.note.en;
+    nt.textContent = st.note.en;
     el.appendChild(nt);
   }
   $("#step-overlay").classList.add("open");
@@ -1598,7 +1471,7 @@ function renderCards(){
   }
 
   for(const p of offer(aiTab)){
-    card({ title: p.label, model: p.model, desc: (lang === "zh" && p.blurb_zh) ? p.blurb_zh : p.blurb,
+    card({ title: p.label, model: p.model, desc: p.blurb,
            badge: p.tier === "free" ? tr("badgefree") : tr("badgepaid"), keyUrl: p.key_url,
            badge2: p.recommended ? tr("badgerec") : null,
            selected: current === p.id,
@@ -1773,8 +1646,7 @@ $("#go-setup").onclick = async () => {
    so latency_ms = think + compose, compose_ms = compose alone, and reading and
    thinking time is the difference. */
 let aiDoneAt = null, composeStart = null;
-/* English needs the singular, Chinese does not distinguish; going through tr()
-   for both means neither language has to be special-cased at the call site. */
+/* "1 turn", "2 turns". */
 const turnCount = n => n + " " + tr(n === 1 ? "turn1" : "turns");
 function header(){
   $("#p-id").textContent    = [S.participant, S.group, S.section].filter(Boolean).join(" · ")
@@ -1887,26 +1759,19 @@ function push(role, text, extra){
    is stored as its own field rather than as turn 0, so nothing downstream has to
    decide whether the opening block was the prompt or the AI speaking. Both model
    attribution runs failed on precisely that question. */
-/* The language toggle also says what language to be taught in.
-
-   Without this the opening turn is whatever the model defaults to, which for an
-   English prompt is English -- so a student who has set the page to 中文 is greeted
-   in English before they have written a word, and the AI only follows them into
-   Chinese once they have written enough of it to be read.
-
-   Switching mid-conversation changes what comes next and never what has already
-   been said. Turns are data; they are not retranslated.
+/* Every request tells the model to reply in English, whatever the student
+   writes in.
 
    The directive is appended to the copy of the prompt SENT to the model and never
    to `activity_prompt.text`, which stays byte-identical for everyone and keeps its
-   SHA-256. Which language was in force is recorded on each AI turn, and the exact
-   wording is recorded once in `reply_directives`, so the instrument can be
-   reconstructed from the file instead of from this source. */
+   SHA-256. The reply language is recorded on each AI turn as `reply_lang`, and the
+   exact wording once in `reply_directives`, so the instrument can be reconstructed
+   from the file instead of from this source. Sessions recorded before October 2026
+   may say "zh": the page could be switched to Chinese until then. */
 const REPLY_DIRECTIVE = {
   en: "Reply in English throughout, whatever language the student writes in.",
-  zh: "请全程使用简体中文回复，无论学生使用什么语言。"
 };
-const replyLang = () => (REPLY_DIRECTIVE[lang] ? lang : "en");
+const replyLang = () => "en";
 function apiMessages(){
   const m = [{ role: "user",
                content: S.activity_prompt.text + "\n\n" + REPLY_DIRECTIVE[replyLang()] }];
@@ -2039,7 +1904,7 @@ async function demoReply(){
     + "I'd like to ask a few short questions to work out what kind of teacher you'd learn best from.\n\n"
     + "First one: when something doesn't make sense, would you rather be given a hint, or be asked "
     + "a question that helps you find it yourself?";
-  if(n === 1) return "Good — that tells me something.\n\n我明白了。Next: when you get an answer wrong, "
+  if(n === 1) return "Good — that tells me something.\n\nNext: when you get an answer wrong, "
     + "do you want me to say so directly, or work around to it more gently?";
   return "Right. Let's begin.\n\nWithout a calculator, estimate sin(0.2) using a 3rd-degree Taylor "
     + "polynomial centred at x = 0.\n\nStart with the series for sin(x). What are its first few terms?\n\n"
@@ -2079,8 +1944,7 @@ $("#say").addEventListener("input", e => {
    survey responses to its 127 transcripts; here the link is structural.
    Name and student ID are not asked: the participant code already carries it. */
 /* `prev` is the shape collectSurvey() returns. Passing it back in repaints the
-   survey in the other language with everything the student has already answered
-   still filled in. */
+   survey with everything the student has already answered still filled in. */
 function renderSurvey(prev){
   const body = $("#survey-body"); body.innerHTML = "";
   SURVEY.forEach((q, i) => {
@@ -2088,7 +1952,7 @@ function renderSurvey(prev){
     const box = document.createElement("div"); box.className = "q";
     const title = document.createElement("p"); title.className = "qt";
     const num = document.createElement("span"); num.className = "qn"; num.textContent = (i + 1) + ".";
-    title.append(num, document.createTextNode(lang === "zh" ? q.zh : q.en));
+    title.append(num, document.createTextNode(q.en));
     box.appendChild(title);
 
     if(q.type === "text"){
@@ -2105,7 +1969,7 @@ function renderSurvey(prev){
         inp.type = "radio"; inp.name = "q_" + q.id; inp.value = o.v;
         inp.checked = chosen.includes(o.v);
         const sp = document.createElement("span");
-        sp.textContent = lang === "zh" ? o.zh : o.en;
+        sp.textContent = o.en;
         lab.append(inp, sp); row.appendChild(lab);
       }
       box.appendChild(row);
@@ -2118,12 +1982,12 @@ function renderSurvey(prev){
         inp.name = "q_" + q.id; inp.value = o.v;
         inp.checked = chosen.includes(o.v);
         const sp = document.createElement("span");
-        sp.textContent = lang === "zh" ? o.zh : o.en;
+        sp.textContent = o.en;
         lab.append(inp, sp); box.appendChild(lab);
         if(o.specify){
           const sx = document.createElement("input");
           sx.type = "text"; sx.className = "spec"; sx.id = "spec_" + q.id + "_" + o.v;
-          sx.placeholder = lang === "zh" ? "请说明" : "Please specify";
+          sx.placeholder = "Please specify";
           sx.disabled = !inp.checked;
           if(had && had.specify && had.specify[o.v]) sx.value = had.specify[o.v];
           inp.addEventListener("change", () => {
@@ -2188,46 +2052,46 @@ function collectSurvey(){
    first because that is the activity. Indices and the power template appear on
    more than one tab on purpose -- a palette is judged by reach, not by taxonomy. */
 const MATH_TABS = [
-  { en: "Calculus", zh: "微积分", rows: [
-      { en: "Symbols", zh: "符号",
+  { en: "Calculus", rows: [
+      { en: "Symbols",
         keys: ["∑","∫","∂","∏","∮","∇","∞","Δ","δ","ε","θ","′","″"] },
-      { en: "Indices", zh: "指数",
+      { en: "Indices",
         keys: ["²","³","⁴","⁵","ⁿ","₀","₁","₂","ₙ","!"] },
-      { en: "Templates", zh: "模板", tmpl: [
-        { en: "Sum",         zh: "求和",  t: "∑_(⟨n=0⟩)^(⟨∞⟩) ⟨term⟩" },
-        { en: "Integral",    zh: "积分",  t: "∫_(⟨a⟩)^(⟨b⟩) ⟨f(x)⟩ d⟨x⟩" },
-        { en: "Derivative",  zh: "导数",  t: "f⁽⟨n⟩⁾(⟨x⟩)" },
-        { en: "Limit",       zh: "极限",  t: "lim_(⟨x→0⟩) ⟨f(x)⟩" },
-        { en: "Taylor term", zh: "泰勒项", t: "⟨x⟩^(⟨n⟩)/⟨n⟩!" }
+      { en: "Templates", tmpl: [
+        { en: "Sum",          t: "∑_(⟨n=0⟩)^(⟨∞⟩) ⟨term⟩" },
+        { en: "Integral",     t: "∫_(⟨a⟩)^(⟨b⟩) ⟨f(x)⟩ d⟨x⟩" },
+        { en: "Derivative",   t: "f⁽⟨n⟩⁾(⟨x⟩)" },
+        { en: "Limit",        t: "lim_(⟨x→0⟩) ⟨f(x)⟩" },
+        { en: "Taylor term", t: "⟨x⟩^(⟨n⟩)/⟨n⟩!" }
       ] }
   ] },
-  { en: "Functions", zh: "函数", rows: [
-      { en: "Symbols", zh: "符号",
+  { en: "Functions", rows: [
+      { en: "Symbols",
         keys: ["π","√","∛","≈","∘","|","e","∅"] },
-      { en: "Templates", zh: "模板", tmpl: [
-        { en: "sin",       zh: "sin",  t: "sin(⟨x⟩)" },
-        { en: "cos",       zh: "cos",  t: "cos(⟨x⟩)" },
-        { en: "tan",       zh: "tan",  t: "tan(⟨x⟩)" },
-        { en: "ln",        zh: "ln",   t: "ln(⟨x⟩)" },
-        { en: "log",       zh: "log",  t: "log_(⟨10⟩)(⟨x⟩)" },
-        { en: "eˣ",        zh: "eˣ",   t: "e^(⟨x⟩)" },
-        { en: "Root",      zh: "根式", t: "√(⟨x⟩)" },
-        { en: "Power",     zh: "幂",   t: "⟨x⟩^(⟨n⟩)" },
-        { en: "Factorial", zh: "阶乘", t: "⟨n⟩!" },
-        { en: "|x|",       zh: "|x|",  t: "|⟨x⟩|" }
+      { en: "Templates", tmpl: [
+        { en: "sin",        t: "sin(⟨x⟩)" },
+        { en: "cos",        t: "cos(⟨x⟩)" },
+        { en: "tan",        t: "tan(⟨x⟩)" },
+        { en: "ln",          t: "ln(⟨x⟩)" },
+        { en: "log",        t: "log_(⟨10⟩)(⟨x⟩)" },
+        { en: "eˣ",          t: "e^(⟨x⟩)" },
+        { en: "Root",      t: "√(⟨x⟩)" },
+        { en: "Power",       t: "⟨x⟩^(⟨n⟩)" },
+        { en: "Factorial", t: "⟨n⟩!" },
+        { en: "|x|",        t: "|⟨x⟩|" }
       ] }
   ] },
-  { en: "Arithmetic", zh: "算术", rows: [
-      { en: "Operators", zh: "运算",
+  { en: "Arithmetic", rows: [
+      { en: "Operators",
         keys: ["+","−","×","÷","·","±","∓","(",")","/"] },
-      { en: "Relations", zh: "关系",
+      { en: "Relations",
         keys: ["=","≈","≠","≤","≥","<",">","≡","→","⇒"] },
-      { en: "Indices", zh: "指数",
+      { en: "Indices",
         keys: ["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹","ⁿ","₀","₁","₂","₃","ₙ"] },
-      { en: "Templates", zh: "模板", tmpl: [
-        { en: "Fraction", zh: "分式", t: "(⟨a⟩)/(⟨b⟩)" },
-        { en: "Power",    zh: "幂",   t: "⟨x⟩^(⟨n⟩)" },
-        { en: "Percent",  zh: "百分比", t: "⟨n⟩%" }
+      { en: "Templates", tmpl: [
+        { en: "Fraction", t: "(⟨a⟩)/(⟨b⟩)" },
+        { en: "Power",      t: "⟨x⟩^(⟨n⟩)" },
+        { en: "Percent",  t: "⟨n⟩%" }
       ] }
   ] }
 ];
@@ -2241,7 +2105,7 @@ function renderMath(){
   const tabs = document.createElement("div"); tabs.className = "mathtabs";
   MATH_TABS.forEach((t, i) => {
     const b = document.createElement("button");
-    b.type = "button"; b.textContent = lang === "zh" ? t.zh : t.en;
+    b.type = "button"; b.textContent = t.en;
     b.setAttribute("aria-selected", String(i === mathTab));
     b.onclick = () => { mathTab = i; renderMath(); $("#say").focus(); };
     tabs.appendChild(b);
@@ -2253,12 +2117,12 @@ function renderMath(){
                      b.onclick = () => insertMath(k); return b; };
   const tmpl = t => { const b = document.createElement("button");
                       b.type = "button"; b.className = "tmpl";
-                      b.textContent = lang === "zh" ? t.zh : t.en;
+                      b.textContent = t.en;
                       b.onclick = () => insertMath(t.t); return b; };
 
   for(const r of MATH_TABS[mathTab].rows){
     const g = document.createElement("div"); g.className = "mathgrp";
-    const b = document.createElement("b"); b.textContent = lang === "zh" ? r.zh : r.en;
+    const b = document.createElement("b"); b.textContent = r.en;
     const wrap = document.createElement("span");
     for(const it of (r.keys || [])) wrap.appendChild(key(it));
     for(const it of (r.tmpl || [])) wrap.appendChild(tmpl(it));
@@ -2371,7 +2235,7 @@ const SURVEY_TYPES = ["single", "multi", "likert", "text"];
 function validateSurvey(v){
   if(!Array.isArray(v) || !v.length) return tr("toolerrlist");
   for(const q of v){
-    if(!q || !q.id || !q.en || !q.zh || !q.type) return tr("toolerrfields");
+    if(!q || !q.id || !q.en || !q.type) return tr("toolerrfields");
     if(!SURVEY_TYPES.includes(q.type)) return tr("toolerrtype") + q.type;
     if(q.type !== "text" && !(Array.isArray(q.options) && q.options.length))
       return tr("toolerropts") + q.id;
@@ -2450,11 +2314,11 @@ function answerText(q, v){
   if(typeof v === "string") return v;
   const label = id => {
     const o = (q.options || []).find(x => x.v === id);
-    return o ? ((lang === "zh" && o.zh) ? o.zh : o.en) : id;
+    return o ? o.en : id;
   };
   const sel = Array.isArray(v.selected) ? v.selected
             : (v.selected == null ? [] : [v.selected]);
-  let out = sel.map(label).join(lang === "zh" ? "、" : ", ");
+  let out = sel.map(label).join(", ");
   if(v.specify && typeof v.specify === "object"){
     const extra = Object.entries(v.specify).filter(([, t]) => t !== "" && t != null)
                                            .map(([, t]) => t);
@@ -2546,7 +2410,7 @@ function fillReport(){
       for(const q of asked){
         const wrap = document.createElement("div"); wrap.className = "qa";
         const qq = document.createElement("span"); qq.className = "q";
-        qq.textContent = (lang === "zh" && q.zh) ? q.zh : q.en;
+        qq.textContent = q.en;
         const aa = document.createElement("span"); aa.className = "a";
         aa.textContent = answerText(q, answers[q.id]);
         wrap.appendChild(qq); wrap.appendChild(aa); box.appendChild(wrap);
@@ -2605,8 +2469,8 @@ function failover(why){
   $("#done-h").textContent   = tr("saved");
   $("#done-msg").textContent = (why ? why + " " : "") + tr("savedmsg");
 }
-/* Finish sits a couple of centimetres below the language toggle, and both are in
-   the top-right corner. One stray click should not end the activity, so it asks.
+/* Finish sits in the top-right corner, among the other buttons. One stray
+   click should not end the activity, so it asks.
    Nothing is lost either way -- the conversation is still there afterwards -- but
    being bounced out of it mid-thought is disorienting enough to be worth a step. */
 /* A student on the survey can go back and talk some more (Todd, 2026-10-10).
@@ -2688,10 +2552,9 @@ if(flag("reset")){
   try{ history.replaceState(null, "", location.pathname); }catch(e){}
 }
 
-/* The static HTML carries English, so nothing had translated it on a zh build or
-   for a student whose saved choice was zh. Runs last, after any restored screen
-   is on show, so it repaints whichever one that is. */
-applyLang();
+/* Runs last, after any restored screen is on show, so it repaints whichever
+   one that is. */
+applyText();
 
 /* ---------- resume after a reload ---------- */
 (function(){
@@ -2870,7 +2733,7 @@ def check(provs: list[dict]) -> int:
 def pub_providers(providers: list[dict]) -> list[dict]:
     """What the page is allowed to know about a provider: never a key."""
     return [{"id": p["id"], "label": p["label"], "model": p["model"],
-            "blurb": p.get("blurb", ""), "blurb_zh": p.get("blurb_zh", ""),
+            "blurb": p.get("blurb", ""),
             "recommended": bool(p.get("recommended")),
             "tier": p.get("tier", "paid"), "api": p.get("api", "openai"),
             "url": p["url"], "key_url": p.get("key_url", ""),
@@ -2901,8 +2764,8 @@ def tint(hex_colour: str, s: float, l: float) -> str:
 
 
 def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
-          avatar: str, footer: str, lang: str, section: str, title_zh: str,
-          subtitle_zh: str, survey: list, demo: bool, title: str, subtitle: str, codehint: str, codehint_zh: str,
+          avatar: str, footer: str, section: str, survey: list, demo: bool,
+          title: str, subtitle: str, codehint: str,
           accent: str, no_codes: bool = False) -> str:
     # Deliberately NOT published to the page: url and key. The page names a
     # provider; the student supplies the credential.
@@ -2916,14 +2779,10 @@ def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
             .replace("__FOOTER_JSON__", json.dumps(footer, ensure_ascii=False))
             .replace("__TITLE_JSON__", json.dumps(title, ensure_ascii=False))
             .replace("__SUBTITLE_JSON__", json.dumps(subtitle, ensure_ascii=False))
-            .replace("__LANG_JSON__", json.dumps(lang))
             .replace("__SECTION_JSON__", json.dumps(section))
             .replace("__CODES_JSON__", "false" if no_codes else "true")
             .replace("__SURVEY_JSON__", json.dumps(survey, ensure_ascii=False))
-            .replace("__TITLE_ZH_JSON__", json.dumps(title_zh, ensure_ascii=False))
-            .replace("__SUBTITLE_ZH_JSON__", json.dumps(subtitle_zh, ensure_ascii=False))
             .replace("__CODEHINT_JSON__", json.dumps(codehint, ensure_ascii=False))
-            .replace("__CODEHINT_ZH_JSON__", json.dumps(codehint_zh, ensure_ascii=False))
             .replace("__DEMO_JSON__", "true" if demo else "false")
             .replace("__ACCENT_BG__", tint(accent, 0.71, 0.945))
             .replace("__ACCENT_EDGE__", tint(accent, 0.56, 0.849))
@@ -2977,16 +2836,8 @@ def main() -> int:
     ap.add_argument("--section", default="",
                     help="fixed section code recorded with every session, e.g. S4. "
                          "When set, students are not asked for it.")
-    ap.add_argument("--title-zh", default="AI 活动",
-                    help="Chinese title shown when the page is switched to 中文")
-    ap.add_argument("--subtitle-zh", default='欢迎！在今天的课上，你将有机会借助生成式 AI 探索泰勒级数。这个应用是我为收集大家的作业而搭建的。开始之前，请先设置 AI，并在下方填写你的编号。你的对话会随时保存。你发送的消息会传给 AI 服务商以获取回复，除此之外不会上传到任何其他地方。结束后请下载 JSON 文件并提交给我，作为本次课的成绩。',
-                    help="Chinese opening paragraph")
     ap.add_argument("--codehint", default='Your instructor will give you a participant code and a group code. Please use those instead of your name — your name should not appear anywhere on this page.',
                     help="Text under the participant-code field, e.g. to say the code is the last five digits of a student number")
-    ap.add_argument("--codehint-zh", default='老师会给你一个参与者编号和组别编号。请使用这两个编号，不要在本页面填写你的姓名。',
-                    help="Chinese version of --codehint")
-    ap.add_argument("--lang", choices=("en", "zh"), default="en",
-                    help="language the page opens in; students can switch either way")
     ap.add_argument("--accent", default="#9a5734", metavar="HEX",
                     help="accent colour, e.g. --accent '#3f5f7a'. Tints the student's "
                          "turns, the buttons and the links, so a set of activities can "
@@ -3060,9 +2911,9 @@ def main() -> int:
     prompt = load_prompt(a.prompt)
     submit = {"url": a.submit_url}
     a.out.parent.mkdir(parents=True, exist_ok=True)
-    a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.lang, a.section.strip().upper(),
-                           a.title_zh, a.subtitle_zh, survey, a.demo, a.title, subtitle,
-                           a.codehint, a.codehint_zh, a.accent, a.no_codes), encoding="utf-8")
+    a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.section.strip().upper(),
+                           survey, a.demo, a.title, subtitle,
+                           a.codehint, a.accent, a.no_codes), encoding="utf-8")
 
     # The builder ships with the activity so a teacher can make their own without
     # Python. It embeds this exact template, so the two stay in step by construction.
@@ -3070,10 +2921,10 @@ def main() -> int:
     if SETUP_SRC.exists() and not a.demo:
         setup_out.write_text(build_setup({
             "providers": pub_providers(provs), "submit": submit, "chat_url": a.chat_url,
-            "avatar": avatar, "footer": a.footer, "title": a.title, "title_zh": a.title_zh,
-            "subtitle": subtitle, "subtitle_zh": a.subtitle_zh, "lang": a.lang,
+            "avatar": avatar, "footer": a.footer, "title": a.title,
+            "subtitle": subtitle,
             "section": a.section.strip().upper(), "prompt": prompt, "survey": survey,
-            "codes": not a.no_codes, "codehint": a.codehint, "codehint_zh": a.codehint_zh,
+            "codes": not a.no_codes, "codehint": a.codehint,
             "accent": a.accent,
             "built": prompt["sha256"][:12],
         }), encoding="utf-8")

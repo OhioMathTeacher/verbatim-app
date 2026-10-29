@@ -233,7 +233,7 @@ to remember a token. Which route built a given page is already recorded separate
 ## Light or dark
 
 The activity follows the machine, and the ☾ button in the corner overrides it either way.
-The choice is remembered in that browser, beside the language, and is deliberately never
+The choice is remembered in that browser, and is deliberately never
 written into the session file: what a student found comfortable to read is not data about
 what they did. The reader is light only.
 
@@ -265,7 +265,7 @@ python3 make_session_capture.py --demo
 Hand out the resulting file, or serve it. Both work: a page opened directly from a file
 sends `Origin: null`, and every provider offered accepts that.
 
-`--help` lists the rest: branding, language, submission, provider selection. Every build also
+`--help` lists the rest: branding, submission, provider selection. Every build also
 writes `setup.html` beside the activity, so the browser builder always carries the template it
 was built from, and `reader.html`, so the reader carries the same maths renderer the activity
 does. Both are generated — edit `setup.src.html` and `reader.src.html`, not the built files.

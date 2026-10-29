@@ -79,12 +79,9 @@ button:hover{border-color:var(--accent)}
 .qhead button:hover{border-color:var(--accent);color:var(--accent)}
 .qhead button.del:hover{border-color:var(--warn);color:var(--warn)}
 .qcard label{margin-top:0}
-.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:640px){.qgrid{grid-template-columns:1fr}}
 .opts{margin:14px 0 0;border-top:1px solid var(--rule);padding:14px 0 0}
-.opt-row{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center;
+.opt-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;
   margin:0 0 8px}
-@media (max-width:640px){.opt-row{grid-template-columns:1fr 1fr auto auto}}
 .opt-row input[type=text]{padding:8px 10px;font-size:14px}
 .opt-row .spec{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);
   text-transform:none;letter-spacing:0;font-weight:500;margin:0;white-space:nowrap}
@@ -112,25 +109,16 @@ code{font-family:var(--mono);font-size:.88em}
   </div>
 
   <section class="panel on" id="p-activity">
-    <div class="row">
-      <div class="field"><label for="title">Title</label>
-        <input id="title"><p class="hint">Shown at the top of the page.</p></div>
-      <div class="field"><label for="titlezh">Title in 中文</label>
-        <input id="titlezh"><p class="hint">Used when a student switches language.</p></div>
-    </div>
+    <div class="field"><label for="title">Title</label>
+      <input id="title"><p class="hint">Shown at the top of the page.</p></div>
     <div class="field"><label for="subtitle">Opening paragraph</label>
       <textarea id="subtitle" rows="4" class="prose"></textarea>
       <p class="hint">The first thing a student reads. Say what they are about to do and what
         to hand in.</p></div>
-    <div class="field"><label for="subtitlezh">Opening paragraph in 中文</label>
-      <textarea id="subtitlezh" rows="4" class="prose"></textarea></div>
     <div class="row">
       <div class="field"><label for="section">Section code</label>
         <input id="section" placeholder="e.g. S4 — or leave empty">
         <p class="hint">Recorded with every session. Leave it empty to ask each student.</p></div>
-      <div class="field"><label for="lang">Language it opens in</label>
-        <select id="lang"><option value="en">English</option><option value="zh">中文</option></select>
-        <p class="hint">Students can switch either way at any time.</p></div>
     </div>
     <div class="field"><label class="check"><input type="checkbox" id="codes" checked>
         Ask each student for a participant code</label>
@@ -220,10 +208,9 @@ function showThumb(){
   if(avatar) img.src = avatar;
 }
 function fillForm(d){
-  $("#title").value = d.title;          $("#titlezh").value = d.title_zh;
-  $("#subtitle").value = d.subtitle;    $("#subtitlezh").value = d.subtitle_zh;
+  $("#title").value = d.title;
+  $("#subtitle").value = d.subtitle;
   $("#section").value = d.section;      $("#footer").value = d.footer;
-  $("#lang").value = d.lang;
   $("#codes").checked = d.codes !== false;
   $("#prompt").value = d.prompt.text;
   QS = JSON.parse(JSON.stringify(d.survey));
@@ -284,10 +271,7 @@ function renderQuestions(){
     head.append(n, sp, up, dn, del);
     card.appendChild(head);
 
-    const grid = document.createElement("div"); grid.className = "qgrid";
-    grid.appendChild(fieldRow("The question", q.en, v => { q.en = v; }, "What do you want to ask?"));
-    grid.appendChild(fieldRow("In 中文", q.zh, v => { q.zh = v; }));
-    card.appendChild(grid);
+    card.appendChild(fieldRow("The question", q.en, v => { q.en = v; }, "What do you want to ask?"));
 
     const tw = document.createElement("div"); tw.style.marginTop = "12px";
     const tl = document.createElement("label"); tl.textContent = "Kind of answer";
@@ -298,15 +282,15 @@ function renderQuestions(){
     }
     sel.onchange = () => {
       q.type = sel.value;
-      const LIKERT = [{v:"1",en:"Strongly disagree",zh:"非常不同意"},{v:"2",en:"Disagree",zh:"不同意"},
-                      {v:"3",en:"Neutral",zh:"中立"},{v:"4",en:"Agree",zh:"同意"},
-                      {v:"5",en:"Strongly agree",zh:"非常同意"}];
+      const LIKERT = [{v:"1",en:"Strongly disagree"},{v:"2",en:"Disagree"},
+                      {v:"3",en:"Neutral"},{v:"4",en:"Agree"},
+                      {v:"5",en:"Strongly agree"}];
       const n = (q.options || []).length;
       if(q.type === "text") delete q.options;
       // Asking for a scale and being handed the two answers you already had is not
       // what anyone means by it; anything already scale-shaped is left alone.
       else if(q.type === "likert" && n < 3) q.options = JSON.parse(JSON.stringify(LIKERT));
-      else if(!n) q.options = [{v:"1",en:"",zh:""},{v:"2",en:"",zh:""}];
+      else if(!n) q.options = [{v:"1",en:""},{v:"2",en:""}];
       renderQuestions();
     };
     tw.append(tl, sel);
@@ -319,9 +303,7 @@ function renderQuestions(){
       (q.options || []).forEach((o, j) => {
         const row = document.createElement("div"); row.className = "opt-row";
         const a = document.createElement("input"); a.type = "text"; a.value = o.en || "";
-        a.placeholder = "In English"; a.oninput = () => { o.en = a.value; };
-        const b = document.createElement("input"); b.type = "text"; b.value = o.zh || "";
-        b.placeholder = "In 中文"; b.oninput = () => { o.zh = b.value; };
+        a.placeholder = "The answer"; a.oninput = () => { o.en = a.value; };
         const spec = document.createElement("label"); spec.className = "spec";
         const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!o.specify;
         cb.onchange = () => { if(cb.checked) o.specify = true; else delete o.specify; };
@@ -329,7 +311,7 @@ function renderQuestions(){
         const x = document.createElement("button"); x.type = "button"; x.className = "x";
         x.textContent = "\u00d7"; x.title = "Remove this answer";
         x.onclick = () => { q.options.splice(j, 1); renderQuestions(); };
-        row.append(a, b, spec, x);
+        row.append(a, spec, x);
         box.appendChild(row);
       });
       const add = document.createElement("button");
@@ -337,7 +319,7 @@ function renderQuestions(){
       add.style.cssText = "padding:7px 12px;font-size:13px;margin-top:4px";
       add.onclick = () => {
         q.options = q.options || [];
-        q.options.push({ v: String(q.options.length + 1), en: "", zh: "" });
+        q.options.push({ v: String(q.options.length + 1), en: "" });
         renderQuestions();
       };
       box.appendChild(add);
@@ -353,8 +335,8 @@ function renderQuestions(){
 $("#qadd").onclick = () => {
   // No id yet: it is derived from the question text when the activity is built,
   // so the recorded answers are keyed by something a reader can recognise.
-  QS.push({ id: "", type: "single", en: "", zh: "",
-            options: [{v:"1",en:"",zh:""},{v:"2",en:"",zh:""}] });
+  QS.push({ id: "", type: "single", en: "",
+            options: [{v:"1",en:""},{v:"2",en:""}] });
   renderQuestions();
 };
 
@@ -383,9 +365,9 @@ $("#qjson").onclick = () => {
    concept. Ids already in use are left alone -- they key the recorded answers. */
 function questionsForBuild(){
   const out = QS.map(q => {
-    const c = { id: q.id || "", type: q.type, en: (q.en || "").trim(), zh: (q.zh || "").trim() };
+    const c = { id: q.id || "", type: q.type, en: (q.en || "").trim() };
     if(q.type !== "text") c.options = (q.options || []).map(o => {
-      const oc = { v: String(o.v), en: (o.en || "").trim(), zh: (o.zh || "").trim() };
+      const oc = { v: String(o.v), en: (o.en || "").trim() };
       if(o.specify) oc.specify = true;
       return oc;
     });
@@ -407,14 +389,13 @@ function validateSurvey(v){
   for(const q of v){
     if(!q || !q.type) return "One of the questions has no kind of answer set.";
     if(!q.en) return "One of the questions has no text. Fill it in or remove it.";
-    if(!q.zh) return "\u201c" + q.en + "\u201d has no 中文 version yet.";
     if(TYPES.indexOf(q.type) < 0)
       return "Unknown question type: " + q.type + ". Use one of: " + TYPES.join(", ") + ".";
     if(q.type !== "text"){
       if(!(Array.isArray(q.options) && q.options.length))
         return "\u201c" + q.en + "\u201d needs some answers to choose from.";
       for(const o of q.options)
-        if(!o.en || !o.zh) return "\u201c" + q.en + "\u201d has an answer with no text in one language.";
+        if(!o.en) return "\u201c" + q.en + "\u201d has an answer with no text.";
     }
   }
   return "";
@@ -461,17 +442,13 @@ async function compose(){
     .split("__FOOTER_JSON__").join(JSON.stringify($("#footer").value.trim()))
     .split("__TITLE_JSON__").join(JSON.stringify(title))
     .split("__SUBTITLE_JSON__").join(JSON.stringify(sub))
-    .split("__LANG_JSON__").join(JSON.stringify($("#lang").value))
     .split("__SECTION_JSON__").join(JSON.stringify($("#section").value.trim().toUpperCase()))
     .split("__SURVEY_JSON__").join(JSON.stringify(survey))
-    .split("__TITLE_ZH_JSON__").join(JSON.stringify($("#titlezh").value.trim() || title))
-    .split("__SUBTITLE_ZH_JSON__").join(JSON.stringify($("#subtitlezh").value.trim() || sub))
     .split("__DEMO_JSON__").join("false")
     .split("__CODES_JSON__").join($("#codes").checked ? "true" : "false")
     // Filled from the published defaults. Before this the token went through
     // unreplaced, and every page built here stopped on a ReferenceError at load.
     .split("__CODEHINT_JSON__").join(JSON.stringify(D.codehint || ""))
-    .split("__CODEHINT_ZH_JSON__").join(JSON.stringify(D.codehint_zh || D.codehint || ""))
     // The accent tokens must be filled here too. The Python builder and this one
     // share one template on purpose, so a token added there and forgotten here
     // ships a page with literal __ACCENT__ in its stylesheet.
