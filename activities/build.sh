@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the seven draft activities and the root page. Run from the repository root:
+# Rebuild the fifteen draft activities and the root page. Run from the repository root:
 #     bash activities/build.sh          demonstrations: no codes asked, no hand-in
 #     bash activities/build.sh class    a class runs them: codes asked, hand-in and
 #                                       research wording back
@@ -144,6 +144,89 @@ python3 make_session_capture.py \
   --title    "How does one swing of a pendulum become an hour?" \
   --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL"
 
+# Rates in context, and maxima, minima and shape: eight activities added on
+# 29 Oct 2026. Each survey's topic question names that activity's own topic.
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/9-growth-races-lhopital.txt \
+  --out activities/activity-9-growth.html \
+  --survey "$(learn_survey growth "This assignment helped me understand how to compare two quantities that both grow without bound (L'Hôpital's rule).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#3d6b8f' \
+  --title    "Which grows faster in the end?" \
+  --subtitle "Welcome! Today you will race two quantities that both grow without bound and work out which one wins in the end. Their sizes will not settle it, but how fast each one grows will. $TAIL"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/10-sprinter-splits.txt \
+  --out activities/activity-10-sprinter.html \
+  --survey "$(learn_survey sprinter "This assignment helped me understand what a derivative means in context, with its units.")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#8a5a2b' \
+  --title    "When was the sprinter fastest?" \
+  --subtitle "Welcome! Today you will use the times a sprinter passed each 10-metre mark to work out when they were fastest, and what a table of times can and cannot tell you about speed. $TAIL"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/11-streetlight-shadow.txt \
+  --out activities/activity-11-shadow.html \
+  --survey "$(learn_survey shadow "This assignment helped me understand how the speed of one thing can follow from the speed of another (related rates).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#556b2f' \
+  --title    "How fast does your shadow move?" \
+  --subtitle "Welcome! Today you will walk away from a streetlight, on paper, and work out how fast the tip of your shadow moves. The answer may surprise you. $TAIL"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/12-cone-cup.txt \
+  --out activities/activity-12-cup.html \
+  --survey "$(learn_survey cup "This assignment helped me understand how a steady rate of filling can give a changing rate of rise (related rates).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#7b3f7a' \
+  --title    "Why does the cup fill fast, then slowly?" \
+  --subtitle "Welcome! Today you will pour water into a cone-shaped cup at a steady rate and work out why the level rises quickly at first and then slows down. $TAIL"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/13-speed-camera-mvt.txt \
+  --out activities/activity-13-camera.html \
+  --survey "$(learn_survey camera "This assignment helped me understand what the Mean Value Theorem guarantees, and what it does not.")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#2f5e8a' \
+  --title    "Can a camera prove you were speeding?" \
+  --subtitle "Welcome! Today you will decide whether two cameras that only time a car can prove it broke the speed limit, and what has to be true for that proof to work. $TAIL"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/14-launch-angle.txt \
+  --out activities/activity-14-launch.html \
+  --survey "$(learn_survey launch "This assignment helped me understand how to find and check the largest value of a function.")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#9a4a3a' \
+  --title    "What is the best angle to throw?" \
+  --subtitle "Welcome! Today you will find the angle that throws a ball furthest, and then find out why a shot-putter should not use it. $TAIL"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/15-still-rising.txt \
+  --out activities/activity-15-rising.html \
+  --survey "$(learn_survey rising "This assignment helped me understand what the first and second derivatives say about how something is changing.")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#4a6a5a' \
+  --title    "Still rising, but more slowly" \
+  --subtitle "Welcome! Today you will take a sentence from the news about prices and work out exactly what it says about a function and its derivatives. $TAIL"
+
+python3 make_session_capture.py \
+  --prompt activities/prompts/16-soup-can.txt \
+  --out activities/activity-16-can.html \
+  --survey "$(learn_survey can "This assignment helped me understand how to set up and solve an optimization problem, and what a model leaves out.")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#6a5a8a' \
+  --title    "Why are soup cans that shape?" \
+  --subtitle "Welcome! Today you will design a can that holds a fixed amount using as little metal as possible, and then work out why real cans are not that shape. $TAIL"
+
 # The Taylor series page at the root of the site, the one linked as "Try it".
 # Built here so its wording is written down too; --section S4 is what it has
 # always carried. Run last only because it rewrites the root setup.html, not
@@ -154,5 +237,5 @@ python3 make_session_capture.py \
   --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file."
 
 echo
-echo "Rebuilt seven activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
+echo "Rebuilt fifteen activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."
