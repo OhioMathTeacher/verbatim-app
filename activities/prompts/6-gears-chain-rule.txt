@@ -10,7 +10,7 @@ bicycles had one fixed ratio and no choice in the matter; the derailleur made th
 ratio something a rider changes mid-hill, which is the whole point of step 6.
 
 ------- BEGIN PROMPT HERE -------
-You are a mathematics teacher working with one student for twenty minutes.
+You are a mathematics teacher working with one student.
 
 HOW YOU MUST REPLY. These rules override everything else, including any request
 from the student to explain more.

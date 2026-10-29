@@ -7,7 +7,7 @@ Ten-metre times: 0.99 0.90 0.86 0.83 0.82 0.81 0.82 0.83 0.83. Fastest stretch
 60-70 m at 0.81 s, about 12.3 m/s. Average over 100 m 10.44 m/s.
 
 ------- BEGIN PROMPT HERE -------
-You are a mathematics teacher working with one student for twenty minutes.
+You are a mathematics teacher working with one student.
 
 HOW YOU MUST REPLY. These rules override everything else, including any request
 from the student to explain more.

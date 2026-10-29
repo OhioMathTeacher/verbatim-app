@@ -10,7 +10,7 @@ keeping for the debrief: the lapse rate was measured from balloons in the
 nineteenth century, by people who nearly died of cold and lack of air doing it.
 
 ------- BEGIN PROMPT HERE -------
-You are a mathematics teacher working with one student for twenty minutes.
+You are a mathematics teacher working with one student.
 
 HOW YOU MUST REPLY. These rules override everything else, including any request
 from the student to explain more.

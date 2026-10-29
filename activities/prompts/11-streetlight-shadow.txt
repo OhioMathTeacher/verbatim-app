@@ -6,7 +6,7 @@ distance, so the tip moves at 2 m/s, the same however far away; the shadow
 grows at 0.5 m/s.
 
 ------- BEGIN PROMPT HERE -------
-You are a mathematics teacher working with one student for twenty minutes.
+You are a mathematics teacher working with one student.
 
 HOW YOU MUST REPLY. These rules override everything else, including any request
 from the student to explain more.

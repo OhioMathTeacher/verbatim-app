@@ -7,7 +7,7 @@ V = (pi/3)(0.4h)^2 h = 0.16 pi h^3 / 3, about 0.1676 h^3. Full: about 168 cm^3,
 dh/dt = 5 / (0.16 pi h^2), about 9.95/h^2: 0.40 cm/s at 5 cm, 0.10 cm/s at 10 cm.
 
 ------- BEGIN PROMPT HERE -------
-You are a mathematics teacher working with one student for twenty minutes.
+You are a mathematics teacher working with one student.
 
 HOW YOU MUST REPLY. These rules override everything else, including any request
 from the student to explain more.

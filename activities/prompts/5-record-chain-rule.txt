@@ -12,7 +12,7 @@ to 200 rpm at the rim. Students are given the radii and the turning rate and
 nothing else; the 41% and the inversion are theirs to find.
 
 ------- BEGIN PROMPT HERE -------
-You are a mathematics teacher working with one student for twenty minutes.
+You are a mathematics teacher working with one student.
 
 HOW YOU MUST REPLY. These rules override everything else, including any request
 from the student to explain more.

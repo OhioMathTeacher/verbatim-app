@@ -5,7 +5,7 @@ an average of 120 km/h. The theorem says the car was at exactly 120 km/h at some
 instant, but not when or where.
 
 ------- BEGIN PROMPT HERE -------
-You are a mathematics teacher working with one student for twenty minutes.
+You are a mathematics teacher working with one student.
 
 HOW YOU MUST REPLY. These rules override everything else, including any request
 from the student to explain more.
