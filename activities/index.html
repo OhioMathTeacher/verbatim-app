@@ -237,6 +237,49 @@
       .cr1, .cr2, .rolling, .walkLong, .walkShort,
       .pend, .g1, .g2, .g3, .hmin, .hhour { animation: none; }
     }
+    /* The Rates and Shape tabs. Each banner animates the activity's own numbers:
+       the sprinter runs the split times in real time, the cup fills along its
+       real curve at four times speed, and the can keeps 400 cm3 at every size.
+       A graph is drawn by uncovering it from the left, at the same pace as
+       whatever moves beside it. */
+    .banner .cover { fill: #faf8f4; }
+    .banner .water { fill: #2563eb; fill-opacity: .28; }
+    .banner .shadow { fill: #333; }
+    .banner .bar15 { fill: #2563eb; fill-opacity: .55; }
+    .banner .tin   { fill: #d8e0e4; stroke: #6b6156; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+    @keyframes uncover { 0% { transform: scaleX(1); } 85%, 100% { transform: scaleX(0); } }
+    .unc9 { animation: uncover 7s linear infinite; }
+    @keyframes run10 { 0% { transform: translateX(0px); } 17.2% { transform: translateX(57px); } 26.2% { transform: translateX(114px); } 34.4% { transform: translateX(171px); } 42.2% { transform: translateX(228px); } 49.7% { transform: translateX(285px); } 57.2% { transform: translateX(342px); } 64.5% { transform: translateX(399px); } 72% { transform: translateX(456px); } 79.5% { transform: translateX(513px); } 87.1% { transform: translateX(570px); } 100% { transform: translateX(570px); } }
+    .run10 { animation: run10 11s linear infinite; }
+    @keyframes ray11 { 0% { transform: rotate(-23.96deg); } 9% { transform: rotate(-46.85deg); } 18% { transform: rotate(-59.37deg); } 27% { transform: rotate(-66.60deg); } 36% { transform: rotate(-71.18deg); } 45% { transform: rotate(-74.29deg); } 54% { transform: rotate(-76.54deg); } 63% { transform: rotate(-78.23deg); } 72% { transform: rotate(-79.55deg); } 81% { transform: rotate(-80.61deg); } 90% { transform: rotate(-81.47deg); } 100% { transform: rotate(-81.47deg); } }
+    @keyframes walk11 { 0% { transform: translateX(0); } 90% { transform: translateX(336px); } 100% { transform: translateX(336px); } }
+    @keyframes tip11 { 0% { transform: translateX(0); } 90% { transform: translateX(448px); } 100% { transform: translateX(448px); } }
+    @keyframes shad11 { 0% { transform: translateX(0) scaleX(1); } 90% { transform: translateX(336px) scaleX(15); } 100% { transform: translateX(336px) scaleX(15); } }
+    .ray11 { animation: ray11 9s linear infinite; }
+    .walk11 { animation: walk11 9s linear infinite; }
+    .tip11 { animation: tip11 9s linear infinite; }
+    .shad11 { animation: shad11 9s linear infinite; }
+    .ray11 { transform: rotate(-23.96deg); }
+    @keyframes cup12 { 0% { transform: scale(0.0000); } 0.1% { transform: scale(0.1000); } 0.4% { transform: scale(0.1587); } 0.9% { transform: scale(0.2154); } 1.8% { transform: scale(0.2714); } 3.6% { transform: scale(0.3420); } 6.2% { transform: scale(0.4121); } 8.9% { transform: scale(0.4642); } 13.4% { transform: scale(0.5313); } 17.8% { transform: scale(0.5848); } 26.7% { transform: scale(0.6694); } 35.6% { transform: scale(0.7368); } 44.5% { transform: scale(0.7937); } 53.5% { transform: scale(0.8434); } 62.4% { transform: scale(0.8879); } 71.3% { transform: scale(0.9283); } 80.2% { transform: scale(0.9655); } 89.1% { transform: scale(1.0000); } 100% { transform: scale(1); } }
+    @keyframes unc12 { 0% { transform: scaleX(1); } 89.1% { transform: scaleX(0); } 100% { transform: scaleX(0); } }
+    .cup12 { animation: cup12 9.4s linear infinite; }
+    .unc12 { animation: unc12 9.4s linear infinite; }
+    @keyframes car13 { 0% { transform: translateX(0); animation-timing-function: cubic-bezier(0.45,0.05,0.55,0.95); } 85% { transform: translateX(260px); } 100% { transform: translateX(260px); } }
+    @keyframes unc13 { 0% { transform: scaleX(1); } 85% { transform: scaleX(0); } 100% { transform: scaleX(0); } }
+    .car13 { animation: car13 7s infinite; }
+    .unc13 { animation: unc13 7s linear infinite; }
+    .unc15 { animation: uncover 8s linear infinite; }
+    @keyframes can16 { 0% { transform: scale(0.6261, 2.5510); } 8.3% { transform: scale(0.7200, 1.9289); } 16.7% { transform: scale(0.8139, 1.5095); } 25% { transform: scale(0.9079, 1.2133); } 33.3% { transform: scale(1.0018, 0.9965); } 41.7% { transform: scale(1.0957, 0.8330); } 50% { transform: scale(1.1896, 0.7066); } 58.3% { transform: scale(1.2835, 0.6070); } 66.7% { transform: scale(1.3774, 0.5271); } 75% { transform: scale(1.4713, 0.4619); } 83.3% { transform: scale(1.5653, 0.4082); } 91.7% { transform: scale(1.6592, 0.3633); } 100% { transform: scale(1.7531, 0.3254); } }
+    @keyframes dot16 { 0% { transform: translate(-122.8px, -31px); } 8.3% { transform: translate(-91.9px, -15.7px); } 16.7% { transform: translate(-61.1px, -6.3px); } 25% { transform: translate(-30.3px, -1.4px); } 33.3% { transform: translate(0.6px, -0px); } 41.7% { transform: translate(31.4px, -1.4px); } 50% { transform: translate(62.2px, -5.1px); } 58.3% { transform: translate(93.1px, -10.9px); } 66.7% { transform: translate(123.9px, -18.5px); } 75% { transform: translate(154.7px, -27.8px); } 83.3% { transform: translate(185.6px, -38.5px); } 91.7% { transform: translate(216.4px, -50.7px); } 100% { transform: translate(247.2px, -64.3px); } }
+    .can16 { animation: can16 5s linear infinite alternate; }
+    .dot16 { animation: dot16 5s linear infinite alternate; }
+    /* With motion reduced, every graph is shown whole and everything that moves
+       rests where it is drawn: the runner at the start, the walker near the
+       lamp, the can at its best shape. */
+    @media (prefers-reduced-motion: reduce) {
+      .unc9, .run10, .ray11, .walk11, .tip11, .shad11, .cup12, .unc12, .car13, .unc13, .unc15, .can16, .dot16 { animation: none; }
+      .unc9, .unc12, .unc13, .unc15 { transform: scaleX(0); }
+    }
     /* Topic tabs. Plain buttons; the chosen one is remembered in the address
        (#limits, #chain) so a link can open on either. */
     .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 2px solid #eee; margin: 1.6em 0 1em; }
@@ -652,6 +695,22 @@
         <div class="applet-desc">
           <p class="week">L'Hôpital's rule and indeterminate forms</p>
           <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="Two curves drawn from left to right, x cubed and two to the x. x cubed is ahead for most of the way, then two to the x overtakes it near x equals 10 and climbs away">
+              <path class="ref" d="M547.9 10 V 88"/>
+              <path class="flat" d="M60 88 L62.5 88 L64.9 88 L67.4 88 L69.8 88 L72.3 88 L74.7 88 L77.2 88 L79.6 88 L82.1 88 L84.5 88 L87 88 L89.5 88 L91.9 88 L94.4 88 L96.8 88 L99.3 88 L101.7 88 L104.2 88 L106.6 88 L109.1 88 L111.5 88 L114 87.9 L116.5 87.9 L118.9 87.9 L121.4 87.9 L123.8 87.9 L126.3 87.9 L128.7 87.9 L131.2 87.9 L133.6 87.9 L136.1 87.9 L138.5 87.8 L141 87.8 L143.5 87.8 L145.9 87.8 L148.4 87.8 L150.8 87.8 L153.3 87.7 L155.7 87.7 L158.2 87.7 L160.6 87.7 L163.1 87.6 L165.5 87.6 L168 87.6 L170.5 87.6 L172.9 87.5 L175.4 87.5 L177.8 87.5 L180.3 87.4 L182.7 87.4 L185.2 87.4 L187.6 87.3 L190.1 87.3 L192.5 87.3 L195 87.2 L197.5 87.2 L199.9 87.1 L202.4 87.1 L204.8 87 L207.3 87 L209.7 86.9 L212.2 86.9 L214.6 86.8 L217.1 86.8 L219.5 86.7 L222 86.6 L224.5 86.6 L226.9 86.5 L229.4 86.4 L231.8 86.4 L234.3 86.3 L236.7 86.2 L239.2 86.2 L241.6 86.1 L244.1 86 L246.5 85.9 L249 85.8 L251.5 85.7 L253.9 85.7 L256.4 85.6 L258.8 85.5 L261.3 85.4 L263.7 85.3 L266.2 85.2 L268.6 85.1 L271.1 85 L273.5 84.9 L276 84.8 L278.5 84.7 L280.9 84.5 L283.4 84.4 L285.8 84.3 L288.3 84.2 L290.7 84.1 L293.2 83.9 L295.6 83.8 L298.1 83.7 L300.5 83.5 L303 83.4 L305.5 83.2 L307.9 83.1 L310.4 83 L312.8 82.8 L315.3 82.7 L317.7 82.5 L320.2 82.3 L322.6 82.2 L325.1 82 L327.5 81.8 L330 81.7 L332.5 81.5 L334.9 81.3 L337.4 81.1 L339.8 81 L342.3 80.8 L344.7 80.6 L347.2 80.4 L349.6 80.2 L352.1 80 L354.5 79.8 L357 79.6 L359.5 79.4 L361.9 79.2 L364.4 78.9 L366.8 78.7 L369.3 78.5 L371.7 78.3 L374.2 78 L376.6 77.8 L379.1 77.6 L381.5 77.3 L384 77.1 L386.5 76.8 L388.9 76.6 L391.4 76.3 L393.8 76.1 L396.3 75.8 L398.7 75.5 L401.2 75.2 L403.6 75 L406.1 74.7 L408.5 74.4 L411 74.1 L413.5 73.8 L415.9 73.5 L418.4 73.2 L420.8 72.9 L423.3 72.6 L425.7 72.3 L428.2 72 L430.6 71.6 L433.1 71.3 L435.5 71 L438 70.7 L440.5 70.3 L442.9 70 L445.4 69.6 L447.8 69.3 L450.3 68.9 L452.7 68.5 L455.2 68.2 L457.6 67.8 L460.1 67.4 L462.5 67 L465 66.7 L467.5 66.3 L469.9 65.9 L472.4 65.5 L474.8 65.1 L477.3 64.7 L479.7 64.2 L482.2 63.8 L484.6 63.4 L487.1 63 L489.5 62.5 L492 62.1 L494.5 61.7 L496.9 61.2 L499.4 60.8 L501.8 60.3 L504.3 59.8 L506.7 59.4 L509.2 58.9 L511.6 58.4 L514.1 57.9 L516.5 57.4 L519 56.9 L521.5 56.4 L523.9 55.9 L526.4 55.4 L528.8 54.9 L531.3 54.4 L533.7 53.9 L536.2 53.3 L538.6 52.8 L541.1 52.2 L543.5 51.7 L546 51.1 L548.5 50.6 L550.9 50 L553.4 49.4 L555.8 48.8 L558.3 48.3 L560.7 47.7 L563.2 47.1 L565.6 46.5 L568.1 45.9 L570.5 45.3 L573 44.6 L575.5 44 L577.9 43.4 L580.4 42.7 L582.8 42.1 L585.3 41.4 L587.7 40.8 L590.2 40.1 L592.6 39.5 L595.1 38.8 L597.5 38.1 L600 37.4"/>
+              <path class="fall" d="M60 88 L62.5 88 L64.9 88 L67.4 88 L69.8 88 L72.3 88 L74.7 88 L77.2 88 L79.6 87.9 L82.1 87.9 L84.5 87.9 L87 87.9 L89.5 87.9 L91.9 87.9 L94.4 87.9 L96.8 87.9 L99.3 87.9 L101.7 87.9 L104.2 87.9 L106.6 87.9 L109.1 87.9 L111.5 87.9 L114 87.9 L116.5 87.9 L118.9 87.9 L121.4 87.9 L123.8 87.9 L126.3 87.9 L128.7 87.9 L131.2 87.9 L133.6 87.9 L136.1 87.9 L138.5 87.9 L141 87.9 L143.5 87.9 L145.9 87.9 L148.4 87.9 L150.8 87.9 L153.3 87.9 L155.7 87.9 L158.2 87.8 L160.6 87.8 L163.1 87.8 L165.5 87.8 L168 87.8 L170.5 87.8 L172.9 87.8 L175.4 87.8 L177.8 87.8 L180.3 87.8 L182.7 87.8 L185.2 87.8 L187.6 87.8 L190.1 87.8 L192.5 87.8 L195 87.7 L197.5 87.7 L199.9 87.7 L202.4 87.7 L204.8 87.7 L207.3 87.7 L209.7 87.7 L212.2 87.7 L214.6 87.7 L217.1 87.7 L219.5 87.6 L222 87.6 L224.5 87.6 L226.9 87.6 L229.4 87.6 L231.8 87.6 L234.3 87.6 L236.7 87.5 L239.2 87.5 L241.6 87.5 L244.1 87.5 L246.5 87.5 L249 87.5 L251.5 87.4 L253.9 87.4 L256.4 87.4 L258.8 87.4 L261.3 87.3 L263.7 87.3 L266.2 87.3 L268.6 87.3 L271.1 87.3 L273.5 87.2 L276 87.2 L278.5 87.2 L280.9 87.1 L283.4 87.1 L285.8 87.1 L288.3 87 L290.7 87 L293.2 87 L295.6 86.9 L298.1 86.9 L300.5 86.9 L303 86.8 L305.5 86.8 L307.9 86.7 L310.4 86.7 L312.8 86.7 L315.3 86.6 L317.7 86.6 L320.2 86.5 L322.6 86.5 L325.1 86.4 L327.5 86.3 L330 86.3 L332.5 86.2 L334.9 86.2 L337.4 86.1 L339.8 86 L342.3 86 L344.7 85.9 L347.2 85.8 L349.6 85.7 L352.1 85.7 L354.5 85.6 L357 85.5 L359.5 85.4 L361.9 85.3 L364.4 85.2 L366.8 85.1 L369.3 85 L371.7 84.9 L374.2 84.8 L376.6 84.7 L379.1 84.6 L381.5 84.4 L384 84.3 L386.5 84.2 L388.9 84 L391.4 83.9 L393.8 83.8 L396.3 83.6 L398.7 83.5 L401.2 83.3 L403.6 83.1 L406.1 83 L408.5 82.8 L411 82.6 L413.5 82.4 L415.9 82.2 L418.4 82 L420.8 81.8 L423.3 81.6 L425.7 81.4 L428.2 81.1 L430.6 80.9 L433.1 80.6 L435.5 80.4 L438 80.1 L440.5 79.8 L442.9 79.5 L445.4 79.2 L447.8 78.9 L450.3 78.6 L452.7 78.3 L455.2 77.9 L457.6 77.6 L460.1 77.2 L462.5 76.8 L465 76.4 L467.5 76 L469.9 75.6 L472.4 75.2 L474.8 74.7 L477.3 74.2 L479.7 73.8 L482.2 73.3 L484.6 72.7 L487.1 72.2 L489.5 71.6 L492 71.1 L494.5 70.5 L496.9 69.8 L499.4 69.2 L501.8 68.5 L504.3 67.9 L506.7 67.1 L509.2 66.4 L511.6 65.7 L514.1 64.9 L516.5 64 L519 63.2 L521.5 62.3 L523.9 61.4 L526.4 60.5 L528.8 59.5 L531.3 58.5 L533.7 57.5 L536.2 56.4 L538.6 55.3 L541.1 54.1 L543.5 52.9 L546 51.7 L548.5 50.4 L550.9 49.1 L553.4 47.7 L555.8 46.3 L558.3 44.8 L560.7 43.3 L563.2 41.7 L565.6 40.1 L568.1 38.4 L570.5 36.7 L573 34.8 L575.5 33 L577.9 31 L580.4 29 L582.8 26.9 L585.3 24.8 L587.7 22.6 L590.2 20.3 L592.6 17.9 L595.1 15.4 L597.5 12.8"/>
+              <rect class="cover unc9" x="58" y="6" width="550" height="83" style="transform-origin:608px 6px"/>
+              <path class="axis" d="M60 88 H 606 M60 88 V 8"/>
+              <text class="sm" x="550.9" y="97">x = 10</text>
+              <text class="sm" x="60" y="97">0</text>
+              <text class="sm" x="616" y="40.4">x³</text>
+              <text class="sm deg" x="570.4" y="14">2ˣ</text>
+              <text class="sm" x="485.9" y="20">2ˣ ahead from here on</text>
+            </svg>
+            <figcaption>x³ is ahead for most of the way. Then 2ˣ catches it near x = 10 and stays ahead from then on.</figcaption>
+          </figure>
           <p>At <em>x</em> = 10, <em>x</em><sup>3</sup> and 2<sup><em>x</em></sup> are nearly tied. At <em>x</em> = 100, <em>x</em><sup>100</sup> is so far ahead of <em>e</em><sup><em>x</em></sup> that it looks like a rout. Students are asked which wins in the long run, and why their sizes cannot tell them.</p>
           <p>They meet ∞/∞ as a question rather than an answer, compare how fast each side grows, and find that each step takes one off the power while <em>e</em><sup><em>x</em></sup> stays the same. It closes by asking them to find where <em>e</em><sup><em>x</em></sup> finally pulls ahead.</p>
         </div>
@@ -661,6 +720,48 @@
         <div class="applet-desc">
           <p class="week">The derivative in context, with its units</p>
           <p class="tags"><span class="tag">Calculating</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A runner covering 100 metres at the pace of the activity's split times, in real time, with the time for each 10 metres written under the track. The stretch from 60 to 70 metres, 0.81 seconds, is the fastest">
+              <path class="trail" d="M40 62 H 610"/>
+              <path class="fall" style="stroke-width:3.4" d="M382 62 H 439"/>
+              <path class="chain" d="M40 57 V 67"/>
+              <text class="sm" x="40" y="78">0 m</text>
+              <path class="chain" d="M97 57 V 67"/>
+              <text class="sm" x="97" y="78">10 m</text>
+              <path class="chain" d="M154 57 V 67"/>
+              <text class="sm" x="154" y="78">20 m</text>
+              <path class="chain" d="M211 57 V 67"/>
+              <text class="sm" x="211" y="78">30 m</text>
+              <path class="chain" d="M268 57 V 67"/>
+              <text class="sm" x="268" y="78">40 m</text>
+              <path class="chain" d="M325 57 V 67"/>
+              <text class="sm" x="325" y="78">50 m</text>
+              <path class="chain" d="M382 57 V 67"/>
+              <text class="sm" x="382" y="78">60 m</text>
+              <path class="chain" d="M439 57 V 67"/>
+              <text class="sm" x="439" y="78">70 m</text>
+              <path class="chain" d="M496 57 V 67"/>
+              <text class="sm" x="496" y="78">80 m</text>
+              <path class="chain" d="M553 57 V 67"/>
+              <text class="sm" x="553" y="78">90 m</text>
+              <path class="chain" d="M610 57 V 67"/>
+              <text class="sm" x="610" y="78">100 m</text>
+              <text class="sm" x="68.5" y="92">1.89 s</text>
+              <text class="sm" x="125.5" y="92">0.99 s</text>
+              <text class="sm" x="182.5" y="92">0.90 s</text>
+              <text class="sm" x="239.5" y="92">0.86 s</text>
+              <text class="sm" x="296.5" y="92">0.83 s</text>
+              <text class="sm" x="353.5" y="92">0.82 s</text>
+              <text class="sm deg" x="410.5" y="92">0.81 s</text>
+              <text class="sm" x="467.5" y="92">0.82 s</text>
+              <text class="sm" x="524.5" y="92">0.83 s</text>
+              <text class="sm" x="581.5" y="92">0.83 s</text>
+              <g class="run10"><circle class="walker" cx="40" cy="52" r="5"/></g>
+              <text class="sm" x="610" y="40">100 m in 9.58 s</text>
+            </svg>
+            <figcaption>The runner moves at the pace of the activity's splits, in real time. The time under each stretch is how long those 10 m took. The fastest was 60 to 70 m, in 0.81 s.</figcaption>
+          </figure>
           <p>A sprinter's times at each 10-metre mark, and nothing else. Students work out the average speed, find the fastest stretch, and decide whether that is the runner's top speed or only a lower bound for it.</p>
           <p>Along the way they say what 12.3 means in a sentence, with units, notice that the runner slows over the last 30 metres, and say what the table would need to give the speed at exactly 65 metres.</p>
         </div>
@@ -670,6 +771,23 @@
         <div class="applet-desc">
           <p class="week">Related rates</p>
           <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A walker moving steadily away from a streetlight. A ray from the lamp passes over their head to the tip of their shadow, which grows longer and runs ahead of them">
+              <g class="ray11" style="transform-origin:60px 16px"><path class="ref" d="M60 16 V 716"/></g>
+              <rect class="hill" x="0" y="88" width="650" height="12"/>
+              <path class="axis" d="M20 88 H 640"/>
+              <path class="trail" d="M60 88 V 16"/>
+              <circle class="head" cx="60" cy="16" r="3.2"/>
+              <rect class="shadow shad11" x="84" y="85" width="8" height="3" style="transform-origin:84px 88px"/>
+              <g class="walk11"><path class="trail" style="stroke:#2563eb" d="M84 88 V 74"/><circle class="walker" cx="84" cy="72" r="2.6"/></g>
+              <g class="tip11"><circle class="walker" cx="92" cy="86.5" r="2.2"/></g>
+              <text class="sm" x="60" y="98">lamp, 6 m</text>
+              <text class="sm" x="560" y="22">walker: 1.5 m/s</text>
+              <text class="sm deg" x="560" y="36">tip of the shadow: 2 m/s</text>
+            </svg>
+            <figcaption>The walker keeps a steady 1.5 m/s. The shadow grows longer, and its tip keeps a steady 2 m/s however far away the walker gets.</figcaption>
+          </figure>
           <p>Someone walks away from a streetlight at a steady pace. The shadow gets longer, so it seems its tip should speed up as they go.</p>
           <p>Students use similar triangles to tie the tip of the shadow to the walker, then the rates to each other, and find that the tip moves at the same speed however far away the walker is.</p>
         </div>
@@ -679,6 +797,24 @@
         <div class="applet-desc">
           <p class="week">Related rates</p>
           <p class="tags"><span class="tag">Graphing</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A cone-shaped cup, point down, filling with water at a steady rate beside a graph of the water's depth against time. The depth shoots up and then levels off, reaching half the depth after an eighth of the time">
+              <path class="water cup12" style="transform-origin:110px 88px" d="M110 88 L81.2 16 H 138.8 Z"/>
+              <path class="trail" d="M81.2 16 L110 88 L138.8 16"/>
+              <path class="ref" d="M220 52 H 267.5 V 88"/>
+              <path class="flat" d="M220 88 L220.9 78.2 L221.9 75.7 L222.8 73.9 L223.8 72.5 L224.8 71.3 L225.7 70.2 L226.7 69.3 L227.6 68.5 L228.6 67.7 L229.5 66.9 L230.4 66.3 L231.4 65.6 L232.3 65 L233.3 64.4 L234.2 63.9 L235.2 63.4 L236.2 62.9 L237.1 62.4 L238.1 61.9 L239 61.5 L239.9 61 L240.9 60.6 L241.8 60.2 L242.8 59.8 L243.8 59.4 L244.7 59.1 L245.7 58.7 L246.6 58.3 L247.6 58 L248.5 57.6 L249.4 57.3 L250.4 57 L251.3 56.7 L252.3 56.3 L253.2 56 L254.2 55.7 L255.2 55.4 L256.1 55.1 L257.1 54.9 L258 54.6 L258.9 54.3 L259.9 54 L260.9 53.8 L261.8 53.5 L262.8 53.2 L263.7 53 L264.6 52.7 L265.6 52.5 L266.6 52.2 L267.5 52 L268.4 51.8 L269.4 51.5 L270.4 51.3 L271.3 51.1 L272.2 50.8 L273.2 50.6 L274.1 50.4 L275.1 50.2 L276.1 50 L277 49.7 L277.9 49.5 L278.9 49.3 L279.9 49.1 L280.8 48.9 L281.8 48.7 L282.7 48.5 L283.6 48.3 L284.6 48.1 L285.6 47.9 L286.5 47.7 L287.4 47.5 L288.4 47.3 L289.4 47.2 L290.3 47 L291.2 46.8 L292.2 46.6 L293.1 46.4 L294.1 46.2 L295.1 46.1 L296 45.9 L296.9 45.7 L297.9 45.5 L298.9 45.4 L299.8 45.2 L300.8 45 L301.7 44.9 L302.6 44.7 L303.6 44.5 L304.6 44.4 L305.5 44.2 L306.4 44 L307.4 43.9 L308.4 43.7 L309.3 43.6 L310.2 43.4 L311.2 43.3 L312.1 43.1 L313.1 42.9 L314.1 42.8 L315 42.6 L315.9 42.5 L316.9 42.3 L317.9 42.2 L318.8 42 L319.8 41.9 L320.7 41.8 L321.6 41.6 L322.6 41.5 L323.6 41.3 L324.5 41.2 L325.4 41 L326.4 40.9 L327.4 40.8 L328.3 40.6 L329.2 40.5 L330.2 40.3 L331.1 40.2 L332.1 40.1 L333.1 39.9 L334 39.8 L334.9 39.7 L335.9 39.5 L336.9 39.4 L337.8 39.3 L338.8 39.1 L339.7 39 L340.6 38.9 L341.6 38.8 L342.6 38.6 L343.5 38.5 L344.4 38.4 L345.4 38.2 L346.4 38.1 L347.3 38 L348.2 37.9 L349.2 37.7 L350.1 37.6 L351.1 37.5 L352 37.4 L353 37.3 L353.9 37.1 L354.9 37 L355.9 36.9 L356.8 36.8 L357.8 36.7 L358.7 36.5 L359.6 36.4 L360.6 36.3 L361.6 36.2 L362.5 36.1 L363.4 36 L364.4 35.8 L365.4 35.7 L366.3 35.6 L367.2 35.5 L368.2 35.4 L369.1 35.3 L370.1 35.2 L371.1 35.1 L372 34.9 L373 34.8 L373.9 34.7 L374.9 34.6 L375.8 34.5 L376.8 34.4 L377.7 34.3 L378.6 34.2 L379.6 34.1 L380.5 34 L381.5 33.9 L382.4 33.8 L383.4 33.7 L384.4 33.6 L385.3 33.4 L386.2 33.3 L387.2 33.2 L388.1 33.1 L389.1 33 L390.1 32.9 L391 32.8 L392 32.7 L392.9 32.6 L393.9 32.5 L394.8 32.4 L395.8 32.3 L396.7 32.2 L397.6 32.1 L398.6 32 L399.5 31.9 L400.5 31.8 L401.4 31.7 L402.4 31.6 L403.4 31.5 L404.3 31.4 L405.2 31.3 L406.2 31.2 L407.1 31.1 L408.1 31 L409.1 30.9 L410 30.9 L410.9 30.8 L411.9 30.7 L412.9 30.6 L413.8 30.5 L414.8 30.4 L415.7 30.3 L416.6 30.2 L417.6 30.1 L418.5 30 L419.5 29.9 L420.4 29.8 L421.4 29.7 L422.4 29.6 L423.3 29.6 L424.2 29.5 L425.2 29.4 L426.1 29.3 L427.1 29.2 L428 29.1 L429 29 L429.9 28.9 L430.9 28.8 L431.9 28.7 L432.8 28.7 L433.8 28.6 L434.7 28.5 L435.6 28.4 L436.6 28.3 L437.6 28.2 L438.5 28.1 L439.5 28 L440.4 28 L441.4 27.9 L442.3 27.8 L443.2 27.7 L444.2 27.6 L445.1 27.5 L446.1 27.4 L447.1 27.4 L448 27.3 L449 27.2 L449.9 27.1 L450.9 27 L451.8 26.9 L452.8 26.9 L453.7 26.8 L454.6 26.7 L455.6 26.6 L456.6 26.5 L457.5 26.4 L458.4 26.4 L459.4 26.3 L460.4 26.2 L461.3 26.1 L462.2 26 L463.2 26 L464.1 25.9 L465.1 25.8 L466 25.7 L467 25.6 L467.9 25.6 L468.9 25.5 L469.9 25.4 L470.8 25.3 L471.8 25.2 L472.7 25.2 L473.6 25.1 L474.6 25 L475.5 24.9 L476.5 24.8 L477.4 24.8 L478.4 24.7 L479.4 24.6 L480.3 24.5 L481.2 24.5 L482.2 24.4 L483.1 24.3 L484.1 24.2 L485.1 24.1 L486 24.1 L486.9 24 L487.9 23.9 L488.9 23.8 L489.8 23.8 L490.8 23.7 L491.7 23.6 L492.7 23.5 L493.6 23.5 L494.6 23.4 L495.5 23.3 L496.4 23.2 L497.4 23.2 L498.4 23.1 L499.3 23 L500.2 22.9 L501.2 22.9 L502.2 22.8 L503.1 22.7 L504.1 22.7 L505 22.6 L505.9 22.5 L506.9 22.4 L507.8 22.4 L508.8 22.3 L509.8 22.2 L510.7 22.2 L511.6 22.1 L512.6 22 L513.5 21.9 L514.5 21.9 L515.5 21.8 L516.4 21.7 L517.3 21.7 L518.3 21.6 L519.2 21.5 L520.2 21.4 L521.1 21.4 L522.1 21.3 L523 21.2 L524 21.2 L525 21.1 L525.9 21 L526.9 21 L527.8 20.9 L528.8 20.8 L529.7 20.7 L530.6 20.7 L531.6 20.6 L532.5 20.5 L533.5 20.5 L534.5 20.4 L535.4 20.3 L536.4 20.3 L537.3 20.2 L538.2 20.1 L539.2 20.1 L540.2 20 L541.1 19.9 L542 19.9 L543 19.8 L544 19.7 L544.9 19.7 L545.9 19.6 L546.8 19.5 L547.8 19.5 L548.7 19.4 L549.7 19.3 L550.6 19.3 L551.5 19.2 L552.5 19.1 L553.5 19.1 L554.4 19 L555.3 18.9 L556.3 18.9 L557.2 18.8 L558.2 18.7 L559.1 18.7 L560.1 18.6 L561 18.5 L562 18.5 L563 18.4 L563.9 18.4 L564.8 18.3 L565.8 18.2 L566.8 18.2 L567.7 18.1 L568.6 18 L569.6 18 L570.5 17.9 L571.5 17.8 L572.5 17.8 L573.4 17.7 L574.4 17.7 L575.3 17.6 L576.2 17.5 L577.2 17.5 L578.1 17.4 L579.1 17.3 L580 17.3 L581 17.2 L582 17.2 L582.9 17.1 L583.9 17 L584.8 17 L585.8 16.9 L586.7 16.8 L587.7 16.8 L588.6 16.7 L589.5 16.7 L590.5 16.6 L591.5 16.5 L592.4 16.5 L593.4 16.4 L594.3 16.4 L595.2 16.3 L596.2 16.2 L597.2 16.2 L598.1 16.1 L599 16.1 L600 16"/>
+              <rect class="cover unc12" x="221" y="10" width="383" height="77" style="transform-origin:604px 10px"/>
+              <path class="axis" d="M220 88 H 606 M220 88 V 10"/>
+              <text class="sm" x="198" y="55">5 cm</text>
+              <text class="sm" x="198" y="19">10 cm</text>
+              <text class="sm deg" x="319.5" y="68">half the depth,</text>
+              <text class="sm deg" x="319.5" y="78">an eighth of the time</text>
+              <text class="sm" x="600" y="97">33.5 s, full</text>
+              <text class="sm" x="110" y="97">5 cm³ each second</text>
+            </svg>
+            <figcaption>Water goes in at a steady 5 cm³ each second, shown here four times faster. The level reaches half the depth in an eighth of the time the whole cup takes.</figcaption>
+          </figure>
           <p>Water goes into a cone-shaped cup at a steady rate, but the level races up at first and then crawls. Students write the volume in terms of the depth alone and work out how long the whole cup takes.</p>
           <p>Then they predict how long it takes to reach half the depth. It is about an eighth of the time. It closes by asking what shape a cup would need for the level to rise steadily.</p>
         </div>
@@ -695,6 +831,30 @@
         <div class="applet-desc">
           <p class="week">The Mean Value Theorem</p>
           <p class="tags"><span class="tag">Discussion</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A car passing between two cameras 10 kilometres apart, speeding up and then slowing down, beside a graph of its distance against time. The dashed line is its average speed, and at two moments the curve runs parallel to it">
+              <path class="trail" d="M26 52 H 314"/>
+              <path class="road" d="M26 60 H 314"/>
+              <rect class="head" x="36" y="20" width="8" height="6" rx="1"/><path class="chain" d="M40 26 V 52"/>
+              <rect class="head" x="296" y="20" width="8" height="6" rx="1"/><path class="chain" d="M300 26 V 52"/>
+              <g class="car13"><rect class="walker" x="32" y="43" width="16" height="7" rx="2"/></g>
+              <text class="sm" x="40" y="16">camera</text>
+              <text class="sm" x="300" y="16">camera, 10 km on</text>
+              <text class="sm" x="170" y="84">5 minutes: an average of 120 km/h</text>
+              <path class="ref" d="M390 88 L620 14"/>
+              <path class="flat" d="M390 88 C493.5 84.3 516.5 17.7 620 14"/>
+              <path class="fall" d="M421.6 86.4 L471.1 70.5"/>
+              <circle class="walker" cx="446.3" cy="78.4" r="2.6"/>
+              <path class="fall" d="M538.9 31.6 L588.4 15.6"/>
+              <circle class="walker" cx="563.6" cy="23.6" r="2.6"/>
+              <rect class="cover unc13" x="391" y="0" width="259" height="87" style="transform-origin:650px 0px"/>
+              <path class="axis" d="M390 88 H 626 M390 88 V 8"/>
+              <text class="sm" x="505" y="97">time</text>
+              <text class="sm" x="372" y="17">10 km</text>
+            </svg>
+            <figcaption>The car speeds up and slows down between the cameras. The dashed line is its average speed. Where the blue lines touch the curve, the car was doing exactly 120 km/h.</figcaption>
+          </figure>
           <p>Two cameras 10 km apart time a car, and it averages 120 km/h on a 100 km/h road. The driver says they were never over the limit. Students decide whether that could be true.</p>
           <p>They work out what has to be true about a journey for the cameras' case to hold, state the theorem about the car in their own words, and say what it promises and what it does not.</p>
         </div>
@@ -704,6 +864,33 @@
         <div class="applet-desc">
           <p class="week">Connecting <em>f</em>, <em>f</em>′ and <em>f</em>″</p>
           <p class="tags"><span class="tag">Discussion</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="Two graphs drawn month by month. On the left, prices climb every month but the curve bends over. On the right, a bar for each month's rise: every bar is above zero, and each is shorter than the one before">
+              <path class="fall" d="M60 88 L61 87.1 L62 86.3 L63 85.4 L64 84.6 L65 83.8 L66 83 L67 82.2 L68 81.4 L69 80.6 L70 79.8 L71 79.1 L72 78.3 L73 77.6 L74 76.8 L75 76.1 L76 75.4 L77 74.7 L78 74 L79 73.3 L80 72.6 L81 72 L82 71.3 L83 70.6 L84 70 L85 69.4 L86 68.7 L87 68.1 L88 67.5 L89 66.9 L90 66.3 L91 65.7 L92 65.1 L93 64.5 L94 64 L95 63.4 L96 62.8 L97 62.3 L98 61.7 L99 61.2 L100 60.7 L101 60.1 L102 59.6 L103 59.1 L104 58.6 L105 58.1 L106 57.6 L107 57.1 L108 56.7 L109 56.2 L110 55.7 L111 55.3 L112 54.8 L113 54.4 L114 53.9 L115 53.5 L116 53 L117 52.6 L118 52.2 L119 51.8 L120 51.4 L121 50.9 L122 50.5 L123 50.1 L124 49.8 L125 49.4 L126 49 L127 48.6 L128 48.2 L129 47.9 L130 47.5 L131 47.1 L132 46.8 L133 46.4 L134 46.1 L135 45.7 L136 45.4 L137 45.1 L138 44.7 L139 44.4 L140 44.1 L141 43.8 L142 43.5 L143 43.2 L144 42.8 L145 42.5 L146 42.2 L147 42 L148 41.7 L149 41.4 L150 41.1 L151 40.8 L152 40.5 L153 40.3 L154 40 L155 39.7 L156 39.5 L157 39.2 L158 38.9 L159 38.7 L160 38.4 L161 38.2 L162 38 L163 37.7 L164 37.5 L165 37.2 L166 37 L167 36.8 L168 36.5 L169 36.3 L170 36.1 L171 35.9 L172 35.7 L173 35.5 L174 35.2 L175 35 L176 34.8 L177 34.6 L178 34.4 L179 34.2 L180 34 L181 33.8 L182 33.7 L183 33.5 L184 33.3 L185 33.1 L186 32.9 L187 32.7 L188 32.6 L189 32.4 L190 32.2 L191 32 L192 31.9 L193 31.7 L194 31.6 L195 31.4 L196 31.2 L197 31.1 L198 30.9 L199 30.8 L200 30.6 L201 30.5 L202 30.3 L203 30.2 L204 30 L205 29.9 L206 29.7 L207 29.6 L208 29.5 L209 29.3 L210 29.2 L211 29.1 L212 28.9 L213 28.8 L214 28.7 L215 28.5 L216 28.4 L217 28.3 L218 28.2 L219 28.1 L220 27.9 L221 27.8 L222 27.7 L223 27.6 L224 27.5 L225 27.4 L226 27.3 L227 27.2 L228 27 L229 26.9 L230 26.8 L231 26.7 L232 26.6 L233 26.5 L234 26.4 L235 26.3 L236 26.2 L237 26.1 L238 26 L239 26 L240 25.9 L241 25.8 L242 25.7 L243 25.6 L244 25.5 L245 25.4 L246 25.3 L247 25.2 L248 25.2 L249 25.1 L250 25 L251 24.9 L252 24.8 L253 24.8 L254 24.7 L255 24.6 L256 24.5 L257 24.5 L258 24.4 L259 24.3 L260 24.2 L261 24.2 L262 24.1 L263 24 L264 24 L265 23.9 L266 23.8 L267 23.8 L268 23.7 L269 23.6 L270 23.6 L271 23.5 L272 23.4 L273 23.4 L274 23.3 L275 23.3 L276 23.2 L277 23.2 L278 23.1 L279 23 L280 23 L281 22.9 L282 22.9 L283 22.8 L284 22.8 L285 22.7 L286 22.7 L287 22.6 L288 22.6 L289 22.5 L290 22.5 L291 22.4 L292 22.4 L293 22.3 L294 22.3 L295 22.2 L296 22.2 L297 22.1 L298 22.1 L299 22 L300 22"/>
+              <rect class="cover unc15" x="61" y="10" width="243" height="77" style="transform-origin:304px 10px"/>
+              <rect class="bar15" x="373" y="30" width="14.8" height="58"/>
+              <rect class="bar15" x="393.8" y="42.8" width="14.8" height="45.2"/>
+              <rect class="bar15" x="414.7" y="52.8" width="14.8" height="35.2"/>
+              <rect class="bar15" x="435.5" y="60.6" width="14.8" height="27.4"/>
+              <rect class="bar15" x="456.3" y="66.7" width="14.8" height="21.3"/>
+              <rect class="bar15" x="477.2" y="71.4" width="14.8" height="16.6"/>
+              <rect class="bar15" x="498" y="75.1" width="14.8" height="12.9"/>
+              <rect class="bar15" x="518.8" y="77.9" width="14.8" height="10.1"/>
+              <rect class="bar15" x="539.7" y="80.2" width="14.8" height="7.8"/>
+              <rect class="bar15" x="560.5" y="81.9" width="14.8" height="6.1"/>
+              <rect class="bar15" x="581.3" y="83.2" width="14.8" height="4.8"/>
+              <rect class="bar15" x="602.2" y="84.3" width="14.8" height="3.7"/>
+              <rect class="cover unc15" x="371" y="10" width="253" height="77" style="transform-origin:624px 10px"/>
+              <path class="axis" d="M60 88 H 306 M60 88 V 14"/>
+              <path class="axis" d="M370 88 H 626"/>
+              <text class="sm deg" x="180" y="12">prices: still rising</text>
+              <text class="sm" x="495" y="12">the rise each month: smaller each time</text>
+              <text class="sm" x="180" y="97">months</text>
+              <text class="sm" x="495" y="97">months</text>
+            </svg>
+            <figcaption>Prices go up every month, but each month&#8217;s rise is smaller than the one before.</figcaption>
+          </figure>
           <p>A sentence from the news: prices are still rising, but more slowly than last month. Students say which function it is about, what each half says about its derivatives, and what the graph looks like.</p>
           <p>They separate "inflation is falling" from "prices are falling", read a second headline about unemployment, and write a sentence of their own where the second derivative is the news.</p>
         </div>
@@ -713,6 +900,21 @@
         <div class="applet-desc">
           <p class="week">Optimization</p>
           <p class="tags"><span class="tag">Graphing</span><span class="tag">Calculating</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A can that always holds 400 cubic centimetres, changing from tall and thin to short and wide, beside a graph of the metal it needs. A dot on the graph follows the can, and the metal is least when the can is as tall as it is wide">
+              <g class="can16" style="transform-origin:110px 88px"><rect class="tin" x="96" y="60" width="28" height="28"/><path class="ring" style="stroke:#6b6156" vector-effect="non-scaling-stroke" d="M96 64 H 124 M96 84 H 124"/></g>
+              <text class="sm" x="110" y="97">400 cm³, every time</text>
+              <path class="ref" d="M352.8 82.4 V 88"/>
+              <path class="flat" d="M230 51.4 L231.8 52.5 L233.7 53.6 L235.5 54.7 L237.4 55.7 L239.2 56.8 L241.1 57.7 L243 58.7 L244.8 59.6 L246.7 60.6 L248.5 61.4 L250.3 62.3 L252.2 63.1 L254.1 64 L255.9 64.8 L257.8 65.5 L259.6 66.3 L261.4 67 L263.3 67.7 L265.2 68.4 L267 69 L268.9 69.7 L270.7 70.3 L272.6 70.9 L274.4 71.5 L276.2 72.1 L278.1 72.6 L279.9 73.1 L281.8 73.7 L283.6 74.1 L285.5 74.6 L287.3 75.1 L289.2 75.5 L291.1 76 L292.9 76.4 L294.8 76.8 L296.6 77.1 L298.4 77.5 L300.3 77.9 L302.1 78.2 L304 78.5 L305.8 78.8 L307.7 79.1 L309.6 79.4 L311.4 79.7 L313.2 79.9 L315.1 80.2 L316.9 80.4 L318.8 80.6 L320.6 80.8 L322.5 81 L324.4 81.2 L326.2 81.3 L328.1 81.5 L329.9 81.6 L331.8 81.8 L333.6 81.9 L335.4 82 L337.3 82.1 L339.1 82.2 L341 82.2 L342.9 82.3 L344.7 82.3 L346.6 82.4 L348.4 82.4 L350.2 82.4 L352.1 82.4 L354 82.4 L355.8 82.4 L357.7 82.4 L359.5 82.4 L361.4 82.3 L363.2 82.3 L365.1 82.2 L366.9 82.1 L368.8 82.1 L370.6 82 L372.4 81.9 L374.3 81.8 L376.1 81.7 L378 81.5 L379.9 81.4 L381.7 81.3 L383.5 81.1 L385.4 81 L387.2 80.8 L389.1 80.6 L390.9 80.4 L392.8 80.2 L394.6 80 L396.5 79.8 L398.3 79.6 L400.2 79.4 L402 79.2 L403.9 78.9 L405.8 78.7 L407.6 78.4 L409.5 78.2 L411.3 77.9 L413.1 77.6 L415 77.3 L416.9 77 L418.7 76.7 L420.5 76.4 L422.4 76.1 L424.2 75.8 L426.1 75.5 L428 75.1 L429.8 74.8 L431.7 74.4 L433.5 74.1 L435.4 73.7 L437.2 73.4 L439.1 73 L440.9 72.6 L442.8 72.2 L444.6 71.8 L446.5 71.4 L448.3 71 L450.1 70.6 L452 70.2 L453.9 69.7 L455.7 69.3 L457.6 68.9 L459.4 68.4 L461.2 68 L463.1 67.5 L464.9 67 L466.8 66.6 L468.6 66.1 L470.5 65.6 L472.3 65.1 L474.2 64.6 L476 64.1 L477.9 63.6 L479.7 63.1 L481.6 62.6 L483.4 62 L485.3 61.5 L487.1 61 L489 60.4 L490.8 59.9 L492.7 59.3 L494.5 58.8 L496.4 58.2 L498.2 57.6 L500.1 57 L502 56.5 L503.8 55.9 L505.6 55.3 L507.5 54.7 L509.4 54.1 L511.2 53.5 L513 52.8 L514.9 52.2 L516.8 51.6 L518.6 51 L520.5 50.3 L522.3 49.7 L524.2 49 L526 48.4 L527.9 47.7 L529.7 47.1 L531.5 46.4 L533.4 45.7 L535.2 45 L537.1 44.4 L539 43.7 L540.8 43 L542.7 42.3 L544.5 41.6 L546.4 40.9 L548.2 40.1 L550 39.4 L551.9 38.7 L553.8 38 L555.6 37.2 L557.5 36.5 L559.3 35.7 L561.1 35 L563 34.2 L564.8 33.5 L566.7 32.7 L568.5 32 L570.4 31.2 L572.2 30.4 L574.1 29.6 L576 28.8 L577.8 28 L579.7 27.2 L581.5 26.4 L583.4 25.6 L585.2 24.8 L587 24 L588.9 23.2 L590.8 22.3 L592.6 21.5 L594.5 20.7 L596.3 19.8 L598.1 19 L600 18.1"/>
+              <g class="dot16"><circle class="walker" cx="352.8" cy="82.4" r="3.4"/></g>
+              <path class="axis" d="M230 88 H 606 M230 88 V 10"/>
+              <text class="sm deg" x="356.8" y="72.4">least metal: as tall as it is wide</text>
+              <text class="sm" x="212" y="14">metal</text>
+              <text class="sm" x="594" y="97">radius</text>
+            </svg>
+            <figcaption>Every can here holds 400 cm³. The metal it needs is least when the can is as tall as it is wide.</figcaption>
+          </figure>
           <p>A can must hold 400 cm³ with as little metal as possible. Students write the area of metal in terms of the radius alone and find that the best can is exactly as tall as it is wide.</p>
           <p>Real cans are not. It closes on what the model left out, and on what happens to the best shape if the metal for the ends costs more than the metal for the side.</p>
         </div>
