@@ -272,7 +272,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6a4f' \
-  --title    "Will the car make it to the charger?" \
+  --title    "Can an Electric Vehicle Recover Enough Energy to Make It Home?" \
   --subtitle "Welcome! Today you will work out whether braking downhill puts enough energy back for an electric car to reach the next charger, and why ending with more energy than you started with may not be enough. $TAIL"
 
 capture \
@@ -282,7 +282,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a4a2f' \
-  --title    "When should the fan turn on?" \
+  --title    "A Smart Cooling System: When Should the Fan Turn On?" \
   --subtitle "Welcome! Today you will work out how much heat a computer chip gains as it works, and choose when a cooling fan should switch on to keep it safe. $TAIL"
 
 capture \
@@ -292,7 +292,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#4f5a8a' \
-  --title    "What is the best way to move a fragile part?" \
+  --title    "Design Smooth Robot Motion: Fast, Safe, or Energy-Efficient?" \
   --subtitle "Welcome! Today you will compare ways a robot arm could carry a delicate part 2 metres in 5 seconds, and decide what the best way even means. $TAIL"
 
 capture \
@@ -302,7 +302,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6f6a2a' \
-  --title    "Will a battery ever finish charging?" \
+  --title    "Will a Battery Ever Finish Charging?" \
   --subtitle "Welcome! Today you will work out whether a charger that never quite stops can deliver an unlimited amount of energy, and decide when it makes sense to unplug. $TAIL"
 
 capture \
@@ -312,7 +312,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3a4f6f' \
-  --title    "Can a signal from deep space add up forever?" \
+  --title    "Can a Spacecraft Communicate Across an Infinite Distance?" \
   --subtitle "Welcome! Today you will follow a space probe as it travels away from Earth and work out whether the total signal Earth receives can grow without limit. $TAIL"
 
 capture \
@@ -322,7 +322,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7a2f3f' \
-  --title    "How much safety is enough?" \
+  --title    "The Million-Dollar Engineering Failure: How Much Safety Is Enough?" \
   --subtitle "Welcome! Today you will work out the average cost of rare but severe failures, and decide whether a company should pay for better safety controls. $TAIL"
 
 # The Taylor series page at the root of the site, the one linked as "Try it".

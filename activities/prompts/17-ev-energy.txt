@@ -1,4 +1,4 @@
-ACTIVITY — Will the car make it to the charger?
+ACTIVITY — Can an Electric Vehicle Recover Enough Energy to Make It Home?
 The Fundamental Theorem of Calculus: accumulation from a rate (AP topics 6.4-6.7).
 Source: Engineering Calculus I sheet, Activity 1. Net charging power P(t) in kW,
 t in minutes: P = -4 + 0.5t on [0,4], P = 6 - 0.5(t-4) on (4,8]. P jumps from

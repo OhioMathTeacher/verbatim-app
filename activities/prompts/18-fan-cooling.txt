@@ -1,4 +1,4 @@
-ACTIVITY — When should the fan turn on?
+ACTIVITY — A Smart Cooling System: When Should the Fan Turn On?
 The Fundamental Theorem of Calculus: an accumulation function and a threshold
 (AP topics 6.4-6.7).
 Source: Engineering Calculus I sheet, Activity 2. Rate r(t) = 12 + 8 sin(pi t/10)

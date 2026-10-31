@@ -1,4 +1,4 @@
-ACTIVITY — Can a signal from deep space add up forever?
+ACTIVITY — Can a Spacecraft Communicate Across an Infinite Distance?
 Improper integrals: accumulation over an endless journey (AP topic 6.13).
 Source: Engineering Calculus I sheet, Activity 5. Received power P(r) = K/r^p,
 distance r(t) = r0 + vt. S(T) = integral from 0 to T of P(r(t)) dt. For p = 2,

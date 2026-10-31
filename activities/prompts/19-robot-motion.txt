@@ -1,4 +1,4 @@
-ACTIVITY — What is the best way to move a fragile part?
+ACTIVITY — Design Smooth Robot Motion: Fast, Safe, or Energy-Efficient?
 The Fundamental Theorem of Calculus: velocity determines displacement
 (AP topics 6.4-6.7).
 Source: Engineering Calculus I sheet, Activity 3. Move 2 m in 5 s, starting and

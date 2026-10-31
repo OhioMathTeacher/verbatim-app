@@ -1,4 +1,4 @@
-ACTIVITY — Will a battery ever finish charging?
+ACTIVITY — Will a Battery Ever Finish Charging?
 Improper integrals: a positive rate with a finite total (AP topic 6.13).
 Source: Engineering Calculus I sheet, Activity 4. P1 = P0 e^(-kt): total P0/k;
 90% at t = ln 10/k, about 2.30/k; 99% at ln 100/k, about 4.61/k.

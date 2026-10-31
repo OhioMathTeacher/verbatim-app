@@ -1,4 +1,4 @@
-ACTIVITY — How much safety is enough?
+ACTIVITY — The Million-Dollar Engineering Failure: How Much Safety Is Enough?
 Improper integrals: a finite probability with an infinite expected value
 (AP topic 6.13).
 Source: Engineering Calculus I sheet, Activity 6. Loss X in millions of
