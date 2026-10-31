@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the fourteen draft activities and the root page. Run from the repository root:
+# Rebuild the twenty draft activities and the root page. Run from the repository root:
 #     bash activities/build.sh          demonstrations: no codes asked, no hand-in
 #     bash activities/build.sh class    a class runs them: codes asked, hand-in and
 #                                       research wording back
@@ -261,6 +261,70 @@ capture \
   --title    "Why are soup cans that shape?" \
   --subtitle "Welcome! Today you will design a can that holds a fixed amount using as little metal as possible, and then work out why real cans are not that shape. $TAIL"
 
+# The Fundamental Theorem and improper integrals: six engineering activities
+# added 30 Oct 2026 from the Engineering Calculus I sheet. Each survey's topic
+# question names that activity's own topic.
+
+capture \
+  --prompt activities/prompts/17-ev-energy.txt \
+  --out activities/activity-17-ev.html \
+  --survey "$(learn_survey ev "This assignment helped me understand how a total, like the energy in a battery, is built up from a rate (the Fundamental Theorem of Calculus).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#2f6a4f' \
+  --title    "Will the car make it to the charger?" \
+  --subtitle "Welcome! Today you will work out whether braking downhill puts enough energy back for an electric car to reach the next charger, and why ending with more energy than you started with may not be enough. $TAIL"
+
+capture \
+  --prompt activities/prompts/18-fan-cooling.txt \
+  --out activities/activity-18-fan.html \
+  --survey "$(learn_survey fan "This assignment helped me understand how a rate adds up to a total, and how to keep that total under a limit (the Fundamental Theorem of Calculus).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#8a4a2f' \
+  --title    "When should the fan turn on?" \
+  --subtitle "Welcome! Today you will work out how much heat a computer chip gains as it works, and choose when a cooling fan should switch on to keep it safe. $TAIL"
+
+capture \
+  --prompt activities/prompts/19-robot-motion.txt \
+  --out activities/activity-19-robot.html \
+  --survey "$(learn_survey robot "This assignment helped me understand how velocity determines distance travelled (the Fundamental Theorem of Calculus), and why equal distances can mean very different motion.")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#4f5a8a' \
+  --title    "What is the best way to move a fragile part?" \
+  --subtitle "Welcome! Today you will compare ways a robot arm could carry a delicate part 2 metres in 5 seconds, and decide what the best way even means. $TAIL"
+
+capture \
+  --prompt activities/prompts/20-battery-charging.txt \
+  --out activities/activity-20-battery.html \
+  --survey "$(learn_survey battery "This assignment helped me understand how something can go on forever and still add up to a finite total (improper integrals).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#6f6a2a' \
+  --title    "Will a battery ever finish charging?" \
+  --subtitle "Welcome! Today you will work out whether a charger that never quite stops can deliver an unlimited amount of energy, and decide when it makes sense to unplug. $TAIL"
+
+capture \
+  --prompt activities/prompts/21-deep-space.txt \
+  --out activities/activity-21-space.html \
+  --survey "$(learn_survey space "This assignment helped me understand when a total collected over an endless journey stays finite (improper integrals).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#3a4f6f' \
+  --title    "Can a signal from deep space add up forever?" \
+  --subtitle "Welcome! Today you will follow a space probe as it travels away from Earth and work out whether the total signal Earth receives can grow without limit. $TAIL"
+
+capture \
+  --prompt activities/prompts/22-failure-risk.txt \
+  --out activities/activity-22-risk.html \
+  --survey "$(learn_survey risk "This assignment helped me understand how a rare but severe outcome can make an average loss infinite (improper integrals).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#7a2f3f' \
+  --title    "How much safety is enough?" \
+  --subtitle "Welcome! Today you will work out the average cost of rare but severe failures, and decide whether a company should pay for better safety controls. $TAIL"
+
 # The Taylor series page at the root of the site, the one linked as "Try it".
 # Built here so its wording is written down too; --section S4 is what it has
 # always carried. Run last only because it rewrites the root setup.html, not
@@ -271,5 +335,5 @@ capture \
   --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file."
 
 echo
-echo "Rebuilt fourteen activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
+echo "Rebuilt twenty activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."
