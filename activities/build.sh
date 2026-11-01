@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild the twenty draft activities and the root page. Run from the repository root:
+# Rebuild the twenty-two draft activities and the root page. Run from the repository root:
 #     bash activities/build.sh          demonstrations: no codes asked, no hand-in
 #     bash activities/build.sh class    a class runs them: codes asked, hand-in and
 #                                       research wording back
@@ -325,6 +325,30 @@ capture \
   --title    "The Million-Dollar Engineering Failure: How Much Safety Is Enough?" \
   --subtitle "Welcome! Today you will work out the average cost of rare but severe failures, and decide whether a company should pay for better safety controls. $TAIL"
 
+# Differential equations: the two BC topics of AP Unit 7, Euler's method and
+# logistic models, added 31 Oct 2026 for Mariemont from the Course and Exam
+# Description Mr. Phelps sent.
+
+capture \
+  --prompt activities/prompts/23-euler-coffee.txt \
+  --out activities/activity-23-coffee.html \
+  --survey "$(learn_survey coffee "This assignment helped me understand how to estimate a solution to a differential equation one step at a time (Euler's method).")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#6a4a2f' \
+  --title    "Why did the coffee get colder than the room?" \
+  --subtitle "Welcome! Today you will predict how a cup of coffee cools, one step at a time, using only how fast it is cooling right now. Then you will find out why one big step can give an answer that makes no sense. $TAIL"
+
+capture \
+  --prompt activities/prompts/24-logistic-virus.txt \
+  --out activities/activity-24-virus.html \
+  --survey "$(learn_survey virus "This assignment helped me understand what a logistic differential equation says about growth, its limit and when it is fastest, without solving it.")" \
+  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  --codehint "$CODEHINT" \
+  --accent '#2f6a7a' \
+  --title    "How far can a computer virus spread?" \
+  --subtitle "Welcome! Today you will follow a virus through a school's computer network and work out how far it spreads, and when it spreads fastest, from the equation for its rate alone. $TAIL"
+
 # The Taylor series page at the root of the site, the one linked as "Try it".
 # Built here so its wording is written down too; --section S4 is what it has
 # always carried. Run last only because it rewrites the root setup.html, not
@@ -335,5 +359,5 @@ capture \
   --subtitle "Welcome! In this activity, you'll explore Taylor series with generative AI. You'll need to set up an AI below to get started. Your conversation is saved as you go. Your messages go to the AI provider to get replies, and nowhere else. When you've finished, you can download your conversation as a file."
 
 echo
-echo "Rebuilt twenty activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
+echo "Rebuilt twenty-two activities and the root page ($MODE). Note that each run also rewrites activities/setup.html"
 echo "(the browser builder ships beside the activity), so the last one wins there."

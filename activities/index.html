@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Verbatim — Draft Activities</title>
+<title>Verbatim</title>
 <style>
     body {
       font-family: system-ui, sans-serif;
@@ -237,7 +237,7 @@
       .cr1, .cr2, .rolling, .walkLong, .walkShort,
       .pend, .g1, .g2, .g3, .hmin, .hhour { animation: none; }
     }
-    /* The Rates and Shape tabs. Each banner animates the activity's own numbers:
+    /* Activities 9 to 16. Each banner animates the activity's own numbers:
        the sprinter runs the split times in real time, the cup fills along its
        real curve at four times speed, and the can keeps 400 cm3 at every size.
        A graph is drawn by uncovering it from the left, at the same pace as
@@ -280,7 +280,7 @@
       .unc9, .run10, .ray11, .walk11, .tip11, .shad11, .cup12, .unc12, .car13, .unc13, .unc15, .can16, .dot16 { animation: none; }
       .unc9, .unc12, .unc13, .unc15 { transform: scaleX(0); }
     }
-    /* The two integral tabs. Same conventions as the banners above: a graph is
+    /* Activities 17 to 22. Same conventions as the banners above: a graph is
        uncovered from the left at the pace of whatever moves beside it, and what
        moves follows the activity's own model (the two robot motions are their
        real displacements, the battery fills as 1 - e^-kt). */
@@ -302,12 +302,14 @@
     .sig21 { animation: sig21 7s linear infinite; }
     .unc21 { animation: uncover 7s linear infinite; }
     .unc22 { animation: uncover 8s linear infinite; }
+    .unc23 { animation: uncover 7s linear infinite; }
+    .unc24 { animation: uncover 7s linear infinite; }
     @media (prefers-reduced-motion: reduce) {
-      .unc17, .unc18, .fan18, .arm19a, .arm19b, .unc19, .bat20, .unc20, .probe21, .sig21, .unc21, .unc22 { animation: none; }
-      .unc17, .unc18, .unc19, .unc20, .unc21, .unc22 { transform: scaleX(0); }
+      .unc17, .unc18, .fan18, .arm19a, .arm19b, .unc19, .bat20, .unc20, .probe21, .sig21, .unc21, .unc22, .unc23, .unc24 { animation: none; }
+      .unc17, .unc18, .unc19, .unc20, .unc21, .unc22, .unc23, .unc24 { transform: scaleX(0); }
     }
     /* Topic tabs. Plain buttons; the chosen one is remembered in the address
-       (#limits, #chain) so a link can open on either. */
+       (#limits, #derivatives) so a link can open on any of them. */
     .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 2px solid #eee; margin: 1.6em 0 1em; }
     .tabs button { font: inherit; font-weight: 600; color: #555; background: none; border: 0;
                    border-bottom: 3px solid transparent; margin-bottom: -2px; padding: 10px 14px; cursor: pointer; }
@@ -317,7 +319,16 @@
     /* What each task is well suited for (Todd, 29 Oct 2026): a tag only where it fits. */
     .tags { margin: -0.2em 0 0.8em; display: flex; flex-wrap: wrap; gap: 6px; }
     .tag { font-size: 0.8em; font-weight: 600; color: #3a4a5a; background: #eef2f6;
-           border: 1px solid #d5dde6; border-radius: 99px; padding: 2px 10px; }
+           border: 1px solid #d5dde6; border-radius: 99px; padding: 2px 10px; cursor: pointer; }
+    .tag:hover { border-color: #2563eb; }
+    .tag.on { color: #fff; background: #2563eb; border-color: #2563eb; }
+    .tag:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+    /* Choosing tags lists every activity that has all of them, from every tab, in
+       page order. The address keeps the choice (#tag=calc-bc+graphing). */
+    [hidden] { display: none !important; }
+    .filterbar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px;
+                 border-bottom: 2px solid #eee; margin: 1.6em 0 1em; padding-bottom: 10px; }
+    .filterbar button { font: inherit; color: #2563eb; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
     hr {
       border: none;
       border-top: 2px solid #eee;
@@ -331,9 +342,9 @@
 </head>
 <body>
   <div class="container">
-    <h1><span role="img" aria-label="conversation">💬</span> Verbatim — Draft Activities</h1>
-    <p>Short conversations between a student and a generative AI, written for a
-    first-semester calculus course. They are sorted by topic in the tabs below. Each
+    <h1><span role="img" aria-label="conversation">💬</span> Verbatim</h1>
+    <p>Short conversations between a student and a generative AI, written for
+    calculus courses. They are sorted by topic in the tabs below. Each
     takes about twenty minutes, needs nothing installed, and saves the conversation as
     you go.</p>
     <p>Open any of them, type the class passcode, and press <strong>Start the
@@ -341,24 +352,31 @@
     server to Claude to get replies, and nowhere else. The server keeps no copy of them.</p>
     <p>The tags on each one say what it is well suited for: <strong>Graphing</strong>,
     <strong>Tables</strong>, <strong>Calculating</strong>, or <strong>Discussion</strong> when it
-    is mostly reasoning in words. Choose the ones you want to explore.</p>
+    is mostly reasoning in words. <strong>Calc AB</strong> or <strong>Calc BC</strong> says which AP
+    Calculus course the topic belongs to. Every Calc AB topic is also in Calc BC. Click a tag to
+    see every activity that has it, and click another to narrow the list. Choose the ones
+    you want to explore.</p>
+    <div class="filterbar" id="filterbar" hidden>
+      <span id="filtersum" aria-live="polite"></span>
+      <button type="button" id="filterclear">Back to the topic tabs</button>
+    </div>
+    <ul class="applet-list" id="filtered" hidden></ul>
     <div class="tabs" role="tablist" aria-label="Activities by topic">
-      <button type="button" role="tab" id="tab-limits" aria-controls="limits" aria-selected="true">Small and large</button>
-      <button type="button" role="tab" id="tab-chain" aria-controls="chain" aria-selected="false">Chain Rule</button>
-      <button type="button" role="tab" id="tab-rates" aria-controls="rates" aria-selected="false">Rates</button>
-      <button type="button" role="tab" id="tab-shape" aria-controls="shape" aria-selected="false">Max Min Shapes</button>
-      <button type="button" role="tab" id="tab-ftc" aria-controls="ftc" aria-selected="false">Fund Theorem</button>
-      <button type="button" role="tab" id="tab-improper" aria-controls="improper" aria-selected="false">Improper Integrals</button>
+      <button type="button" role="tab" id="tab-limits" aria-controls="limits" aria-selected="true">Limits</button>
+      <button type="button" role="tab" id="tab-derivatives" aria-controls="derivatives" aria-selected="false">Derivatives</button>
+      <button type="button" role="tab" id="tab-extrema" aria-controls="extrema" aria-selected="false">Extrema</button>
+      <button type="button" role="tab" id="tab-integration" aria-controls="integration" aria-selected="false">Integration</button>
+      <button type="button" role="tab" id="tab-de" aria-controls="de" aria-selected="false">Differential Equations</button>
     </div>
     <section id="limits" role="tabpanel" aria-labelledby="tab-limits">
-    <p class="tabnote">Three activities on approximation, scaling and limits.</p>
+    <p class="tabnote">Four activities on approximation, scaling and limits: a pendulum, a spider, a speedometer and a race to infinity.</p>
     <ul class="applet-list">
 
       <li>
         <span class="applet-title">🕰️ <a href="activity-1-pendulum.html">How small is small enough?</a></span>
         <div class="applet-desc">
-          <p class="week">Approximation for large and small values</p>
-          <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <p class="week">Approximation for large and small values · Unit 4, topic 4.6</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Three pendulums swinging through 30, 15 and 5 degrees — a
@@ -411,7 +429,6 @@
           three concrete cases rather than from a definition.</p>
         </div>
       </li>
-
       <li>
         <span class="applet-title">🕷️ <a href="activity-2-scaling.html">Why can't a spider be the size of a horse?</a></span>
         <div class="applet-desc">
@@ -436,12 +453,11 @@
           most accessible of the four and a reasonable choice early in the term.</p>
         </div>
       </li>
-
       <li>
         <span class="applet-title">🚗 <a href="activity-3-speedometer.html">What does the speedometer mean?</a></span>
         <div class="applet-desc">
-          <p class="week">Limits, and what a derivative is before it is computed</p>
-          <p class="tags"><span class="tag">Discussion</span></p>
+          <p class="week">Limits, and what a derivative is before it is computed · Unit 2, topic 2.1</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Discussion</span></p>
           <figure class="fig">
             <img class="photo" src="img/car.jpg" width="1950" height="300" loading="lazy"
                  alt="A saloon car in profile, standing on a road ruled with evenly spaced
@@ -461,20 +477,44 @@
           having been given a definition.</p>
         </div>
       </li>
-
+      <li>
+        <span class="applet-title">📈 <a href="activity-9-growth.html">Which grows faster in the end?</a></span>
+        <div class="applet-desc">
+          <p class="week">L'Hôpital's rule and indeterminate forms · Unit 4, topic 4.7</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="Two curves drawn from left to right, x cubed and two to the x. x cubed is ahead for most of the way, then two to the x overtakes it near x equals 10 and climbs away">
+              <path class="ref" d="M547.9 10 V 88"/>
+              <path class="flat" d="M60 88 L62.5 88 L64.9 88 L67.4 88 L69.8 88 L72.3 88 L74.7 88 L77.2 88 L79.6 88 L82.1 88 L84.5 88 L87 88 L89.5 88 L91.9 88 L94.4 88 L96.8 88 L99.3 88 L101.7 88 L104.2 88 L106.6 88 L109.1 88 L111.5 88 L114 87.9 L116.5 87.9 L118.9 87.9 L121.4 87.9 L123.8 87.9 L126.3 87.9 L128.7 87.9 L131.2 87.9 L133.6 87.9 L136.1 87.9 L138.5 87.8 L141 87.8 L143.5 87.8 L145.9 87.8 L148.4 87.8 L150.8 87.8 L153.3 87.7 L155.7 87.7 L158.2 87.7 L160.6 87.7 L163.1 87.6 L165.5 87.6 L168 87.6 L170.5 87.6 L172.9 87.5 L175.4 87.5 L177.8 87.5 L180.3 87.4 L182.7 87.4 L185.2 87.4 L187.6 87.3 L190.1 87.3 L192.5 87.3 L195 87.2 L197.5 87.2 L199.9 87.1 L202.4 87.1 L204.8 87 L207.3 87 L209.7 86.9 L212.2 86.9 L214.6 86.8 L217.1 86.8 L219.5 86.7 L222 86.6 L224.5 86.6 L226.9 86.5 L229.4 86.4 L231.8 86.4 L234.3 86.3 L236.7 86.2 L239.2 86.2 L241.6 86.1 L244.1 86 L246.5 85.9 L249 85.8 L251.5 85.7 L253.9 85.7 L256.4 85.6 L258.8 85.5 L261.3 85.4 L263.7 85.3 L266.2 85.2 L268.6 85.1 L271.1 85 L273.5 84.9 L276 84.8 L278.5 84.7 L280.9 84.5 L283.4 84.4 L285.8 84.3 L288.3 84.2 L290.7 84.1 L293.2 83.9 L295.6 83.8 L298.1 83.7 L300.5 83.5 L303 83.4 L305.5 83.2 L307.9 83.1 L310.4 83 L312.8 82.8 L315.3 82.7 L317.7 82.5 L320.2 82.3 L322.6 82.2 L325.1 82 L327.5 81.8 L330 81.7 L332.5 81.5 L334.9 81.3 L337.4 81.1 L339.8 81 L342.3 80.8 L344.7 80.6 L347.2 80.4 L349.6 80.2 L352.1 80 L354.5 79.8 L357 79.6 L359.5 79.4 L361.9 79.2 L364.4 78.9 L366.8 78.7 L369.3 78.5 L371.7 78.3 L374.2 78 L376.6 77.8 L379.1 77.6 L381.5 77.3 L384 77.1 L386.5 76.8 L388.9 76.6 L391.4 76.3 L393.8 76.1 L396.3 75.8 L398.7 75.5 L401.2 75.2 L403.6 75 L406.1 74.7 L408.5 74.4 L411 74.1 L413.5 73.8 L415.9 73.5 L418.4 73.2 L420.8 72.9 L423.3 72.6 L425.7 72.3 L428.2 72 L430.6 71.6 L433.1 71.3 L435.5 71 L438 70.7 L440.5 70.3 L442.9 70 L445.4 69.6 L447.8 69.3 L450.3 68.9 L452.7 68.5 L455.2 68.2 L457.6 67.8 L460.1 67.4 L462.5 67 L465 66.7 L467.5 66.3 L469.9 65.9 L472.4 65.5 L474.8 65.1 L477.3 64.7 L479.7 64.2 L482.2 63.8 L484.6 63.4 L487.1 63 L489.5 62.5 L492 62.1 L494.5 61.7 L496.9 61.2 L499.4 60.8 L501.8 60.3 L504.3 59.8 L506.7 59.4 L509.2 58.9 L511.6 58.4 L514.1 57.9 L516.5 57.4 L519 56.9 L521.5 56.4 L523.9 55.9 L526.4 55.4 L528.8 54.9 L531.3 54.4 L533.7 53.9 L536.2 53.3 L538.6 52.8 L541.1 52.2 L543.5 51.7 L546 51.1 L548.5 50.6 L550.9 50 L553.4 49.4 L555.8 48.8 L558.3 48.3 L560.7 47.7 L563.2 47.1 L565.6 46.5 L568.1 45.9 L570.5 45.3 L573 44.6 L575.5 44 L577.9 43.4 L580.4 42.7 L582.8 42.1 L585.3 41.4 L587.7 40.8 L590.2 40.1 L592.6 39.5 L595.1 38.8 L597.5 38.1 L600 37.4"/>
+              <path class="fall" d="M60 88 L62.5 88 L64.9 88 L67.4 88 L69.8 88 L72.3 88 L74.7 88 L77.2 88 L79.6 87.9 L82.1 87.9 L84.5 87.9 L87 87.9 L89.5 87.9 L91.9 87.9 L94.4 87.9 L96.8 87.9 L99.3 87.9 L101.7 87.9 L104.2 87.9 L106.6 87.9 L109.1 87.9 L111.5 87.9 L114 87.9 L116.5 87.9 L118.9 87.9 L121.4 87.9 L123.8 87.9 L126.3 87.9 L128.7 87.9 L131.2 87.9 L133.6 87.9 L136.1 87.9 L138.5 87.9 L141 87.9 L143.5 87.9 L145.9 87.9 L148.4 87.9 L150.8 87.9 L153.3 87.9 L155.7 87.9 L158.2 87.8 L160.6 87.8 L163.1 87.8 L165.5 87.8 L168 87.8 L170.5 87.8 L172.9 87.8 L175.4 87.8 L177.8 87.8 L180.3 87.8 L182.7 87.8 L185.2 87.8 L187.6 87.8 L190.1 87.8 L192.5 87.8 L195 87.7 L197.5 87.7 L199.9 87.7 L202.4 87.7 L204.8 87.7 L207.3 87.7 L209.7 87.7 L212.2 87.7 L214.6 87.7 L217.1 87.7 L219.5 87.6 L222 87.6 L224.5 87.6 L226.9 87.6 L229.4 87.6 L231.8 87.6 L234.3 87.6 L236.7 87.5 L239.2 87.5 L241.6 87.5 L244.1 87.5 L246.5 87.5 L249 87.5 L251.5 87.4 L253.9 87.4 L256.4 87.4 L258.8 87.4 L261.3 87.3 L263.7 87.3 L266.2 87.3 L268.6 87.3 L271.1 87.3 L273.5 87.2 L276 87.2 L278.5 87.2 L280.9 87.1 L283.4 87.1 L285.8 87.1 L288.3 87 L290.7 87 L293.2 87 L295.6 86.9 L298.1 86.9 L300.5 86.9 L303 86.8 L305.5 86.8 L307.9 86.7 L310.4 86.7 L312.8 86.7 L315.3 86.6 L317.7 86.6 L320.2 86.5 L322.6 86.5 L325.1 86.4 L327.5 86.3 L330 86.3 L332.5 86.2 L334.9 86.2 L337.4 86.1 L339.8 86 L342.3 86 L344.7 85.9 L347.2 85.8 L349.6 85.7 L352.1 85.7 L354.5 85.6 L357 85.5 L359.5 85.4 L361.9 85.3 L364.4 85.2 L366.8 85.1 L369.3 85 L371.7 84.9 L374.2 84.8 L376.6 84.7 L379.1 84.6 L381.5 84.4 L384 84.3 L386.5 84.2 L388.9 84 L391.4 83.9 L393.8 83.8 L396.3 83.6 L398.7 83.5 L401.2 83.3 L403.6 83.1 L406.1 83 L408.5 82.8 L411 82.6 L413.5 82.4 L415.9 82.2 L418.4 82 L420.8 81.8 L423.3 81.6 L425.7 81.4 L428.2 81.1 L430.6 80.9 L433.1 80.6 L435.5 80.4 L438 80.1 L440.5 79.8 L442.9 79.5 L445.4 79.2 L447.8 78.9 L450.3 78.6 L452.7 78.3 L455.2 77.9 L457.6 77.6 L460.1 77.2 L462.5 76.8 L465 76.4 L467.5 76 L469.9 75.6 L472.4 75.2 L474.8 74.7 L477.3 74.2 L479.7 73.8 L482.2 73.3 L484.6 72.7 L487.1 72.2 L489.5 71.6 L492 71.1 L494.5 70.5 L496.9 69.8 L499.4 69.2 L501.8 68.5 L504.3 67.9 L506.7 67.1 L509.2 66.4 L511.6 65.7 L514.1 64.9 L516.5 64 L519 63.2 L521.5 62.3 L523.9 61.4 L526.4 60.5 L528.8 59.5 L531.3 58.5 L533.7 57.5 L536.2 56.4 L538.6 55.3 L541.1 54.1 L543.5 52.9 L546 51.7 L548.5 50.4 L550.9 49.1 L553.4 47.7 L555.8 46.3 L558.3 44.8 L560.7 43.3 L563.2 41.7 L565.6 40.1 L568.1 38.4 L570.5 36.7 L573 34.8 L575.5 33 L577.9 31 L580.4 29 L582.8 26.9 L585.3 24.8 L587.7 22.6 L590.2 20.3 L592.6 17.9 L595.1 15.4 L597.5 12.8"/>
+              <rect class="cover unc9" x="58" y="6" width="550" height="83" style="transform-origin:608px 6px"/>
+              <path class="axis" d="M60 88 H 606 M60 88 V 8"/>
+              <text class="sm" x="550.9" y="97">x = 10</text>
+              <text class="sm" x="60" y="97">0</text>
+              <text class="sm" x="616" y="40.4">x³</text>
+              <text class="sm deg" x="570.4" y="14">2ˣ</text>
+              <text class="sm" x="485.9" y="20">2ˣ ahead from here on</text>
+            </svg>
+            <figcaption>x³ is ahead for most of the way. Then 2ˣ catches it near x = 10 and stays ahead from then on.</figcaption>
+          </figure>
+          <p>At <em>x</em> = 10, <em>x</em><sup>3</sup> and 2<sup><em>x</em></sup> are nearly tied. At <em>x</em> = 100, <em>x</em><sup>100</sup> is so far ahead of <em>e</em><sup><em>x</em></sup> that it looks like a rout. Students are asked which wins in the long run, and why their sizes cannot tell them.</p>
+          <p>They meet ∞/∞ as a question rather than an answer, compare how fast each side grows, and find that each step takes one off the power while <em>e</em><sup><em>x</em></sup> stays the same. It closes by asking them to find where <em>e</em><sup><em>x</em></sup> finally pulls ahead.</p>
+        </div>
+      </li>
     </ul>
     </section>
-
-    <section id="chain" role="tabpanel" aria-labelledby="tab-chain" hidden>
-    <p class="tabnote">Four ways into the chain rule. Each teaches the same idea through a
-    different object, so the choice can be made by trying them rather than on paper.</p>
+    <section id="derivatives" role="tabpanel" aria-labelledby="tab-derivatives" hidden>
+    <p class="tabnote">Seven activities on derivatives. The first four are ways into the chain rule. Each teaches the same idea through a
+    different object, so the choice can be made by trying them rather than on paper. The last three are about what a
+    derivative means when something real is changing: a sprinter, a shadow and a cup.</p>
     <ul class="applet-list">
 
       <li>
         <span class="applet-title">💿 <a href="activity-5-record.html">Why was the last song the worst?</a></span>
         <div class="applet-desc">
-          <p class="week">A rate reached through a second rate</p>
-          <p class="tags"><span class="tag">Calculating</span></p>
+          <p class="week">A rate reached through a second rate · Unit 3, topic 3.1</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A vinyl record turning evenly while its stylus creeps inward,
@@ -544,12 +584,11 @@
           reached through a second rate, which is what the rule is for.</p>
         </div>
       </li>
-
       <li>
         <span class="applet-title">🚲 <a href="activity-6-gears.html">Why does the same pedalling give you different speeds?</a></span>
         <div class="applet-desc">
-          <p class="week">The chain rule as a literal chain</p>
-          <p class="tags"><span class="tag">Calculating</span></p>
+          <p class="week">The chain rule as a literal chain · Unit 3, topic 3.1</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A bicycle drivetrain: a fifty-tooth chainring turning once
@@ -595,12 +634,11 @@
           could feel.</p>
         </div>
       </li>
-
       <li>
         <span class="applet-title">🥾 <a href="activity-7-uphill.html">How much colder does it get when you walk uphill?</a></span>
         <div class="applet-desc">
-          <p class="week">Two measured rates, one nobody can measure</p>
-          <p class="tags"><span class="tag">Calculating</span></p>
+          <p class="week">Two measured rates, one nobody can measure · Unit 3, topic 3.1</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Two trails climbing the same 300 metres, one long and gentle
@@ -643,12 +681,11 @@
           rate was assembled out of two rates that can be measured.</p>
         </div>
       </li>
-
       <li>
         <span class="applet-title">⏳ <a href="activity-8-clock.html">How does one swing of a pendulum become an hour?</a></span>
         <div class="applet-desc">
-          <p class="week">A companion to the pendulum activity</p>
-          <p class="tags"><span class="tag">Calculating</span></p>
+          <p class="week">A companion to the pendulum activity · Unit 3, topic 3.1</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A pendulum swinging once a second drives a train of three
@@ -711,43 +748,11 @@
           multiply the rates and you multiply the relative errors with them.</p>
         </div>
       </li>
-    </ul>
-    </section>
-
-    <section id="rates" role="tabpanel" aria-labelledby="tab-rates" hidden>
-    <p class="tabnote">Four activities on what a derivative means when something real is changing: a race to infinity, a sprinter, a shadow and a cup.</p>
-    <ul class="applet-list">
-
-      <li>
-        <span class="applet-title">📈 <a href="activity-9-growth.html">Which grows faster in the end?</a></span>
-        <div class="applet-desc">
-          <p class="week">L'Hôpital's rule and indeterminate forms</p>
-          <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
-          <figure class="fig">
-            <svg class="banner" viewBox="0 0 650 100" role="img"
-                 aria-label="Two curves drawn from left to right, x cubed and two to the x. x cubed is ahead for most of the way, then two to the x overtakes it near x equals 10 and climbs away">
-              <path class="ref" d="M547.9 10 V 88"/>
-              <path class="flat" d="M60 88 L62.5 88 L64.9 88 L67.4 88 L69.8 88 L72.3 88 L74.7 88 L77.2 88 L79.6 88 L82.1 88 L84.5 88 L87 88 L89.5 88 L91.9 88 L94.4 88 L96.8 88 L99.3 88 L101.7 88 L104.2 88 L106.6 88 L109.1 88 L111.5 88 L114 87.9 L116.5 87.9 L118.9 87.9 L121.4 87.9 L123.8 87.9 L126.3 87.9 L128.7 87.9 L131.2 87.9 L133.6 87.9 L136.1 87.9 L138.5 87.8 L141 87.8 L143.5 87.8 L145.9 87.8 L148.4 87.8 L150.8 87.8 L153.3 87.7 L155.7 87.7 L158.2 87.7 L160.6 87.7 L163.1 87.6 L165.5 87.6 L168 87.6 L170.5 87.6 L172.9 87.5 L175.4 87.5 L177.8 87.5 L180.3 87.4 L182.7 87.4 L185.2 87.4 L187.6 87.3 L190.1 87.3 L192.5 87.3 L195 87.2 L197.5 87.2 L199.9 87.1 L202.4 87.1 L204.8 87 L207.3 87 L209.7 86.9 L212.2 86.9 L214.6 86.8 L217.1 86.8 L219.5 86.7 L222 86.6 L224.5 86.6 L226.9 86.5 L229.4 86.4 L231.8 86.4 L234.3 86.3 L236.7 86.2 L239.2 86.2 L241.6 86.1 L244.1 86 L246.5 85.9 L249 85.8 L251.5 85.7 L253.9 85.7 L256.4 85.6 L258.8 85.5 L261.3 85.4 L263.7 85.3 L266.2 85.2 L268.6 85.1 L271.1 85 L273.5 84.9 L276 84.8 L278.5 84.7 L280.9 84.5 L283.4 84.4 L285.8 84.3 L288.3 84.2 L290.7 84.1 L293.2 83.9 L295.6 83.8 L298.1 83.7 L300.5 83.5 L303 83.4 L305.5 83.2 L307.9 83.1 L310.4 83 L312.8 82.8 L315.3 82.7 L317.7 82.5 L320.2 82.3 L322.6 82.2 L325.1 82 L327.5 81.8 L330 81.7 L332.5 81.5 L334.9 81.3 L337.4 81.1 L339.8 81 L342.3 80.8 L344.7 80.6 L347.2 80.4 L349.6 80.2 L352.1 80 L354.5 79.8 L357 79.6 L359.5 79.4 L361.9 79.2 L364.4 78.9 L366.8 78.7 L369.3 78.5 L371.7 78.3 L374.2 78 L376.6 77.8 L379.1 77.6 L381.5 77.3 L384 77.1 L386.5 76.8 L388.9 76.6 L391.4 76.3 L393.8 76.1 L396.3 75.8 L398.7 75.5 L401.2 75.2 L403.6 75 L406.1 74.7 L408.5 74.4 L411 74.1 L413.5 73.8 L415.9 73.5 L418.4 73.2 L420.8 72.9 L423.3 72.6 L425.7 72.3 L428.2 72 L430.6 71.6 L433.1 71.3 L435.5 71 L438 70.7 L440.5 70.3 L442.9 70 L445.4 69.6 L447.8 69.3 L450.3 68.9 L452.7 68.5 L455.2 68.2 L457.6 67.8 L460.1 67.4 L462.5 67 L465 66.7 L467.5 66.3 L469.9 65.9 L472.4 65.5 L474.8 65.1 L477.3 64.7 L479.7 64.2 L482.2 63.8 L484.6 63.4 L487.1 63 L489.5 62.5 L492 62.1 L494.5 61.7 L496.9 61.2 L499.4 60.8 L501.8 60.3 L504.3 59.8 L506.7 59.4 L509.2 58.9 L511.6 58.4 L514.1 57.9 L516.5 57.4 L519 56.9 L521.5 56.4 L523.9 55.9 L526.4 55.4 L528.8 54.9 L531.3 54.4 L533.7 53.9 L536.2 53.3 L538.6 52.8 L541.1 52.2 L543.5 51.7 L546 51.1 L548.5 50.6 L550.9 50 L553.4 49.4 L555.8 48.8 L558.3 48.3 L560.7 47.7 L563.2 47.1 L565.6 46.5 L568.1 45.9 L570.5 45.3 L573 44.6 L575.5 44 L577.9 43.4 L580.4 42.7 L582.8 42.1 L585.3 41.4 L587.7 40.8 L590.2 40.1 L592.6 39.5 L595.1 38.8 L597.5 38.1 L600 37.4"/>
-              <path class="fall" d="M60 88 L62.5 88 L64.9 88 L67.4 88 L69.8 88 L72.3 88 L74.7 88 L77.2 88 L79.6 87.9 L82.1 87.9 L84.5 87.9 L87 87.9 L89.5 87.9 L91.9 87.9 L94.4 87.9 L96.8 87.9 L99.3 87.9 L101.7 87.9 L104.2 87.9 L106.6 87.9 L109.1 87.9 L111.5 87.9 L114 87.9 L116.5 87.9 L118.9 87.9 L121.4 87.9 L123.8 87.9 L126.3 87.9 L128.7 87.9 L131.2 87.9 L133.6 87.9 L136.1 87.9 L138.5 87.9 L141 87.9 L143.5 87.9 L145.9 87.9 L148.4 87.9 L150.8 87.9 L153.3 87.9 L155.7 87.9 L158.2 87.8 L160.6 87.8 L163.1 87.8 L165.5 87.8 L168 87.8 L170.5 87.8 L172.9 87.8 L175.4 87.8 L177.8 87.8 L180.3 87.8 L182.7 87.8 L185.2 87.8 L187.6 87.8 L190.1 87.8 L192.5 87.8 L195 87.7 L197.5 87.7 L199.9 87.7 L202.4 87.7 L204.8 87.7 L207.3 87.7 L209.7 87.7 L212.2 87.7 L214.6 87.7 L217.1 87.7 L219.5 87.6 L222 87.6 L224.5 87.6 L226.9 87.6 L229.4 87.6 L231.8 87.6 L234.3 87.6 L236.7 87.5 L239.2 87.5 L241.6 87.5 L244.1 87.5 L246.5 87.5 L249 87.5 L251.5 87.4 L253.9 87.4 L256.4 87.4 L258.8 87.4 L261.3 87.3 L263.7 87.3 L266.2 87.3 L268.6 87.3 L271.1 87.3 L273.5 87.2 L276 87.2 L278.5 87.2 L280.9 87.1 L283.4 87.1 L285.8 87.1 L288.3 87 L290.7 87 L293.2 87 L295.6 86.9 L298.1 86.9 L300.5 86.9 L303 86.8 L305.5 86.8 L307.9 86.7 L310.4 86.7 L312.8 86.7 L315.3 86.6 L317.7 86.6 L320.2 86.5 L322.6 86.5 L325.1 86.4 L327.5 86.3 L330 86.3 L332.5 86.2 L334.9 86.2 L337.4 86.1 L339.8 86 L342.3 86 L344.7 85.9 L347.2 85.8 L349.6 85.7 L352.1 85.7 L354.5 85.6 L357 85.5 L359.5 85.4 L361.9 85.3 L364.4 85.2 L366.8 85.1 L369.3 85 L371.7 84.9 L374.2 84.8 L376.6 84.7 L379.1 84.6 L381.5 84.4 L384 84.3 L386.5 84.2 L388.9 84 L391.4 83.9 L393.8 83.8 L396.3 83.6 L398.7 83.5 L401.2 83.3 L403.6 83.1 L406.1 83 L408.5 82.8 L411 82.6 L413.5 82.4 L415.9 82.2 L418.4 82 L420.8 81.8 L423.3 81.6 L425.7 81.4 L428.2 81.1 L430.6 80.9 L433.1 80.6 L435.5 80.4 L438 80.1 L440.5 79.8 L442.9 79.5 L445.4 79.2 L447.8 78.9 L450.3 78.6 L452.7 78.3 L455.2 77.9 L457.6 77.6 L460.1 77.2 L462.5 76.8 L465 76.4 L467.5 76 L469.9 75.6 L472.4 75.2 L474.8 74.7 L477.3 74.2 L479.7 73.8 L482.2 73.3 L484.6 72.7 L487.1 72.2 L489.5 71.6 L492 71.1 L494.5 70.5 L496.9 69.8 L499.4 69.2 L501.8 68.5 L504.3 67.9 L506.7 67.1 L509.2 66.4 L511.6 65.7 L514.1 64.9 L516.5 64 L519 63.2 L521.5 62.3 L523.9 61.4 L526.4 60.5 L528.8 59.5 L531.3 58.5 L533.7 57.5 L536.2 56.4 L538.6 55.3 L541.1 54.1 L543.5 52.9 L546 51.7 L548.5 50.4 L550.9 49.1 L553.4 47.7 L555.8 46.3 L558.3 44.8 L560.7 43.3 L563.2 41.7 L565.6 40.1 L568.1 38.4 L570.5 36.7 L573 34.8 L575.5 33 L577.9 31 L580.4 29 L582.8 26.9 L585.3 24.8 L587.7 22.6 L590.2 20.3 L592.6 17.9 L595.1 15.4 L597.5 12.8"/>
-              <rect class="cover unc9" x="58" y="6" width="550" height="83" style="transform-origin:608px 6px"/>
-              <path class="axis" d="M60 88 H 606 M60 88 V 8"/>
-              <text class="sm" x="550.9" y="97">x = 10</text>
-              <text class="sm" x="60" y="97">0</text>
-              <text class="sm" x="616" y="40.4">x³</text>
-              <text class="sm deg" x="570.4" y="14">2ˣ</text>
-              <text class="sm" x="485.9" y="20">2ˣ ahead from here on</text>
-            </svg>
-            <figcaption>x³ is ahead for most of the way. Then 2ˣ catches it near x = 10 and stays ahead from then on.</figcaption>
-          </figure>
-          <p>At <em>x</em> = 10, <em>x</em><sup>3</sup> and 2<sup><em>x</em></sup> are nearly tied. At <em>x</em> = 100, <em>x</em><sup>100</sup> is so far ahead of <em>e</em><sup><em>x</em></sup> that it looks like a rout. Students are asked which wins in the long run, and why their sizes cannot tell them.</p>
-          <p>They meet ∞/∞ as a question rather than an answer, compare how fast each side grows, and find that each step takes one off the power while <em>e</em><sup><em>x</em></sup> stays the same. It closes by asking them to find where <em>e</em><sup><em>x</em></sup> finally pulls ahead.</p>
-        </div>
-      </li>
       <li>
         <span class="applet-title">🏃 <a href="activity-10-sprinter.html">When was the sprinter fastest?</a></span>
         <div class="applet-desc">
-          <p class="week">The derivative in context, with its units</p>
-          <p class="tags"><span class="tag">Calculating</span></p>
+          <p class="week">The derivative in context, with its units · Unit 4, topics 4.1–4.3</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A runner covering 100 metres at the pace of the activity's split times, in real time, with the time for each 10 metres written under the track. The stretch from 60 to 70 metres, 0.81 seconds, is the fastest">
@@ -797,8 +802,8 @@
       <li>
         <span class="applet-title">🔦 <a href="activity-11-shadow.html">How fast does your shadow move?</a></span>
         <div class="applet-desc">
-          <p class="week">Related rates</p>
-          <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <p class="week">Related rates · Unit 4, topics 4.4–4.5</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A walker moving steadily away from a streetlight. A ray from the lamp passes over their head to the tip of their shadow, which grows longer and runs ahead of them">
@@ -823,8 +828,8 @@
       <li>
         <span class="applet-title">🥤 <a href="activity-12-cup.html">Why does the cup fill fast, then slowly?</a></span>
         <div class="applet-desc">
-          <p class="week">Related rates</p>
-          <p class="tags"><span class="tag">Graphing</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <p class="week">Related rates · Unit 4, topics 4.4–4.5</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Graphing</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A cone-shaped cup, point down, filling with water at a steady rate beside a graph of the water's depth against time. The depth shoots up and then levels off, reaching half the depth after an eighth of the time">
@@ -849,16 +854,15 @@
       </li>
     </ul>
     </section>
-
-    <section id="shape" role="tabpanel" aria-labelledby="tab-shape" hidden>
+    <section id="extrema" role="tabpanel" aria-labelledby="tab-extrema" hidden>
     <p class="tabnote">Three activities on what derivatives say about a function's largest values and its shape: a speed camera, a headline and a can.</p>
     <ul class="applet-list">
 
       <li>
         <span class="applet-title">📷 <a href="activity-13-camera.html">Can a camera prove you were speeding?</a></span>
         <div class="applet-desc">
-          <p class="week">The Mean Value Theorem</p>
-          <p class="tags"><span class="tag">Discussion</span></p>
+          <p class="week">The Mean Value Theorem · Unit 5, topic 5.1</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Discussion</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A car passing between two cameras 10 kilometres apart, speeding up and then slowing down, beside a graph of its distance against time. The dashed line is its average speed, and at two moments the curve runs parallel to it">
@@ -890,8 +894,8 @@
       <li>
         <span class="applet-title">📰 <a href="activity-15-rising.html">Still rising, but more slowly</a></span>
         <div class="applet-desc">
-          <p class="week">Connecting <em>f</em>, <em>f</em>′ and <em>f</em>″</p>
-          <p class="tags"><span class="tag">Discussion</span></p>
+          <p class="week">Connecting <em>f</em>, <em>f</em>′ and <em>f</em>″ · Unit 5, topics 5.3–5.9</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Discussion</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Two graphs drawn month by month. On the left, prices climb every month but the curve bends over. On the right, a bar for each month's rise: every bar is above zero, and each is shorter than the one before">
@@ -926,8 +930,8 @@
       <li>
         <span class="applet-title">🥫 <a href="activity-16-can.html">Why are soup cans that shape?</a></span>
         <div class="applet-desc">
-          <p class="week">Optimization</p>
-          <p class="tags"><span class="tag">Graphing</span><span class="tag">Calculating</span></p>
+          <p class="week">Optimization · Unit 5, topics 5.10–5.11</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Graphing</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A can that always holds 400 cubic centimetres, changing from tall and thin to short and wide, beside a graph of the metal it needs. A dot on the graph follows the can, and the metal is least when the can is as tall as it is wide">
@@ -949,16 +953,16 @@
       </li>
     </ul>
     </section>
-
-    <section id="ftc" role="tabpanel" aria-labelledby="tab-ftc" hidden>
-    <p class="tabnote">Three activities on building a total from a rate: a car's battery, a chip's heat and a robot arm.</p>
+    <section id="integration" role="tabpanel" aria-labelledby="tab-integration" hidden>
+    <p class="tabnote">Six activities on integrals. Three build a total from a rate: a car's battery, a chip's heat and a robot arm. Three
+    find totals over an endless time or distance: a battery, a space probe and a rare failure.</p>
     <ul class="applet-list">
 
       <li>
         <span class="applet-title">🚙 <a href="activity-17-ev.html">Can an Electric Vehicle Recover Enough Energy to Make It Home?</a></span>
         <div class="applet-desc">
-          <p class="week">The Fundamental Theorem: energy from power</p>
-          <p class="tags"><span class="tag">Calculating</span><span class="tag">Discussion</span></p>
+          <p class="week">The Fundamental Theorem: energy from power · Unit 6, topics 6.4–6.7</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Calculating</span><span class="tag">Discussion</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Two graphs drawn together over eight minutes. On the left, the power going into the battery, below zero for four minutes and then above it. On the right, the energy that power adds up to, which falls to its lowest point at four minutes and then climbs to finish above where it began">
@@ -985,8 +989,8 @@
       <li>
         <span class="applet-title">🌀 <a href="activity-18-fan.html">A Smart Cooling System: When Should the Fan Turn On?</a></span>
         <div class="applet-desc">
-          <p class="week">The Fundamental Theorem: an accumulation function and a limit</p>
-          <p class="tags"><span class="tag">Graphing</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <p class="week">The Fundamental Theorem: an accumulation function and a limit · Unit 6, topics 6.4–6.7</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Graphing</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A graph of the heat a computer chip has gained over twenty seconds, always rising, crossing a dashed limit of 200 joules at about 13.7 seconds. Beside it, a fan that starts turning when the limit is crossed">
@@ -1012,8 +1016,8 @@
       <li>
         <span class="applet-title">🦾 <a href="activity-19-robot.html">Design Smooth Robot Motion: Fast, Safe, or Energy-Efficient?</a></span>
         <div class="applet-desc">
-          <p class="week">The Fundamental Theorem: velocity gives distance</p>
-          <p class="tags"><span class="tag">Graphing</span><span class="tag">Calculating</span></p>
+          <p class="week">The Fundamental Theorem: velocity gives distance · Unit 6, topics 6.4–6.7</p>
+          <p class="tags"><span class="tag">Calc AB</span><span class="tag">Graphing</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Two parts carried 2 metres in 5 seconds by two different motions, side by side, with a graph of each one's velocity. Both arrive together. One starts and stops with a jolt, the other starts and stops gently but goes faster in the middle">
@@ -1037,18 +1041,11 @@
           <p>The two profiles cover the same distance and feel nothing alike. One has the lower top speed but starts with a jolt. Students invent a third, test the AI's claim that the slowest design is always the safest, and say what &#8220;best&#8221; means in their own choice.</p>
         </div>
       </li>
-    </ul>
-    </section>
-
-    <section id="improper" role="tabpanel" aria-labelledby="tab-improper" hidden>
-    <p class="tabnote">Three activities on totals over an endless time or distance: a battery, a space probe and a rare failure.</p>
-    <ul class="applet-list">
-
       <li>
         <span class="applet-title">🔋 <a href="activity-20-battery.html">Will a Battery Ever Finish Charging?</a></span>
         <div class="applet-desc">
-          <p class="week">Improper integrals: a rate that never stops, a total that does</p>
-          <p class="tags"><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <p class="week">Improper integrals: a rate that never stops, a total that does · Unit 6, topic 6.13</p>
+          <p class="tags"><span class="tag">Calc BC</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A graph of charging power fading away but never reaching zero, with the area under it shaded, beside a battery whose energy rises toward a limit, passing 90 percent and then 99 percent">
@@ -1077,8 +1074,8 @@
       <li>
         <span class="applet-title">🛰️ <a href="activity-21-space.html">Can a Spacecraft Communicate Across an Infinite Distance?</a></span>
         <div class="applet-desc">
-          <p class="week">Improper integrals: a total over an endless journey</p>
-          <p class="tags"><span class="tag">Calculating</span><span class="tag">Discussion</span></p>
+          <p class="week">Improper integrals: a total over an endless journey · Unit 6, topic 6.13</p>
+          <p class="tags"><span class="tag">Calc BC</span><span class="tag">Calculating</span><span class="tag">Discussion</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="A probe moving away from Earth while its signal fades, beside a graph of the total signal received, which climbs toward a dashed limit it never passes. Half of that limit has arrived by the time the probe is twice as far away as when it started">
@@ -1105,8 +1102,8 @@
       <li>
         <span class="applet-title">🏗️ <a href="activity-22-risk.html">The Million-Dollar Engineering Failure: How Much Safety Is Enough?</a></span>
         <div class="applet-desc">
-          <p class="week">Improper integrals: a finite probability, an infinite expected loss</p>
-          <p class="tags"><span class="tag">Tables</span><span class="tag">Discussion</span></p>
+          <p class="week">Improper integrals: a finite probability, an infinite expected loss · Unit 6, topic 6.13</p>
+          <p class="tags"><span class="tag">Calc BC</span><span class="tag">Tables</span><span class="tag">Discussion</span></p>
           <figure class="fig">
             <svg class="banner" viewBox="0 0 650 100" role="img"
                  aria-label="Three curves showing the expected loss counted up to larger and larger losses. Two level off, at 2 and at 3 million dollars. The third, for the heaviest tail, keeps climbing">
@@ -1129,13 +1126,65 @@
       </li>
     </ul>
     </section>
+    <section id="de" role="tabpanel" aria-labelledby="tab-de" hidden>
+    <p class="tabnote">Two activities on differential equations, both BC topics: a cooling cup of coffee and a computer virus.</p>
+    <ul class="applet-list">
+
+      <li>
+        <span class="applet-title">☕ <a href="activity-23-coffee.html">Why did the coffee get colder than the room?</a></span>
+        <div class="applet-desc">
+          <p class="week">Differential equations: Euler's method · Unit 7, topic 7.5</p>
+          <p class="tags"><span class="tag">Calc BC</span><span class="tag">Tables</span><span class="tag">Calculating</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="A cooling graph built from straight steps of 5 minutes each, each one following the slope at its start, falling toward a dashed line for room temperature. One long straight step of 20 minutes runs below the room line">
+              <path class="ref" d="M60 76.8 H 600"/>
+              <path class="flat" d="M60 12 L368.6 86"/>
+              <path class="fall" d="M60 12 L195 44.4 L330 60.6 L465 68.7 L600 72.7"/>
+              <circle class="bob" cx="60" cy="12" r="2.6"/><circle class="bob" cx="195" cy="44.4" r="2.6"/><circle class="bob" cx="330" cy="60.6" r="2.6"/><circle class="bob" cx="465" cy="68.7" r="2.6"/><circle class="bob" cx="600" cy="72.7" r="2.6"/>
+              <rect class="cover unc23" x="61" y="4" width="541" height="83" style="transform-origin:602px 4px"/>
+              <path class="axis" d="M60 86 H 602 M60 86 V 8"/>
+              <text class="sm" x="100" y="73">room temperature</text>
+              <text class="sm deg" x="290" y="44">steps of 5 minutes</text>
+              <text class="sm" x="368" y="96">one step of 20 minutes</text>
+              <text class="sm" x="590" y="96">minutes</text>
+            </svg>
+            <figcaption>Each step follows the rate of cooling at the moment it starts. Short steps stay close to the coffee. One long step ends up colder than the room.</figcaption>
+          </figure>
+          <p>A cup of coffee cools faster when it is hotter. Students have only the equation for how fast it cools, and estimate its temperature ten minutes later by taking steps along tangent lines, first 5 minutes at a time and then 2.5.</p>
+          <p>A single 20-minute step says the coffee ends up colder than the room. Students check the exact solution against their estimates, explain which way the estimates are off and why, and decide how small a step they would need.</p>
+        </div>
+      </li>
+      <li>
+        <span class="applet-title">💻 <a href="activity-24-virus.html">How far can a computer virus spread?</a></span>
+        <div class="applet-desc">
+          <p class="week">Differential equations: logistic models · Unit 7, topic 7.9</p>
+          <p class="tags"><span class="tag">Calc BC</span><span class="tag">Graphing</span><span class="tag">Discussion</span></p>
+          <figure class="fig">
+            <svg class="banner" viewBox="0 0 650 100" role="img"
+                 aria-label="Two graphs. On the left, the number of infected computers grows slowly, then quickly, then levels off. On the right, the rate of spread rises and then falls as more computers are infected">
+              <path class="flat" d="M60 85.3 L62.4 85.2 L64.8 85.1 L67.2 85 L69.6 84.9 L72 84.8 L74.4 84.7 L76.8 84.5 L79.2 84.4 L81.6 84.2 L84 84 L86.4 83.8 L88.8 83.6 L91.2 83.4 L93.6 83.1 L96 82.8 L98.4 82.5 L100.8 82.1 L103.2 81.7 L105.6 81.3 L108 80.9 L110.4 80.4 L112.8 79.8 L115.2 79.2 L117.6 78.6 L120 77.9 L122.4 77.1 L124.8 76.3 L127.2 75.5 L129.6 74.5 L132 73.5 L134.4 72.4 L136.8 71.3 L139.2 70.1 L141.6 68.8 L144 67.5 L146.4 66 L148.8 64.5 L151.2 63 L153.6 61.4 L156 59.7 L158.4 58 L160.8 56.2 L163.2 54.4 L165.6 52.6 L168 50.8 L170.4 48.9 L172.8 47.1 L175.2 45.2 L177.6 43.4 L180 41.6 L182.4 39.9 L184.8 38.1 L187.2 36.5 L189.6 34.9 L192 33.3 L194.4 31.8 L196.8 30.4 L199.2 29.1 L201.6 27.8 L204 26.6 L206.4 25.4 L208.8 24.4 L211.2 23.4 L213.6 22.5 L216 21.6 L218.4 20.8 L220.8 20 L223.2 19.3 L225.6 18.7 L228 18.1 L230.4 17.6 L232.8 17.1 L235.2 16.6 L237.6 16.2 L240 15.8 L242.4 15.5 L244.8 15.2 L247.2 14.9 L249.6 14.6 L252 14.4 L254.4 14.2 L256.8 14 L259.2 13.8 L261.6 13.6 L264 13.5 L266.4 13.3 L268.8 13.2 L271.2 13.1 L273.6 13 L276 12.9 L278.4 12.8 L280.8 12.7 L283.2 12.7 L285.6 12.6 L288 12.5 L290.4 12.5 L292.8 12.4 L295.2 12.4 L297.6 12.4 L300 12.3"/>
+              <rect class="cover unc24" x="61" y="4" width="241" height="83" style="transform-origin:302px 4px"/>
+              <path class="fall" d="M370 86 L374.8 80.5 L379.6 75.2 L384.4 70.2 L389.2 65.4 L394 60.8 L398.8 56.4 L403.6 52.3 L408.4 48.4 L413.2 44.7 L418 41.2 L422.8 38 L427.6 34.9 L432.4 32.1 L437.2 29.6 L442 27.2 L446.8 25.1 L451.6 23.2 L456.4 21.5 L461.2 20 L466 18.8 L470.8 17.8 L475.6 17 L480.4 16.4 L485.2 16.1 L490 16 L494.8 16.1 L499.6 16.4 L504.4 17 L509.2 17.8 L514 18.8 L518.8 20 L523.6 21.5 L528.4 23.2 L533.2 25.1 L538 27.2 L542.8 29.6 L547.6 32.1 L552.4 34.9 L557.2 38 L562 41.2 L566.8 44.7 L571.6 48.4 L576.4 52.3 L581.2 56.4 L586 60.8 L590.8 65.4 L595.6 70.2 L600.4 75.2 L605.2 80.5 L610 86"/>
+              <path class="axis" d="M60 86 H 302 M60 86 V 8 M370 86 H 612 M370 86 V 8"/>
+              <text class="sm" x="180" y="96">computers infected, over time</text>
+              <text class="sm deg" x="490" y="96">how fast it spreads, against the number infected</text>
+            </svg>
+            <figcaption>The number infected grows slowly, then quickly, then levels off. The equation for the rate says where it stops and when it is fastest.</figcaption>
+          </figure>
+          <p>A virus gets into a school network of 1000 computers. Students read a logistic differential equation for how fast it spreads, and say where the spread stops and when it is fastest, without solving the equation.</p>
+          <p>They describe the shape of the growth and compare its early stage with exponential growth. Then they add a repair crew to the model, and find that whether the virus takes over depends on how many computers it starts on.</p>
+        </div>
+      </li>
+    </ul>
+    </section>
     <hr>
     <h2>About these</h2>
     <p>All were built with <strong>Verbatim</strong>, which records a student's
     conversation with a generative AI as it happens — each turn marked as the student's or
     the AI's, saved on the student's own device, and handed in as a single file. Nothing is
     posted to a website.</p>
-    <p>All twenty share the same rules for how the AI may reply: no more
+    <p>All twenty-two share the same rules for how the AI may reply: no more
     than sixty words at a time, one question per turn, and never answering its own question.
     Those came out of reading an earlier round of transcripts, where the AI was writing
     roughly eleven words for every one the student wrote. Students were holding up their
@@ -1159,8 +1208,82 @@
       pick(id);
       history.replaceState(null, "", "#" + id);
     };
+
+    /* Tags. The tags already on the cards are the only data: a card is listed when
+       it carries every chosen tag. The list holds copies, so the tabs underneath
+       are left exactly as they were. */
+    const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const cards = [...document.querySelectorAll('[role="tabpanel"] .applet-list > li')];
+    const tagsOf = li => [...li.querySelectorAll(".tag")].map(t => t.textContent.trim());
+    const names = {};
+    for (const li of cards) for (const n of tagsOf(li)) names[slug(n)] = n;
+    const tablist = document.querySelector('[role="tablist"]');
+    const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+    const bar = document.getElementById("filterbar");
+    const sum = document.getElementById("filtersum");
+    const list = document.getElementById("filtered");
+    let chosen = [];
+
+    function andList(xs) {
+      return xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+    }
+    function mark(root) {
+      for (const t of root.querySelectorAll(".tag")) {
+        t.setAttribute("role", "button");
+        t.tabIndex = 0;
+        const on = chosen.includes(slug(t.textContent.trim()));
+        t.classList.toggle("on", on);
+        t.setAttribute("aria-pressed", String(on));
+      }
+    }
+    function show() {
+      const on = chosen.length > 0;
+      bar.hidden = list.hidden = !on;
+      tablist.hidden = on;
+      if (!on) {
+        const sel = tabs.find(t => t.getAttribute("aria-selected") === "true");
+        pick(sel.getAttribute("aria-controls"));
+        mark(document);
+        return;
+      }
+      for (const p of panels) p.hidden = true;
+      const hits = cards.filter(li => {
+        const have = tagsOf(li).map(slug);
+        return chosen.every(c => have.includes(c));
+      });
+      list.replaceChildren(...hits.map(li => li.cloneNode(true)));
+      const label = andList(chosen.map(c => names[c]));
+      sum.textContent = hits.length === 0 ? "No activity has all of these tags: " + label + "."
+        : hits.length === 1 ? "1 activity tagged " + label + "."
+        : hits.length + " activities tagged " + label + ".";
+      mark(document);
+    }
+    function toggle(tag) {
+      const c = slug(tag);
+      chosen = chosen.includes(c) ? chosen.filter(x => x !== c) : chosen.concat(c);
+      const sel = tabs.find(t => t.getAttribute("aria-selected") === "true").getAttribute("aria-controls");
+      history.replaceState(null, "", "#" + (chosen.length ? "tag=" + chosen.join("+") : sel));
+      show();
+    }
+    document.addEventListener("click", e => {
+      const t = e.target.closest(".tag");
+      if (t) toggle(t.textContent.trim());
+    });
+    document.addEventListener("keydown", e => {
+      const t = e.target.closest && e.target.closest(".tag");
+      if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); toggle(t.textContent.trim()); }
+    });
+    document.getElementById("filterclear").onclick = () => {
+      chosen = [];
+      const sel = tabs.find(t => t.getAttribute("aria-selected") === "true").getAttribute("aria-controls");
+      history.replaceState(null, "", "#" + sel);
+      show();
+    };
+
     const start = location.hash.slice(1);
     if (tabs.some(t => t.getAttribute("aria-controls") === start)) pick(start);
+    if (start.startsWith("tag=")) chosen = start.slice(4).split("+").filter(c => c in names);
+    show();
   })();
 </script>
 </body>
