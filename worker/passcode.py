@@ -20,7 +20,7 @@ URL = "https://verbatim-class.ohiomathteacher.workers.dev/check"
 WORKER_DIR = os.path.dirname(os.path.abspath(__file__))
 WRANGLER = os.path.join(WORKER_DIR, "node_modules/.bin/wrangler")
 
-def check(code):
+def check(code, tries=4):
     """None if refused; otherwise the secret's name, or "" for a teacher's own class."""
     body = json.dumps({"passcode": code}).encode()
     req = urllib.request.Request(URL, data=body, headers={"content-type": "application/json",
@@ -35,6 +35,9 @@ def check(code):
             return None
         if e.code == 403 and err == "off":
             return ""
+        if e.code == 429 and tries:      # the Worker's wait after repeated misses
+            time.sleep(6)
+            return check(code, tries - 1)
         sys.exit(f"Unexpected answer from the Worker: {e.code} {err}")
 
 def fit(new):
@@ -53,13 +56,16 @@ def put(secret, new):
         sys.exit("wrangler failed; nothing changed:\n" + (r.stderr or r.stdout))
 
 def settle(new, secret, old=None):
-    # A new secret can take a few seconds to reach the Worker.
-    for _ in range(10):
-        if check(new) == secret and (old is None or check(old) is None):
+    # A new secret reaches the Worker's copies one at a time, so for a minute or so one
+    # answer says yes and the next says no. Only a run of agreeing answers counts.
+    run = 0
+    for _ in range(40):
+        run = run + 1 if check(new) == secret and (old is None or check(old) is None) else 0
+        if run == 6:
             return True
-        time.sleep(6)          # slower than the Worker's wait after repeated misses
-    sys.exit("wrangler reported success, but after a minute the Worker does not yet agree. "
-             "Run this script again to check.")
+        time.sleep(5)
+    sys.exit("wrangler reported success, but after three minutes the Worker's answers still "
+             "disagree. Run this script again to check.")
 
 def ask_new():
     new = getpass.getpass("New passcode (hidden): ")

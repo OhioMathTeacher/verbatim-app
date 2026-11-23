@@ -1305,7 +1305,7 @@ async function probe(url){
 }
 async function probeWellKnown(){
   const have = new Set(endpoints());
-  for(const {port, hint} of LOCAL_PORTS){
+  for(const {port, hint} of __LOCAL_PORTS_JSON__){
     const url = "http://localhost:" + port;
     if(have.has(url)) continue;
     const models = await probe(url);
@@ -2992,6 +2992,7 @@ def with_assets(page: str) -> str:
     return (page
             .replace("__CALCULATOR_CSS__", CALCULATOR_CSS)
             .replace("__CALCULATOR_JS__", CALCULATOR_JS)
+            .replace("__LOCAL_PORTS_JSON__", json.dumps(LOCAL_PORTS))
             .replace("__RICHTEXT_CSS__", RICHTEXT_CSS)
             .replace("__RICHTEXT_JS__", RICHTEXT_JS)
             .replace("__TEMML_CSS__", TEMML_CSS)
