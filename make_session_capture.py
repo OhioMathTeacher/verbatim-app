@@ -943,10 +943,10 @@ const I18N = {
     surveypending: "You have not answered the questions yet. Your work is saved on this computer — you can come back to this page in the same browser and finish.",
     surveylater: "Your work stays saved on this computer, so you can close this and finish later in the same browser.",
     forgetkeys: "Forget all keys",
-    forgetconfirm: "Forget every API key saved in this browser?",
+    forgetconfirm: "Forget every API key and class passcode saved in this browser?",
     resetconfirm: "Clear this session and start from an empty page?\n\nThis is a setup tool, not part of the activity.",
-    forgotten: "Keys forgotten. Nothing is stored in this browser.",
-    forgotnone: "There were no keys stored.",
+    forgotten: "Keys and passcode forgotten. Neither is stored in this browser now.",
+    forgotnone: "There were no keys or passcode stored.",
     dlcopy: "Download the file again", backconv: "Back to the conversation",
     aiteacher: "AI teacher", you: "You",
     rcalced: "you worked out", rcalcgraph: "you graphed", rcalctable: "you tabulated",
@@ -1774,11 +1774,19 @@ $("#ai-forget").onclick = () => {
       if(k && k.startsWith("tea.ai.key.")) doomed.push(k);
     }
   }catch(e){}
+  /* The class passcode opens the class's AI just as a key opens a student's own. */
+  if(SS.get(K_PASS)) doomed.push(K_PASS);
   if(!doomed.length){ $("#ai-err").textContent = tr("forgotnone"); return; }
   if(!confirm(tr("forgetconfirm"))) return;
   for(const k of doomed) SS.del(k);
-  if(CLASS_AI && SS.get(K_PASS)) useClass();
   $("#ai-key-input").value = "";
+  if(CLASS_AI){
+    $("#pass").value = ""; passState(null);
+    /* Nothing is set up now, so the page is as it first opens -- unless the student is
+       using a model on this computer, which needs no key and goes on working. */
+    const own = aiConfig();
+    if(!(own && own.local)){ useClass(); $("#ai-key-section").hidden = true; }
+  }
   const c = aiConfig();
   if(c && !c.local){ const pp = PROVIDERS.find(x => x.id === c.id); if(pp) showKeyEntry(pp); }
   renderCards(); refreshAiStatus();
