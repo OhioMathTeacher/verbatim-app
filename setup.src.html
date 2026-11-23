@@ -459,6 +459,8 @@ async function compose(){
     .split("__ACCENT_BG__").join(tint(accent, 0.71, 0.945))
     .split("__ACCENT_EDGE__").join(tint(accent, 0.56, 0.849))
     .split("__ACCENT__").join(accent)
+    // The wallpaper is for the published set; a page made here has none.
+    .split("__WALL_CSS__").join("")
     .split("__TITLE__").join(esc(title))
     .split("__SUBTITLE__").join(esc(sub));
 }

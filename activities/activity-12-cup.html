@@ -851,6 +851,12 @@ mtable.tml-small mtd {
 body {
   counter-reset: tmlEqnNo;
 }
+:root{--paper:#edf2f8}
+html{background:var(--paper)}body{background-color:transparent}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.17;
+  background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22250%22 viewBox=%220 0 200 250%22 fill=%22none%22 stroke=%22%233a6ea5%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg%3E%3Cpath d=%22M18 22H82L50 92Z%22/%3E%3Cpath d=%22M30 48Q40 43 50 48T70 48%22/%3E%3Cpath d=%22M50 92V100%22/%3E%3Cpath d=%22M34 100H66%22/%3E%3Cpath d=%22M50 4V14%22 stroke-dasharray=%224 4%22/%3E%3C/g%3E%3Cg transform=%22translate(200 125) scale(-1 1)%22%3E%3Cpath d=%22M18 22H82L50 92Z%22/%3E%3Cpath d=%22M30 48Q40 43 50 48T70 48%22/%3E%3Cpath d=%22M50 92V100%22/%3E%3Cpath d=%22M34 100H66%22/%3E%3Cpath d=%22M50 4V14%22 stroke-dasharray=%224 4%22/%3E%3C/g%3E%3C/svg%3E");-webkit-mask-image:linear-gradient(90deg,#000 calc(50% - 500px),transparent calc(50% - 405px),transparent calc(50% + 405px),#000 calc(50% + 500px));mask-image:linear-gradient(90deg,#000 calc(50% - 500px),transparent calc(50% - 405px),transparent calc(50% + 405px),#000 calc(50% + 500px))}
+@media (max-width:860px){body::before{display:none}}
+@media print{body::before{display:none}}
 </style>
 
 <script>
@@ -972,7 +978,7 @@ try{
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
 <p class="ver hide" id="teachers" style="opacity:1;font-family:inherit;font-size:13px"><a href="teacher.html" style="color:inherit" data-i18n="forteachers">For teachers</a></p>
-<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · 3e5f6953</p>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · 6a80f12a</p>
 
 </div>
 
@@ -1950,7 +1956,7 @@ const SCHEMA    = "tea-taylor-session/2";
    page that made it, and by the time a transcript raises a question the page is
    usually gone. Additive: nothing in /2 changed shape, so a reader written for
    /2 goes on working and simply has one more thing it may report. */
-const APP       = { name: "verbatim", version: "1.2.1", build: "3e5f6953" };   // /2: a turn may be a tombstone (no text)
+const APP       = { name: "verbatim", version: "1.2.1", build: "6a80f12a" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --

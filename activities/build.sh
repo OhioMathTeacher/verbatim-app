@@ -112,6 +112,17 @@ capture() {  # make_session_capture.py, with any --prompt given the safety parag
   python3 make_session_capture.py "${args[@]}"
 }
 
+# One color for each tab on activities/index.html, so the page color says the
+# topic, and one drawing for each activity, so no two pages look alike (23 Nov
+# 2026). The drawings set the scene and never show an answer.
+LIMITS='#b8862f'; DERIVATIVES='#3a6ea5'; EXTREMA='#7a5aa0'; INTEGRATION='#3f8f5f'; DE='#b0506a'
+for pair in "limits $LIMITS" "derivatives $DERIVATIVES" "extrema $EXTREMA" "integration $INTEGRATION" "de $DE"; do
+  set -- $pair
+  grep -qF "#tab-$1 { --c: $2; }" activities/index.html \
+    || { echo "activities/index.html: the $1 tab is not $2" >&2; exit 1; }
+done
+
+
 # Activities 5-8 are alternatives for the same slot, so they share one wording.
 CHAIN_EN="This assignment helped me understand how one rate of change can be built from two others (the chain rule)."
 
@@ -122,6 +133,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#9a5734' \
+  --wallpaper activities/wallpaper/pendulum.svg --tint "$LIMITS" \
   --title    "How small is small enough?" \
   --subtitle "Welcome! Today you will work out how far a pendulum can be pulled aside before the usual formula stops being good enough — and find that the answer depends entirely on what the pendulum is for. $TAIL"
 
@@ -132,6 +144,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7a5c1f' \
+  --wallpaper activities/wallpaper/scaling.svg --tint "$LIMITS" \
   --title    "Why can't a spider be the size of a horse?" \
   --subtitle "Welcome! Today you will work out why a spider the size of a horse would collapse under its own weight — no calculus, just what happens to weight and to leg thickness when you make something bigger. $TAIL"
 
@@ -142,6 +155,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3f5f7a' \
+  --wallpaper activities/wallpaper/speedometer.svg --tint "$LIMITS" \
   --title    "What does the speedometer mean?" \
   --subtitle "Welcome! Today you will work out how you would check that a speedometer really does read 60 km/h, using only a stopwatch and distance markers — and what happens as the interval you measure over gets shorter and shorter. $TAIL"
 
@@ -152,6 +166,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6b4a6e' \
+  --wallpaper activities/wallpaper/record.svg --tint "$DERIVATIVES" \
   --title    "Why was the last song the worst?" \
   --subtitle "Welcome! Today you will work out why the last song on a vinyl record sounded worse than the first one. Then you will find out why the engineers who designed the compact disc made it change speed as it plays. $TAIL"
 
@@ -167,6 +182,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6f6a' \
+  --wallpaper activities/wallpaper/gears.svg --tint "$DERIVATIVES" \
   --title    "Why does the same pedalling give you different speeds?" \
   --subtitle "Welcome! Today you will work out how far one turn of the pedals takes you, and how fast that makes you go. Then you will decide what to change when the hill gets too steep to pedal at all. $TAIL"
 
@@ -177,6 +193,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6a7a2f' \
+  --wallpaper activities/wallpaper/uphill.svg --tint "$DERIVATIVES" \
   --title    "How much colder does it get when you walk uphill?" \
   --subtitle "Welcome! Today you will work out how much colder it is at the top of a trail, and then how much colder it gets for every kilometre you walk. Those are two different numbers, and working out why is today's task. $TAIL"
 
@@ -187,6 +204,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a3f52' \
+  --wallpaper activities/wallpaper/clock.svg --tint "$DERIVATIVES" \
   --title    "How does one swing of a pendulum become an hour?" \
   --subtitle "Welcome! Today you will work out how a clock turns one swing of a pendulum, about one a second, into a hand that goes round once in twelve hours. Then you will find out what happens to the clock if the pendulum runs slightly fast. $TAIL"
 
@@ -200,6 +218,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3d6b8f' \
+  --wallpaper activities/wallpaper/growth.svg --tint "$LIMITS" \
   --title    "Which grows faster in the end?" \
   --subtitle "Welcome! Today you will race two quantities that both grow without bound and work out which one wins in the end. Their sizes will not settle it, but how fast each one grows will. $TAIL"
 
@@ -210,6 +229,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a5a2b' \
+  --wallpaper activities/wallpaper/sprinter.svg --tint "$DERIVATIVES" \
   --title    "When was the sprinter fastest?" \
   --subtitle "Welcome! Today you will use the times a sprinter passed each 10-metre mark to work out when they were fastest, and what a table of times can and cannot tell you about speed. $TAIL"
 
@@ -220,6 +240,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#556b2f' \
+  --wallpaper activities/wallpaper/shadow.svg --tint "$DERIVATIVES" \
   --title    "How fast does your shadow move?" \
   --subtitle "Welcome! Today you will walk away from a streetlight, on paper, and work out how fast the tip of your shadow moves. The answer may surprise you. $TAIL"
 
@@ -230,6 +251,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7b3f7a' \
+  --wallpaper activities/wallpaper/cup.svg --tint "$DERIVATIVES" \
   --title    "Why does the cup fill fast, then slowly?" \
   --subtitle "Welcome! Today you will pour water into a cone-shaped cup at a steady rate and work out why the level rises quickly at first and then slows down. $TAIL"
 
@@ -240,6 +262,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f5e8a' \
+  --wallpaper activities/wallpaper/camera.svg --tint "$EXTREMA" \
   --title    "Can a camera prove you were speeding?" \
   --subtitle "Welcome! Today you will decide whether two cameras that only time a car can prove it broke the speed limit, and what has to be true for that proof to work. $TAIL"
 
@@ -250,6 +273,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#4a6a5a' \
+  --wallpaper activities/wallpaper/rising.svg --tint "$EXTREMA" \
   --title    "Still rising, but more slowly" \
   --subtitle "Welcome! Today you will take a sentence from the news about prices and work out exactly what it says about a function and its derivatives. $TAIL"
 
@@ -260,6 +284,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6a5a8a' \
+  --wallpaper activities/wallpaper/can.svg --tint "$EXTREMA" \
   --title    "Why are soup cans that shape?" \
   --subtitle "Welcome! Today you will design a can that holds a fixed amount using as little metal as possible, and then work out why real cans are not that shape. $TAIL"
 
@@ -274,6 +299,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6a4f' \
+  --wallpaper activities/wallpaper/ev.svg --tint "$INTEGRATION" \
   --title    "Can an Electric Vehicle Recover Enough Energy to Make It Home?" \
   --subtitle "Welcome! Today you will work out whether braking downhill puts enough energy back for an electric car to reach the next charger, and why ending with more energy than you started with may not be enough. $TAIL"
 
@@ -284,6 +310,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a4a2f' \
+  --wallpaper activities/wallpaper/fan.svg --tint "$INTEGRATION" \
   --title    "A Smart Cooling System: When Should the Fan Turn On?" \
   --subtitle "Welcome! Today you will work out how much heat a computer chip gains as it works, and choose when a cooling fan should switch on to keep it safe. $TAIL"
 
@@ -294,6 +321,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#4f5a8a' \
+  --wallpaper activities/wallpaper/robot.svg --tint "$INTEGRATION" \
   --title    "Design Smooth Robot Motion: Fast, Safe, or Energy-Efficient?" \
   --subtitle "Welcome! Today you will compare ways a robot arm could carry a delicate part 2 metres in 5 seconds, and decide what the best way even means. $TAIL"
 
@@ -304,6 +332,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6f6a2a' \
+  --wallpaper activities/wallpaper/battery.svg --tint "$INTEGRATION" \
   --title    "Will a Battery Ever Finish Charging?" \
   --subtitle "Welcome! Today you will work out whether a charger that never quite stops can deliver an unlimited amount of energy, and decide when it makes sense to unplug. $TAIL"
 
@@ -314,6 +343,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3a4f6f' \
+  --wallpaper activities/wallpaper/space.svg --tint "$INTEGRATION" \
   --title    "Can a Spacecraft Communicate Across an Infinite Distance?" \
   --subtitle "Welcome! Today you will follow a space probe as it travels away from Earth and work out whether the total signal Earth receives can grow without limit. $TAIL"
 
@@ -324,6 +354,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7a2f3f' \
+  --wallpaper activities/wallpaper/risk.svg --tint "$INTEGRATION" \
   --title    "The Million-Dollar Engineering Failure: How Much Safety Is Enough?" \
   --subtitle "Welcome! Today you will work out the average cost of rare but severe failures, and decide whether a company should pay for better safety controls. $TAIL"
 
@@ -338,6 +369,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6a4a2f' \
+  --wallpaper activities/wallpaper/coffee.svg --tint "$DE" \
   --title    "Why did the coffee get colder than the room?" \
   --subtitle "Welcome! Today you will predict how a cup of coffee cools, one step at a time, using only how fast it is cooling right now. Then you will find out why one big step can give an answer that makes no sense. $TAIL"
 
@@ -348,6 +380,7 @@ capture \
   $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6a7a' \
+  --wallpaper activities/wallpaper/virus.svg --tint "$DE" \
   --title    "How far can a computer virus spread?" \
   --subtitle "Welcome! Today you will follow a virus through a school's computer network and work out how far it spreads, and when it spreads fastest, from the equation for its rate alone. $TAIL"
 

@@ -851,6 +851,12 @@ mtable.tml-small mtd {
 body {
   counter-reset: tmlEqnNo;
 }
+:root{--paper:#edf2f8}
+html{background:var(--paper)}body{background-color:transparent}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.17;
+  background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22250%22 viewBox=%220 0 200 250%22 fill=%22none%22 stroke=%22%233a6ea5%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg%3E%3Cpath d=%22M60.8 66.6 L65.8 67.1 L65.8 72.9 L60.8 73.4 L59.4 78.5 L63.6 81.4 L60.7 86.5 L56.0 84.3 L52.3 88.0 L54.5 92.7 L49.4 95.6 L46.5 91.4 L41.4 92.8 L40.9 97.8 L35.1 97.8 L34.6 92.8 L29.5 91.4 L26.6 95.6 L21.5 92.7 L23.7 88.0 L20.0 84.3 L15.3 86.5 L12.4 81.4 L16.6 78.5 L15.2 73.4 L10.2 72.9 L10.2 67.1 L15.2 66.6 L16.6 61.5 L12.4 58.6 L15.3 53.5 L20.0 55.7 L23.7 52.0 L21.5 47.3 L26.6 44.4 L29.5 48.6 L34.6 47.2 L35.1 42.2 L40.9 42.2 L41.4 47.2 L46.5 48.6 L49.4 44.4 L54.5 47.3 L52.3 52.0 L56.0 55.7 L60.7 53.5 L63.6 58.6 L59.4 61.5Z%22/%3E%3Ccircle cx=%2238%22 cy=%2270%22 r=%228.0%22/%3E%3Cpath d=%22M87.7 27.2 L92.8 27.2 L92.8 32.8 L87.7 32.8 L86.0 37.0 L89.6 40.6 L85.6 44.6 L82.0 41.0 L77.8 42.7 L77.8 47.8 L72.2 47.8 L72.2 42.7 L68.0 41.0 L64.4 44.6 L60.4 40.6 L64.0 37.0 L62.3 32.8 L57.2 32.8 L57.2 27.2 L62.3 27.2 L64.0 23.0 L60.4 19.4 L64.4 15.4 L68.0 19.0 L72.2 17.3 L72.2 12.2 L77.8 12.2 L77.8 17.3 L82.0 19.0 L85.6 15.4 L89.6 19.4 L86.0 23.0Z%22/%3E%3Ccircle cx=%2275%22 cy=%2230%22 r=%224.5%22/%3E%3C/g%3E%3Cg transform=%22translate(200 125) scale(-1 1)%22%3E%3Cpath d=%22M60.8 66.6 L65.8 67.1 L65.8 72.9 L60.8 73.4 L59.4 78.5 L63.6 81.4 L60.7 86.5 L56.0 84.3 L52.3 88.0 L54.5 92.7 L49.4 95.6 L46.5 91.4 L41.4 92.8 L40.9 97.8 L35.1 97.8 L34.6 92.8 L29.5 91.4 L26.6 95.6 L21.5 92.7 L23.7 88.0 L20.0 84.3 L15.3 86.5 L12.4 81.4 L16.6 78.5 L15.2 73.4 L10.2 72.9 L10.2 67.1 L15.2 66.6 L16.6 61.5 L12.4 58.6 L15.3 53.5 L20.0 55.7 L23.7 52.0 L21.5 47.3 L26.6 44.4 L29.5 48.6 L34.6 47.2 L35.1 42.2 L40.9 42.2 L41.4 47.2 L46.5 48.6 L49.4 44.4 L54.5 47.3 L52.3 52.0 L56.0 55.7 L60.7 53.5 L63.6 58.6 L59.4 61.5Z%22/%3E%3Ccircle cx=%2238%22 cy=%2270%22 r=%228.0%22/%3E%3Cpath d=%22M87.7 27.2 L92.8 27.2 L92.8 32.8 L87.7 32.8 L86.0 37.0 L89.6 40.6 L85.6 44.6 L82.0 41.0 L77.8 42.7 L77.8 47.8 L72.2 47.8 L72.2 42.7 L68.0 41.0 L64.4 44.6 L60.4 40.6 L64.0 37.0 L62.3 32.8 L57.2 32.8 L57.2 27.2 L62.3 27.2 L64.0 23.0 L60.4 19.4 L64.4 15.4 L68.0 19.0 L72.2 17.3 L72.2 12.2 L77.8 12.2 L77.8 17.3 L82.0 19.0 L85.6 15.4 L89.6 19.4 L86.0 23.0Z%22/%3E%3Ccircle cx=%2275%22 cy=%2230%22 r=%224.5%22/%3E%3C/g%3E%3C/svg%3E");-webkit-mask-image:linear-gradient(90deg,#000 calc(50% - 500px),transparent calc(50% - 405px),transparent calc(50% + 405px),#000 calc(50% + 500px));mask-image:linear-gradient(90deg,#000 calc(50% - 500px),transparent calc(50% - 405px),transparent calc(50% + 405px),#000 calc(50% + 500px))}
+@media (max-width:860px){body::before{display:none}}
+@media print{body::before{display:none}}
 </style>
 
 <script>
@@ -972,7 +978,7 @@ try{
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
 <p class="ver hide" id="teachers" style="opacity:1;font-family:inherit;font-size:13px"><a href="teacher.html" style="color:inherit" data-i18n="forteachers">For teachers</a></p>
-<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · 3e5f6953</p>
+<p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim 1.2.1 · 6a80f12a</p>
 
 </div>
 
@@ -1950,7 +1956,7 @@ const SCHEMA    = "tea-taylor-session/2";
    page that made it, and by the time a transcript raises a question the page is
    usually gone. Additive: nothing in /2 changed shape, so a reader written for
    /2 goes on working and simply has one more thing it may report. */
-const APP       = { name: "verbatim", version: "1.2.1", build: "3e5f6953" };   // /2: a turn may be a tombstone (no text)
+const APP       = { name: "verbatim", version: "1.2.1", build: "6a80f12a" };   // /2: a turn may be a tombstone (no text)
 /* Saved work is keyed per activity, not per app.
    localStorage is scoped to the origin and ignores the path, so two activities
    served from one site -- which happens the moment you publish more than one --

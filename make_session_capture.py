@@ -86,6 +86,7 @@ from __future__ import annotations
 
 import argparse
 import colorsys, hashlib, json, os, re, sys
+import urllib.parse
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -575,6 +576,7 @@ button.ghost.danger:hover:not(:disabled){border-color:var(--warn);color:var(--wa
 __RICHTEXT_CSS__
 __CALCULATOR_CSS__
 __TEMML_CSS__
+__WALL_CSS__
 </style>
 
 <script>
@@ -3133,12 +3135,38 @@ def tint(hex_colour: str, s: float, l: float) -> str:
     return "#%02x%02x%02x" % (round(rr * 255), round(gg * 255), round(bb * 255))
 
 
+def wall_css(svg: str, colour: str) -> str:
+    """A pale page colour and a faint wallpaper of one drawing, from --tint and --wallpaper.
+
+    The drawing is tiled twice per tile, the second copy mirrored and dropped half
+    a step, and it fades out before the 780px column: nothing is ever drawn behind
+    what a student reads. Narrow screens have no margins, so they get the colour
+    alone. The colour is the tint's hue at a fixed pale lightness, so a page cannot
+    come out dark however strong the tint is, and the dark theme keeps its own paper.
+    """
+    inner = svg.strip()
+    inner = inner[inner.index(">") + 1:inner.rindex("</svg>")]
+    tile = ('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="250" viewBox="0 0 200 250" '
+            f'fill="none" stroke="{colour}" stroke-width="2" stroke-linecap="round" '
+            f'stroke-linejoin="round"><g>{inner}</g>'
+            f'<g transform="translate(200 125) scale(-1 1)">{inner}</g></svg>')
+    uri = "data:image/svg+xml," + urllib.parse.quote(tile, safe="/:=,() ")
+    fade = ("linear-gradient(90deg,#000 calc(50% - 500px),transparent calc(50% - 405px),"
+            "transparent calc(50% + 405px),#000 calc(50% + 500px))")
+    return (f":root{{--paper:{tint(colour, 0.45, 0.95)}}}\n"
+            "html{background:var(--paper)}body{background-color:transparent}\n"
+            'body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.17;\n'
+            f'  background:url("{uri}");-webkit-mask-image:{fade};mask-image:{fade}}}\n'
+            "@media (max-width:860px){body::before{display:none}}\n"
+            "@media print{body::before{display:none}}")
+
+
 def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
           avatar: str, footer: str, section: str, survey: list, demo: bool,
           title: str, subtitle: str, codehint: str,
           accent: str, no_codes: bool = False,
           class_ai: dict | None = None, home: dict | None = None,
-          voice: bool = False) -> str:
+          voice: bool = False, wall: str = "") -> str:
     # Deliberately NOT published to the page: url and key. The page names a
     # provider; the student supplies the credential. A class build offers providers
     # only with --own-key; otherwise the Worker is the only AI it calls.
@@ -3163,6 +3191,7 @@ def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
             .replace("__ACCENT_BG__", tint(accent, 0.71, 0.945))
             .replace("__ACCENT_EDGE__", tint(accent, 0.56, 0.849))
             .replace("__ACCENT__", accent)
+            .replace("__WALL_CSS__", wall)
             .replace("__TITLE__", title)
             .replace("__SUBTITLE__", subtitle))
 
@@ -3234,6 +3263,12 @@ def main() -> int:
                          "turns, the buttons and the links, so a set of activities can "
                          "be told apart at a glance instead of looking identical. The "
                          "pale background and edge tones are derived from it.")
+    ap.add_argument("--wallpaper", type=Path, metavar="SVG",
+                    help="a line drawing (viewBox 0 0 100 110, no text) repeated faintly in the "
+                         "page margins. Needs --tint.")
+    ap.add_argument("--tint", metavar="HEX",
+                    help="the wallpaper's colour, and the hue of a pale page background. "
+                         "Needs --wallpaper.")
     ap.add_argument("--title", default="AI activity")
     ap.add_argument("--minutes", type=int, default=0,
                     help="suggested duration shown to students; 0 says nothing. "
@@ -3315,10 +3350,20 @@ def main() -> int:
     elif a.own_key:
         ap.error("--own-key needs --class-ai")
     home = {"url": a.home_url, "label": a.home_label} if a.home_url else None
+    wall = ""
+    if bool(a.wallpaper) != bool(a.tint):
+        ap.error("--wallpaper and --tint go together")
+    if a.wallpaper:
+        svg = a.wallpaper.read_text(encoding="utf-8")
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}", a.tint):
+            ap.error(f"--tint must be a six-digit hex colour, got {a.tint!r}")
+        if 'viewBox="0 0 100 110"' not in svg or re.search(r"<(text|image|script|style)\b", svg):
+            ap.error(f"{a.wallpaper}: expected a plain line drawing with viewBox 0 0 100 110")
+        wall = wall_css(svg, a.tint)
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.section.strip().upper(),
                            survey, a.demo, a.title, subtitle,
-                           a.codehint, a.accent, a.no_codes, class_ai, home, a.voice), encoding="utf-8")
+                           a.codehint, a.accent, a.no_codes, class_ai, home, a.voice, wall), encoding="utf-8")
 
     # The builder ships with the activity so a teacher can make their own without
     # Python. It embeds this exact template, so the two stay in step by construction.

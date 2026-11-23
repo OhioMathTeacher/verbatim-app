@@ -314,7 +314,14 @@
     .tabs button { font: inherit; font-weight: 600; color: #555; background: none; border: 0;
                    border-bottom: 3px solid transparent; margin-bottom: -2px; padding: 10px 14px; cursor: pointer; }
     .tabs button:hover { color: #222; }
-    .tabs button[aria-selected="true"] { color: #222; border-bottom-color: #2563eb; }
+    /* The same five colors as the activity pages; build.sh checks that they match. */
+    #tab-limits { --c: #b8862f; } #tab-derivatives { --c: #3a6ea5; } #tab-extrema { --c: #7a5aa0; }
+    #tab-integration { --c: #3f8f5f; } #tab-de { --c: #b0506a; }
+    .tabs button[role="tab"] { background: color-mix(in srgb, var(--c) 9%, #fff); border-radius: 9px 9px 0 0;
+                               border-bottom-color: color-mix(in srgb, var(--c) 35%, #fff); color: #444; }
+    .tabs button[role="tab"]:hover { background: color-mix(in srgb, var(--c) 16%, #fff); color: #222; }
+    .tabs button[role="tab"][aria-selected="true"] { background: color-mix(in srgb, var(--c) 22%, #fff); color: #222;
+                                         border-bottom-color: var(--c); }
     .tabnote { color: #555; }
     /* What each task is well suited for (Todd, 29 Oct 2026): a tag only where it fits. */
     .tags { margin: -0.2em 0 0.8em; display: flex; flex-wrap: wrap; gap: 6px; }
@@ -354,12 +361,6 @@
     <a href="getting-a-key.html">your own AI key</a>.</p>
     <p><strong>Teachers:</strong> <a href="teacher.html">set up a class</a> with your own
     Claude API key and choose a passcode for your students.</p>
-    <p>The tags on each one say what it is well suited for: <strong>Graphing</strong>,
-    <strong>Tables</strong>, <strong>Calculating</strong>, or <strong>Discussion</strong> when it
-    is mostly reasoning in words. <strong>Calc AB</strong> or <strong>Calc BC</strong> says which AP
-    Calculus course the topic belongs to. Every Calc AB topic is also in Calc BC. Click a tag to
-    see every activity that has it, and click another to narrow the list. Choose the ones
-    you want to explore.</p>
     <div class="filterbar" id="filterbar" hidden>
       <span id="filtersum" aria-live="polite"></span>
       <button type="button" id="filterclear">Back to the topic tabs</button>
