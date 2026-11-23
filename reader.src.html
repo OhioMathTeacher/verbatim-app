@@ -162,7 +162,7 @@ const T = {
     deleted:"Deleted by the student", deletedn:"deleted by the student",
     restarts:"Started over", restartn:"time(s); the set-aside conversation is at the end",
     setaside:"Set aside by the student", setasideat:"set aside",
-    codeschanged:"Codes changed", wentback:"went back to the start", hadunder:"under",
+    codeschanged:"Codes changed", aichanged:"AI changed", wentback:"went back to the start", hadunder:"under",
     voice:"How the AI sounded at the start", voicechanged:"Voice changed",
     deletedat:"deleted",
     swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
@@ -233,6 +233,9 @@ function render(d){
   const codes = o => [o && o.participant, o && o.group, o && o.section].filter(Boolean).join(" · ") || "—";
   for (const c of (Array.isArray(d.codes_changed) ? d.codes_changed : []))
     h += fact(tr("codeschanged"), `${codes(c.from)} → ${codes(c.to)}`, c.changed_utc || "");
+  const afmt = o => [o && o.provider, o && o.model].filter(Boolean).join(" ") || "—";
+  for (const c of (Array.isArray(d.ai_changes) ? d.ai_changes : []))
+    h += fact(tr("aichanged"), `${afmt(c.from)} → ${afmt(c.to)}`, c.changed_utc || "");
   /* "How your AI teacher sounds": where the session began, and each change shown
      at the point in the conversation where it was made. */
   const vfmt = v => v && typeof v === "object" ? Object.entries(v).map(([k, x]) => `${k} ${x}`).join(" · ") : "—";

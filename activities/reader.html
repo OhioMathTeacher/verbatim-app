@@ -492,7 +492,7 @@ body {
 <p id="err"></p>
 
 <div id="out" class="hide"></div>
-<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.2.1 · 15fb659a</p>
+<p class="ver" title="The version of verbatim that built this reader, and a digest of the code that made it">verbatim 1.2.1 · de7735f8</p>
 </div>
 
 <!-- Temml (MIT), vendored from vendor/temml.min.js and inlined so this file
@@ -686,7 +686,7 @@ const T = {
     deleted:"Deleted by the student", deletedn:"deleted by the student",
     restarts:"Started over", restartn:"time(s); the set-aside conversation is at the end",
     setaside:"Set aside by the student", setasideat:"set aside",
-    codeschanged:"Codes changed", wentback:"went back to the start", hadunder:"under",
+    codeschanged:"Codes changed", aichanged:"AI changed", wentback:"went back to the start", hadunder:"under",
     voice:"How the AI sounded at the start", voicechanged:"Voice changed",
     deletedat:"deleted",
     swords:"from the student", awords:"from the AI", promptsha:"Prompt SHA-256", psource:"Prompt source",
@@ -757,6 +757,9 @@ function render(d){
   const codes = o => [o && o.participant, o && o.group, o && o.section].filter(Boolean).join(" · ") || "—";
   for (const c of (Array.isArray(d.codes_changed) ? d.codes_changed : []))
     h += fact(tr("codeschanged"), `${codes(c.from)} → ${codes(c.to)}`, c.changed_utc || "");
+  const afmt = o => [o && o.provider, o && o.model].filter(Boolean).join(" ") || "—";
+  for (const c of (Array.isArray(d.ai_changes) ? d.ai_changes : []))
+    h += fact(tr("aichanged"), `${afmt(c.from)} → ${afmt(c.to)}`, c.changed_utc || "");
   /* "How your AI teacher sounds": where the session began, and each change shown
      at the point in the conversation where it was made. */
   const vfmt = v => v && typeof v === "object" ? Object.entries(v).map(([k, x]) => `${k} ${x}`).join(" · ") : "—";

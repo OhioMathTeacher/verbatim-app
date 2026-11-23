@@ -3,8 +3,10 @@
 Draft activities built with Verbatim, published so they can be tried on a phone
 without installing anything: <https://ohiomathteacher.github.io/verbatim-app/activities/>
 
-Each page is self-contained. It holds no API key — the reader supplies their own
-through **AI Setup** — and it posts to no server. `getting-a-key.html` is the
+Each page is self-contained and holds no API key. The reader types a class passcode at
+the top, which uses the class's server (`worker/README.md`), or supplies their own key
+through **AI Setup**. `teacher.html` is where a teacher makes a passcode on their own
+Claude key. `getting-a-key.html` is the
 plain-language walkthrough for anyone who has not made one before.
 
 `prompts/` holds the source. To rebuild a page after editing a prompt:

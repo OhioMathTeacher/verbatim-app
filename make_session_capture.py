@@ -290,6 +290,17 @@ h1{font-family:var(--serif);font-size:27px;font-weight:600;letter-spacing:-.01em
 /* Back to the page that lists the activities, when there is one (--home-url). */
 .homelink{display:inline-block;margin:0 0 14px;font-size:13.5px;color:var(--accent);text-decoration:none}
 .homelink:hover{text-decoration:underline}
+/* A class page's top row: the way back, the passcode, and the buttons. */
+.topbar{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin:0 0 16px}
+.topbar .homelink{margin:0 auto 0 0}
+.topbar .mastbtns{margin-left:0}
+.passbar{display:flex;align-items:center;gap:8px;margin:0}
+.passbar label{margin:0;text-transform:none;letter-spacing:0;font-size:13.5px;color:var(--ink)}
+.passbar input{width:165px;padding:7px 10px;font-size:14px;border-radius:9px}
+.passbar button{padding:7px 13px;font-size:13.5px}
+.passbar .state{min-width:15px;font-weight:700;font-size:15px}
+.passbar .state.ok{color:var(--ok)} .passbar .state.bad{color:var(--warn)}
+@media (max-width:520px){.passbar{width:100%}.passbar input{flex:1;width:auto;min-width:0}}
 /* "How your AI teacher sounds": one row per setting, one card per choice. */
 .vrow{margin:0 0 16px}
 .vrow h3{font-size:14px;font-weight:700;margin:0 0 8px}
@@ -583,6 +594,12 @@ try{
 <div class="wrap">
 
 <a class="homelink hide" id="homelink" href="#"></a>
+<form class="passbar hide" id="passbar" autocomplete="off">
+  <label for="pass" data-i18n="passlabel">Passcode:</label>
+  <input id="pass" autocomplete="off" autocapitalize="none" spellcheck="false">
+  <button type="submit" id="pass-enter" data-i18n="passenter">Enter</button>
+  <span class="state" id="pass-state" role="status"></span>
+</form>
 <div class="mast">
   <img class="avatar hide" id="avatar" alt="">
   <h1 data-i18n="title">__TITLE__</h1>
@@ -614,12 +631,7 @@ try{
         <span class="txt" id="ai-status-txt">Not set up yet</span>
         <button type="button" class="ghost" id="ai-open">Set up</button>
       </div>
-      <p class="hint" style="margin-top:10px" data-i18n="aihint">Use your own API key, or the one your instructor gives you.</p>
-    </div>
-    <div class="field hide" id="passwrap">
-      <label for="pass" data-i18n="passlabel">Class passcode</label>
-      <input id="pass" autocomplete="off" spellcheck="false" data-i18n-ph="passph" placeholder="Your teacher will tell you">
-      <p class="hint" style="margin-top:10px" data-i18n="passhint">Your teacher will give you this.</p>
+      <p class="hint" style="margin-top:10px" id="aihint" data-i18n="aihint">Use your own API key, or the one your instructor gives you.</p>
     </div>
     <div class="field hide" id="voicewrap">
       <button type="button" class="ghost" id="voice-open" data-i18n="voiceopen">How your AI teacher sounds</button>
@@ -683,6 +695,7 @@ try{
 </section>
 
 <footer class="foot hide" id="foot"><img class="hide" id="footimg" alt=""><span id="foottext"></span></footer>
+<p class="ver hide" id="teachers" style="opacity:1;font-family:inherit;font-size:13px"><a href="teacher.html" style="color:inherit" data-i18n="forteachers">For teachers</a></p>
 <p class="ver" title="The version of verbatim that built this page, and a digest of the code that made it">verbatim __VERSION__ · __BUILD__</p>
 
 </div>
@@ -794,8 +807,9 @@ const CODES     = __CODES_JSON__;
 let   SURVEY    = __SURVEY_JSON__;
 const FOOTER    = __FOOTER_JSON__;
 const DEMO      = __DEMO_JSON__;
-/* Set when the page was built with --class-ai: the class's Worker and the model it
-   answers with. Null otherwise. See askClass(). */
+/* Set when the page was built with --class-ai: the class's Worker, the model it
+   answers with, and whether a student may use their own key instead (--own-key).
+   Null otherwise. See askClass(). */
 const CLASS_AI  = __CLASS_AI_JSON__;
 /* The page that lists this activity among others (--home-url), or null. */
 const HOME      = __HOME_JSON__;
@@ -876,7 +890,7 @@ if(SECTION){ $("#sec").value = SECTION; $("#secwrap").classList.add("hide"); }
    has, so anything reading sessions already copes with it. */
 if(!CODES){
   for(const id of ["#pidwrap", "#grpwrap", "#codehint"]) $(id).classList.add("hide");
-  /* Kept on a class page: it is where a student retypes a passcode. */
+  /* Kept on a class page: it is where a student changes to a different AI. */
   if(!CLASS_AI) $("#back-start").classList.add("hide");
   if(!SECTION) $("#secwrap").classList.add("hide");
   if($("#grprow").children.length && $("#secwrap").classList.contains("hide"))
@@ -954,10 +968,18 @@ const I18N = {
     errfields: "Participant code, group and section are all required.",
     errcode: "The participant code should be letters and numbers only, e.g. P07. Please do not use your name.",
     errai: "Please set up your AI first.",
-    passlabel: "Class passcode",
-    passph: "Your teacher will tell you",
-    passhint: "Your teacher will give you this. It lets this page use the class's AI, so you do not need an API key. Your messages go through the class's server to Claude, Anthropic's AI, to get replies. The server keeps no copy of them.",
-    errpassneed: "Please type the class passcode your teacher gave you.",
+    passlabel: "Passcode:", passenter: "Enter", classai: "Class AI", forteachers: "For teachers",
+    passok: "Passcode accepted. The class AI is on.",
+    passhint: "Type the passcode from your teacher at the top of the page and press Enter. Your messages go through the class's server to Claude, Anthropic's AI, to get replies. The server keeps no copy of them.",
+    passhintown: "Or press AI Setup to use your own key. Then your messages go straight from this browser to the AI company you choose.",
+    errpassneed: "Please type the passcode from your teacher at the top of the page and press Enter.",
+    errpassneedown: "Please type the passcode from your teacher at the top of the page and press Enter, or press AI Setup to use your own key.",
+    errpassbad: "That passcode was not accepted. Check it with your teacher.",
+    errpassnet: "Could not check the passcode. Check your connection and press Enter again.",
+    errslow: "Too many tries. Wait a few seconds and try again.",
+    erroff: "your teacher has turned this class off.",
+    errclasskey: "the key behind this passcode was not accepted. Please tell your teacher.",
+    errclasscredit: "the key behind this passcode is out of credit. Please tell your teacher.",
     voiceopen: "How your AI teacher sounds",
     voicebtn: "How it sounds",
     voiceh: "How your AI teacher sounds",
@@ -973,7 +995,7 @@ const I18N = {
     vsteps: "Clear steps", vstepsd: "Tell me the plan as we go",
     vmixed: "Some of each",
     vexplore: "Let me explore", vexplored: "Leave room to find my own way",
-    errpass: "the class passcode was not accepted. Press Back to the start and type it again.",
+    errpass: "the passcode was not accepted. Type it again at the top of the page and press Enter.",
     errcap: "this conversation has used all of today's turns with the class AI.",
     errcapclass: "the class AI has reached its limit for today.",
     errclassup: "the class AI's server could not get a reply.",
@@ -1120,7 +1142,10 @@ const SS = {
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
 const K_PROV = "tea.ai.provider", K_ENDS = "tea.ai.endpoints";
-const K_PASS = "tea.ai.passcode";   // a class build only; kept like a key, for the same reason
+/* A class build only. The passcode is saved once the Worker has accepted it, and kept
+   like a key, for the same reason. K_MODE is "own" while the student is using their own
+   AI instead; a class page starts on the passcode whatever a student set up elsewhere. */
+const K_PASS = "tea.ai.passcode", K_MODE = "tea.ai.mode";
 const K_KEY  = id => "tea.ai.key." + id;
 
 /* Which services this network can reach.
@@ -1140,11 +1165,17 @@ let showAddEndpoint = false, localModels = {};
 const endpoints    = () => { try{ return JSON.parse(SS.get(K_ENDS) || "[]"); }catch(e){ return []; } };
 const setEndpoints = a  => SS.set(K_ENDS, JSON.stringify(a));
 
+/* Is the class passcode what this page would use? Choosing your own AI in AI Setup
+   turns it off; entering a passcode turns it back on. */
+const onClass = () => !!CLASS_AI && !(CLASS_AI.own_key && SS.get(K_MODE) === "own");
+const useOwn  = () => { if(CLASS_AI) SS.set(K_MODE, "own"); };
+const useClass = () => SS.del(K_MODE);
+
 function aiConfig(){
-  /* A class build has one AI and nothing to choose. The passcode stands where a
-     key would, so everything that asks "is the AI ready" works unchanged. */
-  if(CLASS_AI) return { id: "class", api: "class", url: CLASS_AI.url, model: CLASS_AI.model,
-                        label: "Claude", key: SS.get(K_PASS) || "" };
+  /* The passcode stands where a key would, so everything that asks "is the AI
+     ready" works unchanged. */
+  if(onClass()) return { id: "class", api: "class", url: CLASS_AI.url, model: CLASS_AI.model,
+                         label: tr("classai"), key: SS.get(K_PASS) || "" };
   const id = SS.get(K_PROV);
   if(!id) return null;
   if(id.startsWith("webgpu:")){
@@ -1168,12 +1199,59 @@ const aiLive  = () => { const c = aiConfig(); return !!c && (c.local || !!c.key)
 const aiReady = () => DEMO || aiLive();
 const demoActive = () => DEMO && !aiLive();
 
-/* A class build keeps all of AI Setup in the page but shows none of it: the gear
-   and the provider line go, and the passcode field takes their place. */
+/* A class page carries the passcode in a row along the top, with the buttons, where it
+   stays in reach during the conversation (after Matrix Explorer). AI Setup is beside it
+   only when the page was built with --own-key. */
 if(CLASS_AI){
-  for(const id of ["#gear", "#aiwrap"]) $(id).classList.add("hide");
-  $("#passwrap").classList.remove("hide");
+  const top = document.createElement("div"); top.className = "topbar";
+  $("#homelink").before(top);
+  top.append($("#homelink"), $("#passbar"), $(".mastbtns"));
+  $("#passbar").classList.remove("hide");
+  $("#aihint").dataset.i18n = "passhint";
+  if(CLASS_AI.own_key){
+    const more = document.createElement("p");
+    more.className = "hint"; more.style.marginTop = "6px"; more.dataset.i18n = "passhintown";
+    $("#aihint").after(more);
+    $("#teachers").classList.remove("hide");
+  }else for(const id of ["#gear", "#ai-open"]) $(id).classList.add("hide");
   $("#pass").value = SS.get(K_PASS) || "";
+  /* A passcode kept from before may have been changed since. */
+  if($("#pass").value && onClass()) enterPass();
+  $("#pass").addEventListener("input", () => passState(null));
+  $("#passbar").onsubmit = e => { e.preventDefault(); enterPass(); };
+}
+function passState(ok, key){
+  const el = $("#pass-state");
+  el.className = "state" + (ok === null ? "" : ok ? " ok" : " bad");
+  el.textContent = ok === null ? "" : ok ? "\u2713" : "\u2717";
+  el.title = key ? tr(key) : "";
+}
+/* The Worker says whether the passcode is right without calling the AI, so a student
+   knows at once. Returns the text of what went wrong, or "". */
+async function enterPass(){
+  const v = $("#pass").value.trim();
+  const say = (key, forget) => {
+    if(forget) SS.del(K_PASS);
+    passState(false, key); refreshAiStatus();
+    const text = tr(key), shown = text.charAt(0).toUpperCase() + text.slice(1);
+    $("#setup-err").textContent = shown;
+    if(S && !$("#s-chat").classList.contains("hide")) $("#chat-err").textContent = shown;
+    return shown;
+  };
+  if(!v){ SS.del(K_PASS); useClass(); passState(null); refreshAiStatus(); return ""; }
+  let r;
+  try{
+    r = await fetch(CLASS_AI.url + "/check", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passcode: v }) });
+  }catch(e){ return say("errpassnet"); }
+  if(r.status === 429) return say("errslow");
+  if(r.status === 403) return say("erroff", true);
+  if(r.status === 401) return say("errpassbad", true);
+  if(!r.ok) return say("errpassnet");
+  SS.set(K_PASS, v); useClass(); passState(true, "passok");
+  $("#setup-err").textContent = ""; $("#chat-err").textContent = "";
+  refreshAiStatus();
+  return "";
 }
 if(VOICE_ON){
   for(const id of ["#voicewrap", "#voice-chat"]) $(id).classList.remove("hide");
@@ -1203,12 +1281,12 @@ function refreshAiStatus(){
        off. Saying only "ready" during that first download would be a lie the
        student discovers by pressing Send and waiting, so the percentage is
        carried out here, where it is visible with the dialog closed. */
-    $("#ai-status-txt").textContent = c.label + " · " + (c.short || c.model)
+    $("#ai-status-txt").textContent = (c.api === "class" ? tr("passok") : c.label + " · " + (c.short || c.model))
       + (c.webgpu && wgpuPhase === "getting" ? "  " + Math.round(wgpuPct * 100) + "%" : "");
     el.classList.add("ready"); return;
   }
   if(demoActive()){ $("#ai-status-txt").textContent = tr("demomode"); el.classList.add("ready"); return; }
-  $("#ai-status-txt").textContent = c ? (c.label + " — " + tr("keyneeded")) : tr("notset");
+  $("#ai-status-txt").textContent = c && c.api !== "class" ? (c.label + " — " + tr("keyneeded")) : tr("notset");
   el.classList.remove("ready");
 }
 
@@ -1478,8 +1556,10 @@ async function answers(url){
 /* Runs once at load, silently. The student never asks for this and never sees it
    happen -- by the time they open AI Setup the list is simply the services that
    work here. A student is choosing an AI teacher, not diagnosing a network. */
+let probing = false;
 async function probeProviders(){
   if(DEMO) return;                       // no network in a demo build
+  probing = true;
   await Promise.all(PROVIDERS.map(async p => {
     reach[p.id] = (await answers(p.url)) ? "yes" : "no";
     if($("#ai-modal-overlay").classList.contains("open")) renderCards();
@@ -1528,7 +1608,7 @@ function renderCards(){
   $("#ai-selected").appendChild(sb);
   $("#ai-foot").textContent = tr(aiTab === "webgpu" ? "footlocal" : aiTab === "free" ? "footfree" : "footpaid");
   $("#ai-err").textContent = "";
-  const current = SS.get(K_PROV);
+  const current = onClass() ? null : SS.get(K_PROV);
 
   if(aiTab === "webgpu"){
     for(const m of (webgpuOK() ? (wgpuList || []) : [])){
@@ -1539,7 +1619,7 @@ function renderCards(){
              badge2: m.rec ? tr("badgerec") : null, selected: current === id,
              /* Choosing the model is what starts the download. The failure is
                 already drawn in the panel, so nothing is rethrown at the page. */
-             onClick: () => { SS.set(K_PROV, id); showAddEndpoint = false;
+             onClick: () => { SS.set(K_PROV, id); useOwn(); showAddEndpoint = false;
                               $("#ai-key-section").hidden = true; $("#ai-endpoint-section").hidden = true;
                               renderCards(); refreshAiStatus();
                               webgpuEngineFor(m.id).catch(() => {}); } });
@@ -1549,7 +1629,7 @@ function renderCards(){
         const id = "local:" + url + "|" + m;
         card({ title: m, model: url, desc: tr("cardlocaldesc"),
                badge: tr("badgelocal"), badgeClass: "local", selected: current === id,
-               onClick: () => { SS.set(K_PROV, id); showAddEndpoint = false;
+               onClick: () => { SS.set(K_PROV, id); useOwn(); showAddEndpoint = false;
                                 $("#ai-key-section").hidden = true; $("#ai-endpoint-section").hidden = true;
                                 renderCards(); refreshAiStatus(); } });
       }
@@ -1575,6 +1655,8 @@ function renderCards(){
            badge2: p.recommended ? tr("badgerec") : null,
            selected: current === p.id,
            onClick: () => { SS.set(K_PROV, p.id); showAddEndpoint = false;
+                            /* Without a key yet, the passcode stays in use until one is saved. */
+                            if(SS.get(K_KEY(p.id)) || !CLASS_AI || !SS.get(K_PASS)) useOwn();
                             $("#ai-endpoint-section").hidden = true;
                             showKeyEntry(p); renderCards(); refreshAiStatus(); } });
   }
@@ -1606,7 +1688,7 @@ function keyShapeWarning(p, v){
 async function commitKey(opts){
   const id = SS.get(K_PROV), v = $("#ai-key-input").value.trim();
   if(!id || !v) return;
-  SS.set(K_KEY(id), v); $("#ai-key-input").value = "";
+  SS.set(K_KEY(id), v); useOwn(); $("#ai-key-input").value = "";
   $("#ai-key-input").placeholder = tr("keysaved");
   refreshAiStatus();
   const p = PROVIDERS.find(x => x.id === id);
@@ -1636,6 +1718,7 @@ async function testKey(warn){
 /* ---- wiring ---- */
 $("#gear").onclick = $("#ai-open").onclick = () => {
   $("#ai-modal-overlay").classList.add("open");
+  if(CLASS_AI && !probing) probeProviders();
   const c = aiConfig();
   if(c && c.webgpu) aiTab = "webgpu";
   else if(c && !c.local){ const p = PROVIDERS.find(x => x.id === c.id); if(p){ aiTab = p.tier; showKeyEntry(p); } }
@@ -1694,6 +1777,7 @@ $("#ai-forget").onclick = () => {
   if(!doomed.length){ $("#ai-err").textContent = tr("forgotnone"); return; }
   if(!confirm(tr("forgetconfirm"))) return;
   for(const k of doomed) SS.del(k);
+  if(CLASS_AI && SS.get(K_PASS)) useClass();
   $("#ai-key-input").value = "";
   const c = aiConfig();
   if(c && !c.local){ const pp = PROVIDERS.find(x => x.id === c.id); if(pp) showKeyEntry(pp); }
@@ -1705,20 +1789,23 @@ $("#ai-forget").onclick = () => {
 $("#ai-test").onclick = () => { const c = aiConfig(); if(c && c.webgpu) testKey(""); else commitKey(); };
 
 refreshAiStatus();
-probeProviders();
+/* A class page talks to nobody but the class's server unless the student asks for
+   their own AI, so there the check waits until AI Setup is opened. */
+if(!CLASS_AI) probeProviders();
 
 $("#go-setup").onclick = async () => {
   const pid = CODES ? $("#pid").value.trim().toUpperCase() : "";
   const grp = CODES ? $("#grp").value.trim().toUpperCase() : "";
   const sec = CODES ? $("#sec").value.trim().toUpperCase() : (SECTION || "");
-  const cfg = aiConfig();
   if(CODES && (!pid || !grp || !sec)){ $("#setup-err").textContent = tr("errfields"); return; }
-  if(CLASS_AI){
-    const pass = $("#pass").value.trim();
-    if(!pass){ $("#setup-err").textContent = tr("errpassneed"); return; }
-    SS.set(K_PASS, pass);
+  /* A passcode typed but not entered is entered by Start. */
+  const typed = CLASS_AI ? $("#pass").value.trim() : "";
+  if(CLASS_AI && typed !== (SS.get(K_PASS) || "") && (typed || onClass()) && await enterPass()) return;
+  if(!DEMO && !aiReady()){
+    $("#setup-err").textContent = tr(!CLASS_AI || !onClass() ? "errai" : CLASS_AI.own_key ? "errpassneedown" : "errpassneed");
+    return;
   }
-  if(!DEMO && !aiReady()){ $("#setup-err").textContent = tr("errai"); return; }
+  const cfg = aiConfig();
   if(pid && /[^A-Z0-9-]/.test(pid)){ $("#setup-err").textContent = tr("errcode"); return; }
   $("#setup-err").textContent = "";
   /* Back from "Back to the start": the same session, not a new one. */
@@ -1978,9 +2065,24 @@ function apiMessages(){
   return m;
 }
 
+/* Which AI is answering, checked before every request. `provider` and `model` name the
+   one in use now; ai_changes records each change made during the conversation, with when,
+   after which turn, and from what to what, so every turn can still be traced to the AI
+   that wrote it. */
+function noteAi(){
+  const c = aiConfig();
+  if(!c || !aiLive()) return;
+  if(S.provider === c.id && S.model === c.model) return;
+  (S.ai_changes = S.ai_changes || []).push({ changed_utc: nowUTC(), after_turn: S.turns.length - 1,
+    from: { provider: S.provider, model: S.model }, to: { provider: c.id, model: c.model } });
+  S.provider = c.id; S.model = c.model;
+  save(); header();
+}
+
 let busy = false;
 async function turnFromAI(){
   if(busy) return;
+  noteAi();
   busy = true; $("#send").disabled = true; $("#chat-err").textContent = "";
   const wait = document.createElement("div");
   wait.className = "turn ai";
@@ -2109,7 +2211,11 @@ async function askClass(c, messages){
     body: JSON.stringify({ passcode: c.key, sid: S.session_id, messages }) });
   let d = {};
   try{ d = await r.json(); }catch(e){}
-  if(r.status === 401){ SS.del(K_PASS); $("#pass").value = ""; throw new Error(tr("errpass")); }
+  if(d.error === "passcode"){ SS.del(K_PASS); passState(false, "errpassbad"); refreshAiStatus(); throw new Error(tr("errpass")); }
+  if(d.error === "off") throw new Error(tr("erroff"));
+  if(d.error === "slow") throw new Error(tr("errslow"));
+  if(d.error === "key") throw new Error(tr("errclasskey"));
+  if(d.error === "credit") throw new Error(tr("errclasscredit"));
   if(d.error === "cap") throw new Error(tr("errcap"));
   if(d.error === "cap-class") throw new Error(tr("errcapclass"));
   if(d.error === "refusal") throw new Error("Claude declined to answer that message.");
@@ -2712,9 +2818,11 @@ $("#restart").onclick = async () => {
   if(!S.turns.some(t => t.role === "student")){ $("#chat-err").textContent = tr("errsay"); return; }
   if(!confirm(tr("restartconfirm"))) return;
   (S.set_aside = S.set_aside || []).push(Object.assign({ set_aside_utc: nowUTC(), turns: S.turns,
-    tool_uses: S.tool_uses || [] }, S.voice_changes ? { voice_changes: S.voice_changes } : {}));
+    tool_uses: S.tool_uses || [] }, S.voice_changes ? { voice_changes: S.voice_changes } : {},
+    S.ai_changes ? { ai_changes: S.ai_changes } : {}));
   S.turns = []; S.tool_uses = []; Calculator.restore([]);
   if(S.voice_changes) S.voice_changes = [];
+  delete S.ai_changes;
   aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
   save(); render(); header(); window.scrollTo(0, 0);
   await turnFromAI();
@@ -2739,9 +2847,11 @@ $("#back-start").onclick = () => {
     (S.set_aside = S.set_aside || []).push({ set_aside_utc: nowUTC(), reason: "back_to_start",
       participant: S.participant, group: S.group, section: S.section,
       provider: S.provider, model: S.model, turns: S.turns, tool_uses: S.tool_uses || [],
-      ...(S.voice_changes ? { voice_changes: S.voice_changes } : {}) });
+      ...(S.voice_changes ? { voice_changes: S.voice_changes } : {}),
+      ...(S.ai_changes ? { ai_changes: S.ai_changes } : {}) });
   S.turns = []; S.tool_uses = []; Calculator.restore([]);
   if(S.voice_changes) S.voice_changes = [];
+  delete S.ai_changes;
   aiDoneAt = null; composeStart = null; $("#chat-err").textContent = "";
   S.at_start = true;
   save(); toStart();
@@ -3022,9 +3132,9 @@ def build(providers: list[dict], prompt: dict, submit: dict, chat_url: str,
           class_ai: dict | None = None, home: dict | None = None,
           voice: bool = False) -> str:
     # Deliberately NOT published to the page: url and key. The page names a
-    # provider; the student supplies the credential. A class build offers no
-    # provider at all: the Worker is the only AI it calls.
-    pub = [] if class_ai else pub_providers(providers)
+    # provider; the student supplies the credential. A class build offers providers
+    # only with --own-key; otherwise the Worker is the only AI it calls.
+    pub = [] if class_ai and not class_ai["own_key"] else pub_providers(providers)
     return (TEMPLATE
             .replace("__PROVIDERS_JSON__", json.dumps(pub, ensure_ascii=False))
             .replace("__PROMPT_JSON__", json.dumps(prompt, ensure_ascii=False))
@@ -3088,8 +3198,11 @@ def main() -> int:
     ap.add_argument("--class-ai", default="", metavar="URL",
                     help="the class's Worker (worker/README.md), e.g. "
                          "https://verbatim-class.<account>.workers.dev. Students type the "
-                         "class passcode instead of setting up an AI, and never see or hold "
-                         "a key. AI Setup stays in the page but is not shown.")
+                         "class passcode at the top of the page instead of setting up an AI. "
+                         "AI Setup stays in the page but is not shown, unless --own-key.")
+    ap.add_argument("--own-key", action="store_true",
+                    help="with --class-ai: show AI Setup beside the passcode, so a student "
+                         "may use their own key instead, and link to teacher.html")
     ap.add_argument("--home-url", default="",
                     help="a link back to the page that lists this activity, e.g. index.html")
     ap.add_argument("--home-label", default="All activities")
@@ -3190,7 +3303,9 @@ def main() -> int:
         if not re.match(r"https://|http://(127\.0\.0\.1|localhost)[:/]", url + "/"):
             ap.error("--class-ai must be an https:// URL (or http://127.0.0.1 for testing)")
         conf = tomllib.loads((HERE / "worker" / "wrangler.toml").read_text(encoding="utf-8"))
-        class_ai = {"url": url, "model": conf["vars"]["MODEL"]}
+        class_ai = {"url": url, "model": conf["vars"]["MODEL"], "own_key": a.own_key}
+    elif a.own_key:
+        ap.error("--own-key needs --class-ai")
     home = {"url": a.home_url, "label": a.home_label} if a.home_url else None
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(build(provs, prompt, submit, a.chat_url, avatar, a.footer, a.section.strip().upper(),
@@ -3237,8 +3352,9 @@ def main() -> int:
         return 0
 
     if class_ai:
-        print(f"  class AI          : {class_ai['url']}  ({class_ai['model']}); AI Setup hidden")
-        print("  keys              : none in this file or the student's hands; they type the passcode")
+        print(f"  class AI          : {class_ai['url']}  ({class_ai['model']}); AI Setup {'shown' if class_ai['own_key'] else 'hidden'}")
+        print("  keys              : none in this file; students type the passcode"
+              + (" or use their own key" if class_ai["own_key"] else ""))
     else:
         print(f"  providers offered : {', '.join(p['id'] for p in provs)}")
         print("  keys              : entered by the student in AI Setup; none in this file")

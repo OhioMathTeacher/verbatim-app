@@ -2,6 +2,9 @@
 # Secrets (set once with `npx wrangler secret put NAME`, never in this file):
 #   ANTHROPIC_API_KEY   a key made for Verbatim alone, with its own monthly limit in Console
 #   PASSCODE            the phrase the teacher gives the class
+#   PASSCODE_<NAME>     more of the same, one per teacher, all on ANTHROPIC_API_KEY
+#   CLASS_KEY           random; encrypts the keys teachers save on activities/teacher.html.
+#                       Never replace it: a new one makes every saved key unreadable.
 name = "verbatim-class"
 main = "src/worker.js"
 compatibility_date = "2026-09-01"

@@ -19,23 +19,25 @@ cd "$(dirname "$0")/.."
 # is uploaded to the internet", which is false -- the page calls the provider's
 # API from the student's browser. What is true is that no copy comes to us until
 # the student hands the file in, and that it is posted to no website.
-TAIL_CLASS="Type the class passcode and your codes below to begin. Your conversation is saved on this device as you go, and the words you send go through the class's server to Claude, Anthropic's AI, to get replies, and nowhere else. The server keeps no copy of them. When you have finished, download the file and turn it in on the course LMS. This conversation is your coursework. With your permission and your parent's, a copy with your name removed may also be used in a research study at Miami University. Saying yes or no makes no difference to your grade."
+TAIL_CLASS="Type the class passcode at the top of the page and your codes below to begin. Your conversation is saved on this device as you go, and the words you send go through the class's server to Claude, Anthropic's AI, to get replies, and nowhere else. The server keeps no copy of them. When you have finished, download the file and turn it in on the course LMS. This conversation is your coursework. With your permission and your parent's, a copy with your name removed may also be used in a research study at Miami University. Saying yes or no makes no difference to your grade."
 # What the pages say while they are demonstrations: no codes to enter, nothing
 # handed in, no research use.
-TAIL="Type the class passcode below to begin. Your conversation is saved on this device as you go, and the words you send go through the class's server to Claude, Anthropic's AI, to get replies, and nowhere else. The server keeps no copy of them. When you have finished, you can download the conversation as a file."
+TAIL="Type the passcode from your teacher at the top of the page to begin, or press AI Setup to use your own AI key. Your conversation is saved on this device as you go. The words you send go to the AI to get replies, and nowhere else. When you have finished, you can download the conversation as a file."
 
 # The one switch. Demo (the default) builds with --no-codes and the demo TAIL;
 # "class" asks for codes again and uses the TAIL_CLASS wording.
 MODE="${1:-demo}"
 
-# The eight activities call Claude through the class's Worker (worker/README.md):
-# students type the class passcode and never see a key, and AI Setup is in the
-# page but not shown (decided 29 Oct 2026). Each links back to the activities
-# page. Set VERBATIM_CLASS_AI to try a build against a Worker on 127.0.0.1.
+# The activities call Claude through the class's Worker (worker/README.md):
+# students type the class passcode at the top of the page and never see a key.
+# The demonstrations also show AI Setup, for using your own key instead, and a
+# link to teacher.html (decided 23 Nov 2026, after Matrix Explorer). A class
+# build keeps AI Setup in the page but not shown, as decided 29 Oct 2026. Each
+# links back to the activities page. Set VERBATIM_CLASS_AI to try a build against a Worker on 127.0.0.1.
 CLASS_AI="${VERBATIM_CLASS_AI:-https://verbatim-class.ohiomathteacher.workers.dev}"
 case "$MODE" in
-  demo)  CODES="--no-codes" ;;
-  class) CODES=""; TAIL="$TAIL_CLASS" ;;
+  demo)  CODES="--no-codes"; OWN="--own-key" ;;
+  class) CODES=""; OWN=""; TAIL="$TAIL_CLASS" ;;
   *)     echo "usage: bash activities/build.sh [demo|class]" >&2; exit 2 ;;
 esac
 
@@ -117,7 +119,7 @@ capture \
   --prompt activities/prompts/1-pendulum-approximation.txt \
   --out activities/activity-1-pendulum.html \
   --survey "$(learn_survey pendulum "This assignment helped me understand how to decide when an approximation is good enough.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#9a5734' \
   --title    "How small is small enough?" \
@@ -127,7 +129,7 @@ capture \
   --prompt activities/prompts/2-scaling-square-cube.txt \
   --out activities/activity-2-scaling.html \
   --survey "$(learn_survey scaling "This assignment helped me understand how weight and strength change when something is made bigger.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7a5c1f' \
   --title    "Why can't a spider be the size of a horse?" \
@@ -137,7 +139,7 @@ capture \
   --prompt activities/prompts/3-speedometer-limits.txt \
   --out activities/activity-3-speedometer.html \
   --survey "$(learn_survey speedometer "This assignment helped me understand what speed at a single instant means.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3f5f7a' \
   --title    "What does the speedometer mean?" \
@@ -147,7 +149,7 @@ capture \
   --prompt activities/prompts/5-record-chain-rule.txt \
   --out activities/activity-5-record.html \
   --survey "$(learn_survey record "$CHAIN_EN")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6b4a6e' \
   --title    "Why was the last song the worst?" \
@@ -162,7 +164,7 @@ capture \
   --prompt activities/prompts/6-gears-chain-rule.txt \
   --out activities/activity-6-gears.html \
   --survey "$(learn_survey gears "$CHAIN_EN")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6f6a' \
   --title    "Why does the same pedalling give you different speeds?" \
@@ -172,7 +174,7 @@ capture \
   --prompt activities/prompts/7-uphill-chain-rule.txt \
   --out activities/activity-7-uphill.html \
   --survey "$(learn_survey uphill "$CHAIN_EN")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6a7a2f' \
   --title    "How much colder does it get when you walk uphill?" \
@@ -182,7 +184,7 @@ capture \
   --prompt activities/prompts/8-clock-chain-rule.txt \
   --out activities/activity-8-clock.html \
   --survey "$(learn_survey clock "$CHAIN_EN")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a3f52' \
   --title    "How does one swing of a pendulum become an hour?" \
@@ -195,7 +197,7 @@ capture \
   --prompt activities/prompts/9-growth-races-lhopital.txt \
   --out activities/activity-9-growth.html \
   --survey "$(learn_survey growth "This assignment helped me understand how to compare two quantities that both grow without bound (L'Hôpital's rule).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3d6b8f' \
   --title    "Which grows faster in the end?" \
@@ -205,7 +207,7 @@ capture \
   --prompt activities/prompts/10-sprinter-splits.txt \
   --out activities/activity-10-sprinter.html \
   --survey "$(learn_survey sprinter "This assignment helped me understand what a derivative means in context, with its units.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a5a2b' \
   --title    "When was the sprinter fastest?" \
@@ -215,7 +217,7 @@ capture \
   --prompt activities/prompts/11-streetlight-shadow.txt \
   --out activities/activity-11-shadow.html \
   --survey "$(learn_survey shadow "This assignment helped me understand how the speed of one thing can follow from the speed of another (related rates).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#556b2f' \
   --title    "How fast does your shadow move?" \
@@ -225,7 +227,7 @@ capture \
   --prompt activities/prompts/12-cone-cup.txt \
   --out activities/activity-12-cup.html \
   --survey "$(learn_survey cup "This assignment helped me understand how a steady rate of filling can give a changing rate of rise (related rates).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7b3f7a' \
   --title    "Why does the cup fill fast, then slowly?" \
@@ -235,7 +237,7 @@ capture \
   --prompt activities/prompts/13-speed-camera-mvt.txt \
   --out activities/activity-13-camera.html \
   --survey "$(learn_survey camera "This assignment helped me understand what the Mean Value Theorem guarantees, and what it does not.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f5e8a' \
   --title    "Can a camera prove you were speeding?" \
@@ -245,7 +247,7 @@ capture \
   --prompt activities/prompts/15-still-rising.txt \
   --out activities/activity-15-rising.html \
   --survey "$(learn_survey rising "This assignment helped me understand what the first and second derivatives say about how something is changing.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#4a6a5a' \
   --title    "Still rising, but more slowly" \
@@ -255,7 +257,7 @@ capture \
   --prompt activities/prompts/16-soup-can.txt \
   --out activities/activity-16-can.html \
   --survey "$(learn_survey can "This assignment helped me understand how to set up and solve an optimization problem, and what a model leaves out.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6a5a8a' \
   --title    "Why are soup cans that shape?" \
@@ -269,7 +271,7 @@ capture \
   --prompt activities/prompts/17-ev-energy.txt \
   --out activities/activity-17-ev.html \
   --survey "$(learn_survey ev "This assignment helped me understand how a total, like the energy in a battery, is built up from a rate (the Fundamental Theorem of Calculus).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6a4f' \
   --title    "Can an Electric Vehicle Recover Enough Energy to Make It Home?" \
@@ -279,7 +281,7 @@ capture \
   --prompt activities/prompts/18-fan-cooling.txt \
   --out activities/activity-18-fan.html \
   --survey "$(learn_survey fan "This assignment helped me understand how a rate adds up to a total, and how to keep that total under a limit (the Fundamental Theorem of Calculus).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#8a4a2f' \
   --title    "A Smart Cooling System: When Should the Fan Turn On?" \
@@ -289,7 +291,7 @@ capture \
   --prompt activities/prompts/19-robot-motion.txt \
   --out activities/activity-19-robot.html \
   --survey "$(learn_survey robot "This assignment helped me understand how velocity determines distance travelled (the Fundamental Theorem of Calculus), and why equal distances can mean very different motion.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#4f5a8a' \
   --title    "Design Smooth Robot Motion: Fast, Safe, or Energy-Efficient?" \
@@ -299,7 +301,7 @@ capture \
   --prompt activities/prompts/20-battery-charging.txt \
   --out activities/activity-20-battery.html \
   --survey "$(learn_survey battery "This assignment helped me understand how something can go on forever and still add up to a finite total (improper integrals).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6f6a2a' \
   --title    "Will a Battery Ever Finish Charging?" \
@@ -309,7 +311,7 @@ capture \
   --prompt activities/prompts/21-deep-space.txt \
   --out activities/activity-21-space.html \
   --survey "$(learn_survey space "This assignment helped me understand when a total collected over an endless journey stays finite (improper integrals).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#3a4f6f' \
   --title    "Can a Spacecraft Communicate Across an Infinite Distance?" \
@@ -319,7 +321,7 @@ capture \
   --prompt activities/prompts/22-failure-risk.txt \
   --out activities/activity-22-risk.html \
   --survey "$(learn_survey risk "This assignment helped me understand how a rare but severe outcome can make an average loss infinite (improper integrals).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#7a2f3f' \
   --title    "The Million-Dollar Engineering Failure: How Much Safety Is Enough?" \
@@ -333,7 +335,7 @@ capture \
   --prompt activities/prompts/23-euler-coffee.txt \
   --out activities/activity-23-coffee.html \
   --survey "$(learn_survey coffee "This assignment helped me understand how to estimate a solution to a differential equation one step at a time (Euler's method).")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#6a4a2f' \
   --title    "Why did the coffee get colder than the room?" \
@@ -343,7 +345,7 @@ capture \
   --prompt activities/prompts/24-logistic-virus.txt \
   --out activities/activity-24-virus.html \
   --survey "$(learn_survey virus "This assignment helped me understand what a logistic differential equation says about growth, its limit and when it is fastest, without solving it.")" \
-  $CODES --class-ai "$CLASS_AI" --home-url index.html --voice \
+  $CODES --class-ai "$CLASS_AI" $OWN --home-url index.html --voice \
   --codehint "$CODEHINT" \
   --accent '#2f6a7a' \
   --title    "How far can a computer virus spread?" \

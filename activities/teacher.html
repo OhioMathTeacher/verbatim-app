@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Verbatim · For teachers</title>
+<!--
+  Teacher setup for Verbatim's class AI, after Matrix Explorer's /teacher page.
+
+  A teacher pastes their own Claude key and picks a passcode; the Worker (worker/src/worker.js)
+  tests the key, stores it encrypted, and returns a teacher code. Students type the passcode at
+  the top of an activity and their turns use this teacher's key. The key never comes back to
+  any browser, this one included. The teacher code is the only way to manage the class later.
+-->
+<style>
+    body { font: 16px/1.5 system-ui, sans-serif; background: #f6f4ef; color: #222; margin: 0; }
+    .container { max-width: 736px; margin: 40px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 18px; }
+    h1 { font-size: 2em; margin: 0; } h1 small { font-weight: 400; color: #666; font-size: .55em; }
+    h2 { font-size: 1.2em; margin: 0; }
+    p { margin: 0; } a { color: #2563eb; }
+    .lead, .hint, footer { color: #5c5c58; } .hint, footer { font-size: .87em; }
+    .panel { background: #fffefa; border: 1px solid #e2ded3; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    label { font-weight: 700; font-size: .93em; }
+    input { font: inherit; border: 1px solid #cfcabd; border-radius: 7px; padding: 8px 10px; background: #f9f7f1; color: #222; width: 100%; box-sizing: border-box; }
+    .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .95em; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .row input { flex: 1 1 12em; width: auto; }
+    .btn { border: 1px solid #cfcabd; background: #fffefa; color: #222; border-radius: 7px; padding: 8px 14px; font: inherit; font-size: .93em; cursor: pointer; }
+    .btn.primary { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 700; }
+    .btn.danger { color: #a3430f; border-color: #d9a588; }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .msg { font-size: .93em; min-height: 1.4em; } .msg.bad { color: #a3430f; } .msg.ok { color: #1d7044; }
+    .result { border: 2px solid #1d7044; background: #eaf5ee; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .big { font: 600 1.35em/1.3 ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
+    .warnbox { background: #fbefe2; border-left: 4px solid #c7722a; padding: 8px 12px; border-radius: 6px; font-size: .93em; }
+    dl.facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin: 0; } dl.facts dt { color: #5c5c58; } dl.facts dd { margin: 0; }
+    .state { font-weight: 700; } .state.on { color: #1d7044; } .state.off { color: #a3430f; }
+    #manage { display: flex; flex-direction: column; gap: 14px; }
+    [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <p><a href="index.html">← All activities</a></p>
+  <h1>Verbatim <small>· For teachers</small></h1>
+  <p class="lead">Give your students the AI on your own Claude key. You choose a passcode. Students type it at the top of any activity and press Enter. They never see your key, and neither does anyone else.</p>
+
+  <section class="panel" aria-labelledby="hNew">
+    <h2 id="hNew">Create a class</h2>
+    <div class="field">
+      <label for="key">Your Claude API key</label>
+      <input id="key" class="mono" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
+      <p class="hint">Make one at <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">platform.claude.com → API keys</a>, and add only the credit the class needs. The key is tested now and stored encrypted. It is never shown again, even to you.</p>
+    </div>
+    <div class="field">
+      <label for="pass">Passcode for your students</label>
+      <div class="row"><input id="pass" class="mono" type="text" autocomplete="off" spellcheck="false"><button class="btn" id="bSuggest" type="button">Suggest one</button></div>
+      <p class="hint">At least 6 letters or digits. Capitals, spaces and dashes don't matter when students type it.</p>
+    </div>
+    <div class="field">
+      <label for="name">Class name (optional)</label>
+      <input id="name" type="text" autocomplete="off" maxlength="80">
+    </div>
+    <div class="row"><button class="btn primary" id="bCreate" type="button">Create class</button></div>
+    <p class="msg" id="createMsg" aria-live="polite"></p>
+    <div class="result" id="result" hidden>
+      <div><div class="hint">Students type this passcode:</div><div class="big" id="rPass"></div></div>
+      <div><div class="hint">Your teacher code (to manage this class later):</div><div class="big" id="rCode"></div></div>
+      <div class="warnbox">Save your teacher code now. It is the only way to turn this class off, change the passcode or replace the key. It cannot be recovered.</div>
+      <div class="row"><button class="btn" id="bCopy" type="button">Copy both</button><button class="btn" id="bSave" type="button">Save as a file</button><button class="btn primary" id="bGoManage" type="button">Manage this class</button></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="hManage">
+    <h2 id="hManage">Manage a class</h2>
+    <div class="field">
+      <label for="tcode">Teacher code</label>
+      <div class="row"><input id="tcode" class="mono" type="text" autocomplete="off" spellcheck="false" placeholder="T-XXXX-XXXX-XXXX"><button class="btn primary" id="bOpen" type="button">Open</button></div>
+    </div>
+    <p class="msg" id="manageMsg" aria-live="polite"></p>
+    <div id="manage" hidden>
+      <dl class="facts">
+        <dt>Class</dt><dd id="fName"></dd>
+        <dt>Passcode</dt><dd class="mono" id="fPass"></dd>
+        <dt>Status</dt><dd><span class="state" id="fState"></span></dd>
+        <dt>Questions today</dt><dd id="fToday"></dd>
+        <dt>Questions in all</dt><dd id="fTotal"></dd>
+      </dl>
+      <div class="row"><button class="btn primary" id="bToggle" type="button"></button><button class="btn" id="bRefresh" type="button">Refresh</button></div>
+      <div class="field"><label for="newPass">New passcode</label><div class="row"><input id="newPass" class="mono" type="text" autocomplete="off"><button class="btn" id="bNewPass" type="button">Change</button></div></div>
+      <div class="field"><label for="newKey">Replace the Claude key</label><div class="row"><input id="newKey" class="mono" type="password" autocomplete="off" placeholder="sk-ant-…"><button class="btn" id="bNewKey" type="button">Change</button></div></div>
+      <div class="row"><button class="btn danger" id="bDelete" type="button">Delete this class</button></div>
+    </div>
+  </section>
+
+  <footer>What is stored: your key and passcode (encrypted), the class name, and counts of questions. No student names and no conversation text. Students' conversations stay on their own computers.</footer>
+</div>
+<script>
+(function(){
+'use strict';
+// The class's Worker. On this machine, a Worker run with `npx wrangler dev --ip 127.0.0.1`.
+var API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://127.0.0.1:8787' : 'https://verbatim-class.ohiomathteacher.workers.dev';
+var T = {
+  creating:'Testing your key with Claude…', rPass:'Students type this passcode:', rCode:'Your teacher code (to manage this class later):',
+  copied:'Copied.', opening:'Opening…', on:'On: students can use it', off:'Off: the passcode does nothing', turnOff:'Turn off', turnOn:'Turn on',
+  confirmDelete:"Delete this class for good? Students' passcode will stop working, and the stored key is erased.", deleted:'Class deleted.', saved:'Saved.', none:'(none)'
+};
+var ERR = {
+  'key-format':'That does not look like a Claude key (it starts with sk-ant-).','key-rejected':'Claude did not accept that key.',
+  'key-model':'That key works, but it may not use the model these activities run on.','key-unchecked':'Could not reach Claude to test the key. Try again in a minute.',
+  'passcode-short':'The passcode needs at least 6 letters or digits.','passcode-taken':'That passcode is already used by another class. Choose another.',
+  'teacher-code':'That teacher code was not found.','slow':'Too many tries. Wait a few seconds and try again.','classes-off':'Teacher classes are not set up on this site yet.', network:'Network problem. Try again.'
+};
+var $ = function(id){ return document.getElementById(id); };
+function L(k){ return T[k]; }
+function E(code){ return ERR[code] || code; }
+
+function post(path, body){
+  return fetch(API + path, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
+    .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(d){ d._status = r.status; return d; }); },
+          function(){ return {error:'network'}; });
+}
+function say(id, text, kind){ var m = $(id); m.textContent = text || ''; m.className = 'msg' + (kind ? ' ' + kind : ''); }
+
+// Passcode suggestions: two words and a number, easy to write on a board and say aloud.
+var W1 = ['orbit','prime','vector','matrix','sigma','delta','cosine','tensor','radix','lambda','theta','gauss'];
+var W2 = ['tiger','river','maple','comet','harbor','falcon','meadow','lantern','summit','willow','ember','crane'];
+function suggest(){
+  var r = crypto.getRandomValues(new Uint8Array(3));
+  return W1[r[0] % W1.length] + '-' + W2[r[1] % W2.length] + '-' + (10 + r[2] % 90);
+}
+$('pass').value = suggest();
+$('bSuggest').addEventListener('click', function(){ $('pass').value = suggest(); });
+
+var made = null;
+$('bCreate').addEventListener('click', function(){
+  $('result').hidden = true; $('bCreate').disabled = true; say('createMsg', L('creating'));
+  post('/class/create', {key:$('key').value, passcode:$('pass').value, name:$('name').value}).then(function(d){
+    $('bCreate').disabled = false;
+    if (!d.ok){ say('createMsg', E(d.error || 'network'), 'bad'); return; }
+    say('createMsg', '');
+    made = d; $('key').value = '';
+    $('rPass').textContent = d.passcode; $('rCode').textContent = d.teacherCode;
+    $('result').hidden = false;
+    try { localStorage.setItem('verbatim-teacher-code', d.teacherCode); } catch(e) {}
+  });
+});
+function summary(){ return 'Verbatim\n' + (made.name ? made.name + '\n' : '') + L('rPass') + ' ' + made.passcode + '\n' + L('rCode') + ' ' + made.teacherCode + '\n' + location.href.split(/[?#]/)[0] + '\n'; }
+$('bCopy').addEventListener('click', function(){
+  try { navigator.clipboard.writeText(summary()).then(function(){ say('createMsg', L('copied'), 'ok'); }); } catch(e) { prompt('', summary()); }
+});
+$('bSave').addEventListener('click', function(){
+  var url = URL.createObjectURL(new Blob([summary()], {type:'text/plain;charset=utf-8'})), a = document.createElement('a');
+  a.href = url; a.download = 'verbatim-class-' + made.passcode + '.txt'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);      // see Journaler: iOS reads the blob after click()
+});
+$('bGoManage').addEventListener('click', function(){ $('tcode').value = made.teacherCode; manage('status'); $('hManage').scrollIntoView({behavior:'smooth'}); });
+
+var current = null;
+function show(d){
+  current = d;
+  $('manage').hidden = false;
+  $('fName').textContent = d.name || L('none');
+  $('fPass').textContent = d.passcode;
+  $('fState').textContent = d.active ? L('on') : L('off'); $('fState').className = 'state ' + (d.active ? 'on' : 'off');
+  $('fToday').textContent = d.today + ' / ' + d.dailyCap;
+  $('fTotal').textContent = d.questions;
+  $('bToggle').textContent = d.active ? L('turnOff') : L('turnOn');
+}
+function manage(action, extra){
+  var body = {teacherCode:$('tcode').value.trim(), action:action};
+  for (var k in (extra || {})) body[k] = extra[k];
+  say('manageMsg', L('opening'));
+  return post('/class/manage', body).then(function(d){
+    if (d.deleted){ current = null; $('manage').hidden = true; say('manageMsg', L('deleted'), 'ok'); try { localStorage.removeItem('verbatim-teacher-code'); } catch(e) {} return; }
+    if (!d.ok){ say('manageMsg', E(d.error || 'network'), 'bad'); return; }
+    show(d); say('manageMsg', action === 'status' ? '' : L('saved'), action === 'status' ? '' : 'ok');
+    try { localStorage.setItem('verbatim-teacher-code', body.teacherCode); } catch(e) {}
+  });
+}
+$('bOpen').addEventListener('click', function(){ manage('status'); });
+$('tcode').addEventListener('keydown', function(e){ if (e.key === 'Enter') manage('status'); });
+$('bRefresh').addEventListener('click', function(){ manage('status'); });
+$('bToggle').addEventListener('click', function(){ manage(current && current.active ? 'off' : 'on'); });
+$('bNewPass').addEventListener('click', function(){ manage('passcode', {passcode:$('newPass').value}).then(function(){ $('newPass').value = ''; }); });
+$('bNewKey').addEventListener('click', function(){ manage('key', {key:$('newKey').value}).then(function(){ $('newKey').value = ''; }); });
+$('bDelete').addEventListener('click', function(){ if (confirm(L('confirmDelete'))) manage('delete'); });
+
+try { var saved = localStorage.getItem('verbatim-teacher-code'); if (saved) $('tcode').value = saved; } catch(e) {}
+})();
+</script>
+</body>
+</html>
